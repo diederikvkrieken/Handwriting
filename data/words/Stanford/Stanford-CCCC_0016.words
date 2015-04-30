@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding = "UTF-8"?>
 <Image name="Stanford-CCCC_0016">
-    <TextLine no="1" top="119" bottom="410" left="133" right="468" shear="0">
-        <Word no="1" top="119" bottom="410" left="133" right="164" shear="0" text="s"/>
+    <TextLine no="1" top="300" bottom="410" left="133" right="468" shear="0">
+        <Word no="1" top="300" bottom="410" left="133" right="164" shear="0" text="s"/>
         <Word no="2" top="308" bottom="395" left="411" right="468" shear="0" text="h"/>
     </TextLine>
     <TextLine no="2" top="467" bottom="520" left="56" right="92" shear="0">
