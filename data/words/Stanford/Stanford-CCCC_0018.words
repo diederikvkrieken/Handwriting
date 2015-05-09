@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding = "UTF-8"?>
 <Image name="Stanford-CCCC_0018">
-    <TextLine no="1" top="93" bottom="402" left="109" right="147" shear="0">
-        <Word no="1" top="93" bottom="402" left="109" right="147" shear="0" text="d"/>
+    <TextLine no="1" top="300" bottom="402" left="109" right="147" shear="0">
+        <Word no="1" top="300" bottom="402" left="109" right="147" shear="0" text="d"/>
     </TextLine>
     <TextLine no="2" top="429" bottom="517" left="607" right="1850" shear="0">
         <Word no="1" top="430" bottom="517" left="788" right="831" shear="0" text="p"/>
@@ -103,13 +103,13 @@
         <Word no="3" top="3301" bottom="3395" left="866" right="921" shear="0" text="h"/>
         <Word no="4" top="3312" bottom="3436" left="990" right="1035" shear="0" text="@thorn"/>
     </TextLine>
-    <TextLine no="26" top="3427" bottom="3885" left="577" right="1927" shear="0">
-        <Word no="1" top="3427" bottom="3885" left="1691" right="1927" shear="0" text="thonne"/>
+    <TextLine no="26" top="3427" bottom="3585" left="577" right="1927" shear="0">
+        <Word no="1" top="3427" bottom="3585" left="1691" right="1927" shear="0" text="thonne"/>
         <Word no="2" top="3427" bottom="3564" left="1691" right="1736" shear="0" text="@thorn"/>
-        <Word no="3" top="3427" bottom="3728" left="1691" right="1893" shear="0" text="thonne"/>
-        <Word no="4" top="3427" bottom="3857" left="1691" right="1920" shear="0" text="thonne"/>
-        <Word no="5" top="3427" bottom="3791" left="1691" right="1914" shear="0" text="thonne"/>
-        <Word no="6" top="3427" bottom="3727" left="1691" right="1895" shear="0" text="thonne"/>
+        <Word no="3" top="3427" bottom="3528" left="1691" right="1893" shear="0" text="thonne"/>
+        <Word no="4" top="3427" bottom="3557" left="1691" right="1920" shear="0" text="thonne"/>
+        <Word no="5" top="3427" bottom="3591" left="1691" right="1914" shear="0" text="thonne"/>
+        <Word no="6" top="3427" bottom="3527" left="1691" right="1895" shear="0" text="thonne"/>
         <Word no="7" top="3446" bottom="3501" left="577" right="615" shear="0" text="c"/>
     </TextLine>
 </Image>
