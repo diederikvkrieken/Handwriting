@@ -19,6 +19,20 @@ class PreProcessor:
         # Reads the input file
         self.orig = pamImage.PamImage(inputPPM)
 
+    def cropCV(self, image, inxml):
+        lines, name = wordio.read(inxml)
+        # Cut image
+        crops = []  # Array of tuples (cropped images, text)
+        for line in lines:
+            # Iterate over lines
+            for region in line:
+                # Iterate over regions (words/characters)
+                crops.append((image[region.top:region.bottom,
+                              region.left:region.right], region.text))
+
+        # Return array
+        return crops
+
     # Cuts regions from an image and returns these in an array
     def cut(self, inxml):
         # Read in a words xml

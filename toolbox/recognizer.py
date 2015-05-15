@@ -8,6 +8,8 @@ Next, a similar approach is used on 'novel' pictures.
 
 import sys
 import prepImage
+import numpy
+import cv2
 
 
 class Recognizer:
@@ -20,14 +22,19 @@ class Recognizer:
 
     def main(self, ppm, words):
         prepper = prepImage.PreProcessor()
+        img = cv2.imread(ppm)
+
         prepper.read(ppm)
-        crops = prepper.cut(words)
+        crops = prepper.cropCV(img, words)
         print "crops length: ", len(crops)
 
         # Testing to print crop
-        ppmfileout = open('tmp.ppm', 'wb')
-        prepper.writeppm(crops.pop()[0], ppmfileout)
-        ppmfileout.close()
+        #ppmfileout = open('tmp.ppm', 'wb')
+        crop = crops.pop()[0]
+        cv2.imshow('test', crops[9][0])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        #ppmfileout.close()
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
