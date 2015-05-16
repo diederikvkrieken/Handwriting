@@ -5,6 +5,7 @@ and outputs this as .ppm
 """
 
 import wordio, pamImage, croplib
+import cv2
 
 
 class PreProcessor:
@@ -17,8 +18,9 @@ class PreProcessor:
 
     def read(self, inputPPM):
         # Reads the input file
-        self.orig = pamImage.PamImage(inputPPM)
+        self.orig = cv2.imread(inputPPM)
 
+    # Crops an image based on a words xml
     def cropCV(self, image, inxml):
         lines, name = wordio.read(inxml)
         # Cut image
@@ -33,7 +35,18 @@ class PreProcessor:
         # Return array
         return crops
 
-    # Cuts regions from an image and returns these in an array
+    # Subtracts background from image
+    def bgSub(self):
+        pass
+
+    # Binarizes image based on threshold
+    def binarize(self):
+        # Convert to grayscale
+        self.gray = cv2.cvtColor(self.orig, cv2.COLOR_BGR2GRAY)
+        # Binarize, NOTE: Uses Otsu's method!
+        (thresh, self.bw) = cv2.threshold(self.gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
+    # Obsolete method using provided code
     def cut(self, inxml):
         # Read in a words xml
         lines, name = wordio.read(inxml)
@@ -54,31 +67,3 @@ class PreProcessor:
 
         # Return array
         return crops
-
-    # def binarize(self):
-    #     # Binarizes the image
-    #     for pixel in self.orig:
-    #         if (pixel > threshold):
-    #             # One, otherwise zero
-
-    # Ripped code from the net to write ppm
-    def writeppm(self, ppm, f, ppmformat='P6'):
-        assert ppmformat in ['P3', 'P6'], 'Format wrong'
-        maxval = max(max(max(bit) for bit in row) for row in ppm.map)
-        assert ppmformat == 'P3' or 0 <= maxval < 256, 'R,G,B must fit in a byte'
-        if ppmformat == 'P6':
-            fwrite = lambda s: f.write(bytes(s, 'UTF-8'))
-            maxval = 255
-        else:
-            fwrite = f.write
-            numsize=len(str(maxval))
-        fwrite('%i %i\n%i\n' % (ppm.width, ppm.height, maxval))
-        for h in range(ppm.height-1, -1, -1):
-            for w in range(ppm.width):
-                r, g, b = ppm.get(w, h)
-                if ppmformat == 'P3':
-                    fwrite('   %*i %*i %*i' % (numsize, r, numsize, g, numsize, b))
-                else:
-                    fwrite('%c%c%c' % (r, g, b))
-            if ppmformat == 'P3':
-                fwrite('\n')

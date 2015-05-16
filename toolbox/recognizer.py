@@ -21,20 +21,30 @@ class Recognizer:
         pass
 
     def main(self, ppm, words):
-        prepper = prepImage.PreProcessor()
-        img = cv2.imread(ppm)
-
+        # Read and preprocess
+        prepper = prepImage.PreProcessor()  # Initialize preprocessor
         prepper.read(ppm)
-        crops = prepper.cropCV(img, words)
+        crops = prepper.cropCV(prepper.orig, words)  # Crop words
+        # Debug print
         print "crops length: ", len(crops)
-
-        # Testing to print crop
-        #ppmfileout = open('tmp.ppm', 'wb')
         crop = crops.pop()[0]
         cv2.imshow('test', crops[9][0])
         cv2.waitKey(0)
+        # pre-processing
+        prepper.bgSub()
+        prepper.binarize()
+        cv2.imshow('binarized', prepper.bw)
+        cv2.waitKey(0)
+
+        # feature extraction
+
+
+        # classification
+
+
+        # results
+
         cv2.destroyAllWindows()
-        #ppmfileout.close()
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
