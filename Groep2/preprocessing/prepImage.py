@@ -6,6 +6,7 @@ and outputs this as .ppm
 
 from toolbox import wordio
 import cv2
+import numpy as np
 
 
 class PreProcessor:
@@ -23,17 +24,24 @@ class PreProcessor:
     # Crops an image based on a words xml
     def cropCV(self, image, inxml):
         lines, name = wordio.read(inxml)
-        # Cut image
-        crops = []  # Array of tuples (cropped images, text)
+
+        # Arrays of tuples (cropped images, text)
+        words = []
+        characters = []
+
+        # Cut from image
         for line in lines:
             # Iterate over lines
-            for region in line:
-                # Iterate over regions (words/characters)
-                crops.append((image[region.top:region.bottom,
-                              region.left:region.right], region.text))
+            for word in line:
+                # Add regions (words/characters) to respective arrays
+                words.append((image[word.top:word.bottom,
+                              word.left:word.right], word.text))
+                for character in word.characters:
+                    characters.append((image[character.top:character.bottom,
+                                       character.left:character.right], character.text))
 
-        # Return array
-        return crops
+        # Return arrays
+        return words, characters
 
     # Subtracts background from image
     def bgSub(self):

@@ -10,7 +10,7 @@ import sys
 
 import cv2
 
-from Groep2.opencv_test import prepImage
+from Groep2.preprocessing import prepImage
 
 
 class Recognizer:
@@ -25,17 +25,17 @@ class Recognizer:
         # Read and preprocess
         prepper = prepImage.PreProcessor()  # Initialize preprocessor
         prepper.read(ppm)
-        crops = prepper.cropCV(prepper.orig, words)  # Crop words
+        words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
         # Debug print
-        print "crops length: ", len(crops)
-        crop = crops.pop()[0]
-        cv2.imshow('test', crops[9][0])
+        print "crops length: ", len(words)
+        crop = words.pop()[0]
+        cv2.imshow('test', words[9][0])
         cv2.waitKey(0)
         # pre-processing
         prepper.bgSub()
         prepper.binarize()
-        cv2.imshow('binarized', prepper.bw)
-        cv2.waitKey(0)
+        # cv2.imshow('binarized', prepper.bw)
+        # cv2.waitKey(0)
 
         # feature extraction
 
