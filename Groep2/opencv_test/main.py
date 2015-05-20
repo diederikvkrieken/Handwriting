@@ -1,4 +1,4 @@
-__author__ = 'jasper'
+__author__ = 'Diederik, Diederik, Jasper, Sebastiaan, Pieter'
 
 import cv2
 import numpy as np

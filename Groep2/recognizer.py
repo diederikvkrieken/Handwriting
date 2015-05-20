@@ -7,9 +7,10 @@ Next, a similar approach is used on 'novel' pictures.
 """
 
 import sys
-import prepImage
-import numpy
+
 import cv2
+
+from Groep2.opencv_test import prepImage
 
 
 class Recognizer:

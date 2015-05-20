@@ -1,8 +1,11 @@
-from css import CurvatureScaleSpace, SlicedCurvatureScaleSpace
-from contourpreprocess import findContour
 import numpy as np
-from skimage import io
+
 import matplotlib.pyplot as plt
+
+from css import CurvatureScaleSpace
+from contourpreprocess import findContour
+from skimage import io
+
 
 def run():
 	

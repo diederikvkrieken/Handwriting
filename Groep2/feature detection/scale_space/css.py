@@ -1,6 +1,8 @@
-from utils import gaussian_kernel, compute_curvature
-import matplotlib.pyplot as plt
 import numpy as np
+
+import matplotlib.pyplot as plt
+
+from utils import gaussian_kernel, compute_curvature
 
 
 class CurvatureScaleSpace(object):
