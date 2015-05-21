@@ -21,20 +21,22 @@ class Recognizer:
     def __init__(self):
         pass
 
-    def main(self, ppm, words):
+    def main(self, ppm, inwords):
         # Read and preprocess
         prepper = prepImage.PreProcessor()  # Initialize preprocessor
-        prepper.read(ppm)
-        words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
-        # Debug print
-        print "crops length: ", len(words)
-        crop = words.pop()[0]
-        cv2.imshow('test', words[9][0])
-        cv2.waitKey(0)
-        # pre-processing
-        prepper.bgSub()
-        prepper.binarize()
-        # cv2.imshow('binarized', prepper.bw)
+        words = prepper.prep(ppm, inwords)
+        for word in words:
+            cv2.imshow('Cropped word: %s' % word[1], word[0])
+            cv2.waitKey(0)
+
+        # # For reference if we want characters
+        # words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
+        # # Debug print
+        # print "crops length: ", len(words)
+        # crop = words.pop()[0]
+        # cv2.imshow('testWord', words[9][0])
+        # cv2.waitKey(0)
+        # cv2.imshow('testCharacter', chars[9][0])
         # cv2.waitKey(0)
 
         # feature extraction

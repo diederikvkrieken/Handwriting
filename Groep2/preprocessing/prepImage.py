@@ -17,9 +17,10 @@ class PreProcessor:
     def __init__(self):
         pass
 
+    # Reads a ppm as grayscale
     def read(self, inputPPM):
         # Reads the input file
-        self.orig = cv2.imread(inputPPM)
+        self.orig = cv2.imread(inputPPM, cv2.IMREAD_GRAYSCALE)
 
     # Crops an image based on a words xml
     def cropCV(self, image, inxml):
@@ -44,15 +45,41 @@ class PreProcessor:
         return words, characters
 
     # Subtracts background from image
-    def bgSub(self):
-        pass
+    def bgSub(self, img):
+        # blur image a bit to prevent most speckles from noise
+        img = cv2.GaussianBlur(img,(5,5),0)
 
-    # Binarizes image based on threshold
-    def binarize(self):
-        # Convert to grayscale
-        self.gray = cv2.cvtColor(self.orig, cv2.COLOR_BGR2GRAY)
-        # Binarize, NOTE: Uses Otsu's method!
-        (thresh, self.bw) = cv2.threshold(self.gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        # Make bigger blur and subtract to get rid of background
+        blur = cv2.GaussianBlur(img,(55,55),0)
+        img = np.float32(img) - np.float32(blur)
+
+        # return contrast stretched image
+        return np.uint8(cv2.normalize(img,img,0,255,cv2.NORM_MINMAX))
+
+    # Binarizes image and uses that as mask
+    def binarize(self, img):
+        # Binarize image with the Otsu method. Set object pixels to 1, background to zero
+        (thr, binary) = cv2.threshold(img, 0, 1, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+        # Use binary image as mask
+        return (img * binary)
+
+    # Preprocesses provided image
+    def prep(self, inimg, inxml):
+        # Crop all words from image
+        self.read(inimg)
+        words, characters = self.cropCV(self.orig, inxml)
+
+        # For all words, subtract background, binarize and multiply with original
+        prossed = []    # New list for tuples because tuples are immutable...
+        for w in words:
+            pros = self.bgSub(w[0])
+            pros = self.binarize(w[0])
+            prossed.append((pros, w[1]))
+
+        # Return pre-processed words
+        return prossed
+
 
     # Obsolete method using provided code
     # def cut(self, inxml):
