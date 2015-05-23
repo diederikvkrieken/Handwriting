@@ -11,6 +11,8 @@ import sys
 import cv2
 
 from Groep2.preprocessing import prepImage
+from Groep2.features import featExtraction
+from Groep2.classification import classification
 
 
 class Recognizer:
@@ -25,29 +27,41 @@ class Recognizer:
         # Read and preprocess
         prepper = prepImage.PreProcessor()  # Initialize preprocessor
         words = prepper.prep(ppm, inwords)
+
+        # Debug show
         for word in words:
             cv2.imshow('Cropped word: %s' % word[1], word[0])
             cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
         # # For reference if we want characters
         # words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
-        # # Debug print
-        # print "crops length: ", len(words)
-        # crop = words.pop()[0]
-        # cv2.imshow('testWord', words[9][0])
-        # cv2.waitKey(0)
-        # cv2.imshow('testCharacter', chars[9][0])
-        # cv2.waitKey(0)
 
-        # feature extraction
+        ## Feature extraction
+        feat = featExtraction.Features()
+
+        # Iterate through words to extract features
+        features = []   # List containing all features
+        classes = []    # List containing class (word) features belong to
+        for word in words:
+            features.append(feat.css(word[0]))
+            classes.append(word[1])
+        # NOTE: these are in order! Do not shuffle or you lose correspondence.
+
+        ## Classification
+        cls = classification.Classification()
+
+        cls.data(features, classes) # Prepare dataset
+        # Cross-validation
+        # Split train/test
+
+        # Train on features
+
+        # Test classifiers
+
+        ## results
 
 
-        # classification
-
-
-        # results
-
-        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

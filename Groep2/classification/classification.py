@@ -1,26 +1,22 @@
-"Container for classification"
+"""
+Container for classification
+"""
 
-import sklearn  # Very useful package
+import randomForest as RF
+import svm
 
 class Classification():
 
-    class RandomForest():
+    # Prepare all classifiers
+    def __init__(self):
+        self.classifiers = []   # Array of all classifiers
 
-        def __init__(self):
-            self.RF = sklearn.ensemble.RandomForestClassifier()
+        # Append all useful classifiers
+        self.classifiers.append(RF.RandomForest())
+        self.classifiers.append(svm.SVM())
 
-        def train(self):
-            #TODO training RF
-            pass
-
-        def test(self):
-            #TODO testing RF
-            pass
-
-    class SVM():
-
-        def __init__(self):
-            self.svm = sklearn.svm()
-
-        def train(self, data):
-            self.svm.fit(data)
+    # Take data and prepare for training and testing
+    def data(self, feat, goal):
+        # Split into train and test
+        
+        pass
