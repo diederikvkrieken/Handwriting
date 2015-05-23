@@ -47,17 +47,16 @@ class Recognizer:
             features.append(feat.css(word[0]))
             classes.append(word[1])
         # NOTE: these are in order! Do not shuffle or you lose correspondence.
+        # zip() is also possible of course, but I simply do not feel the need. :)
+
+        #TODO this is a debug classification problem
+        # features = range(100)
+        # classes = [0] * 50 + [1] * 50
 
         ## Classification
         cls = classification.Classification()
 
-        cls.data(features, classes) # Prepare dataset
-        # Cross-validation
-        # Split train/test
-
-        # Train on features
-
-        # Test classifiers
+        cls.fullPass(features, classes) # Just a full run
 
         ## results
 

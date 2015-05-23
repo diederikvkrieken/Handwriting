@@ -7,10 +7,9 @@ class RandomForest(rfc):
             super(RandomForest, self).__init__()
             self.name = 'Random Forest'
 
-        def train(self):
-            #TODO training RF
-            pass
+        def train(self, feat, goal):
+            print feat, goal
+            super(RandomForest, self).fit(feat, goal)
 
-        def test(self):
-            #TODO testing RF
-            pass
+        def test(self, feat):
+            return super(RandomForest, self).predict(feat)

@@ -1,10 +1,13 @@
-from sklearn import svm
+from sklearn.svm import SVC
 
-class SVM(svm):
+class SVM(SVC):
 
         def __init__(self):
             super(SVM, self).__init__()
             self.name = 'SVM'
 
-        def train(self, data):
-            super(SVM, self).fit(data)
+        def train(self, feat, goal):
+            super(SVM, self).fit(feat, goal)
+
+        def test(self, feat):
+            super(SVM, self).predict(feat)
