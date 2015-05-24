@@ -44,7 +44,7 @@ class PreProcessor:
         return words, characters
 
     # Subtracts background from image
-    def bgSub(self):
+    def bgSub(self, img):
         pass
 
     # Binarizes image based on threshold
