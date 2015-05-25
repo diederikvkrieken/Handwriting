@@ -32,7 +32,7 @@ class CurvatureScaleSpace(object):
 
     def generate_css(self, curve, max_sigma, step_sigma):
 		""" generate_css(curve, max_sigma, step_sigma)
-        Generates a CSS image representation by repetatively smoothing the initial curve L_0 with increasing sigma
+        Generates a CSS image representation by repetitively smoothing the initial curve L_0 with increasing sigma
         """
         
 		cols = curve[0, :].size

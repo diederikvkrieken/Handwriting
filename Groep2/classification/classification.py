@@ -1,26 +1,92 @@
-"Container for classification"
+"""
+Container for classification
+"""
 
-import sklearn  # Very useful package
+import randomForest as RF
+import svm
+from sklearn.cross_validation import KFold as kf
 
 class Classification():
 
-    class RandomForest():
+    # Prepare all classifiers
+    def __init__(self):
+        # Dictionary of all classifiers
+        self.classifiers = {'RF': RF.RandomForest(),
+                            'SVM': svm.SVM()}
+        self.perf = {}  # Dictionary of performances
 
-        def __init__(self):
-            self.RF = sklearn.ensemble.RandomForestClassifier()
+    # Take data and prepare for training and testing
+    def data(self, feat, goal):
+        # Store data
+        self.feat = feat
+        self.goal = goal
 
-        def train(self):
-            #TODO training RF
-            pass
+        # 4-fold cross validation, implying each fold 75% train / 25% test
+        self.folds = kf(len(feat), n_folds=4, shuffle=True)
 
-        def test(self):
-            #TODO testing RF
-            pass
+    # Prepares fold n
+    def n_fold(self, n):
+        # Sorry.. could not think of a nicer way..
+        for fold, [tri, tei] in enumerate(self.folds):
+            if n == fold:
+                # Indices of instances
+                self.train_idx = tri
+                self.test_idx = tei
 
-    class SVM():
+    # Trains all algorithms on current training set
+    def train(self):
+        for name, classifier in self.classifiers.iteritems():
+            classifier.train([self.feat[idx] for idx in self.train_idx],
+                             [self.goal[idx] for idx in self.train_idx])
 
-        def __init__(self):
-            self.svm = sklearn.svm()
+    # Lets all algorithms predict classes of the current test set
+    def test(self):
+        self.predictions = {}   # Dictionary of predictions
+        for name, cls in self.classifiers.iteritems():
+            self.predictions[name] = cls.test([self.feat[idx] for idx in self.test_idx])
 
-        def train(self, data):
-            self.svm.fit(data)
+        return self.predictions
+
+    # Assesses performance of all classifiers
+    def assess(self):
+        #TODO more performance measures?
+
+        # Consider every algorithm
+        for name, classifier in self.classifiers.iteritems():
+            er = 0                          # No errors at start
+            exp = self.predictions[name]    # Get predictions
+            # Run over predictions
+            for idx in range(0, len(exp)):
+                # Compare prediction with goal
+                if exp[idx] != self.goal[self.test_idx[idx]]:
+                    # Incorrect prediction, increment error
+                    er += 1
+
+            # Store performance in dictionary
+            self.perf[name].append(er)
+
+        # Return all outcomes
+        return self.perf
+
+    # Nicely prints results of classifiers
+    def dispRes(self):
+        # Go through all folds
+        for i in range(0, len(self.folds)):
+            print 'fold %d:\n\tclassifier\terrors\ttotal' % i+1
+            for name, er in self.perf:
+                print '%s\t%d\t%d' % name, er, len(self.test_idx)
+            print '\n------------------------------------------'
+
+    # Applies all classifiers on provided data
+    def fullPass(self, feat, goal):
+        self.data(feat, goal)
+        # Train and test on each fold
+        for n, [train_i, test_i] in enumerate(self.folds):
+            self.n_fold(n)
+            self.train()
+            self.test()
+            self.assess()
+
+        self.dispRes()
+        return self.perf
+

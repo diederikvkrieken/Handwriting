@@ -4,19 +4,10 @@ import matplotlib.pyplot as plt
 
 from css import CurvatureScaleSpace
 from contourpreprocess import findContour
-from skimage import io
+import cv2
 
 
-def run():
-	
-	import sys
-	
-	if len(sys.argv) != 2:
-		print "Usage: %s <image>" % sys.argv[0]
-		sys.exit(1)
-	
-	# Read image
-	img = io.imread(sys.argv[1])
+def run(img):
 	
 	# Find contour
 	fc = findContour(img)
@@ -38,5 +29,12 @@ def run():
 	
 	plt.show()
 
+
 if __name__ == '__main__':
-    run()
+	import sys
+
+	if len(sys.argv) != 2:
+		print "Usage: %s <image>" % sys.argv[0]
+		sys.exit(1)
+
+	run(cv2.imread(sys.argv[1]))
