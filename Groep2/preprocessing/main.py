@@ -4,16 +4,16 @@ import cv2
 import numpy as np
 
 # load an color image in grayscale
-img = cv2.imread('stigui.jpg', cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
 
 # blur image a bit to prevent most speckles from noise
 img = cv2.GaussianBlur(img,(3,3),0)
 
-"""
+
 
 cv2.imshow('original', img)
 
-
+"""
 
 
 
@@ -45,17 +45,38 @@ img = np.uint8(cv2.normalize(sub,sub,0,255,cv2.NORM_MINMAX))
 """
 
 # Binarize image with the Otsu method. Set object pixels to 0, background to zero
-binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-binary2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 31, 0)
+binary = cv2.threshold(img, 0, 1, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+binary2 = cv2.adaptiveThreshold(img, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 41, 0)
 
 
 binaryRes = binary & binary2
 
-cv2.imshow("binary", binary)
-cv2.imshow("binary2", binary2)
-cv2.imshow("binaryres", binaryRes)
+#find contours won't work good with border connected contours, so we use a 1 px border to disconnect them from the border
+binaryRes = cv2.copyMakeBorder(binaryRes, 1, 1, 1, 1, cv2.BORDER_CONSTANT, binaryRes, 255)
 
+cv2.imshow("binary", binary * 255)
+cv2.imshow("binary2", binary2 * 255)
+cv2.imshow("binaryres", binaryRes * 255)
 
+(cnts, _) = cv2.findContours(binaryRes.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+mask = np.ones(binaryRes.shape[:2], dtype="uint8") * 255
+
+# loop over the contours
+for c in cnts:
+	# if the contour is bad, draw it on the mask
+	if cv2.contourArea(c) < 200:
+		cv2.drawContours(mask, [c], -1, 0, -1)
+
+binaryRes = cv2.bitwise_and(binaryRes, binaryRes, mask=mask)
+
+#remove the border:
+rows, cols = binaryRes.shape
+binaryRes = binaryRes[1:rows-1, 1:cols-1]
+
+cv2.imshow("mask", mask)
+cv2.imshow("binaryres after removal", binaryRes * 255)
+
+"""
 # derotate
 binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (40,1)), None, None, 1)
 binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
@@ -87,7 +108,7 @@ if abs(rotation) > 10:
 M = cv2.getRotationMatrix2D((cols/2, rows/2), rotation, 1)
 img = cv2.warpAffine(img, M, (cols,rows))
 cv2.imshow("derotated", img)
-
+"""
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()

@@ -56,13 +56,69 @@ class PreProcessor:
         # return contrast stretched image
         return np.uint8(cv2.normalize(img,img,0,255,cv2.NORM_MINMAX))
 
-    # Binarizes image and uses that as mask
+    # Binarizes image and uses that as mask. Returns an image with 0 as background and 255 as object
     def binarize(self, img):
         # Binarize image with the Otsu method. Set object pixels to 1, background to zero
-        (thr, binary) = cv2.threshold(img, 0, 1, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+        # Binarize image with adaptive thresholding. This function uses a gaussian kernel to
+        # calculate the threshold value of a certain pixel
+        binary2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 31, 0)
 
-        # Use binary image as mask
-        return (img * binary)
+        # Combine the result of both Otsu and the local thresholding method
+        binaryRes = binary & binary2
+
+        # Find contours won't work good with border connected contours, so we use a 1 px border to disconnect them from the border
+        binaryRes = cv2.copyMakeBorder(binaryRes, 1, 1, 1, 1, cv2.BORDER_CONSTANT, binaryRes, 255)
+
+        # Steps for removing small contours from the binary image
+        (cnts, _) = cv2.findContours(binaryRes.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        mask = np.ones(binaryRes.shape[:2], dtype="uint8") * 255
+
+        for c in cnts:
+            # If the contour is bad, draw it on the mask
+            if cv2.contourArea(c) < 200:
+                cv2.drawContours(mask, [c], -1, 0, -1)
+
+        binaryRes = cv2.bitwise_and(binaryRes, binaryRes, mask=mask)
+
+        #remove the border:
+        rows, cols = binaryRes.shape
+        binaryRes = binaryRes[1:rows-1, 1:cols-1]
+
+        # return the resulting binary mask
+        return (binaryRes)
+
+    # Derotates all images in images list using a thresholded version
+    def derotate(self, binary, images):
+
+        # smear out the binary image to get one large blob
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (40,1)), None, None, 1)
+        # remove some extended parts of the big blob (the top of f's, bottom of p's etc)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1,20)), None, None, 1)
+
+        cpy = binary.copy()
+        cnt = cv2.findContours(cpy, 0, 2)[0][0]
+
+        # Finds the surounding box of the image and it's rotation
+        rect = cv2.minAreaRect(cnt)
+
+        # Apply rotation to all images in images list
+        new_list = []
+        for image in images:
+            rows, cols = image.shape
+            rotation = rect[2]
+
+            # Sometimes rotation is 90 degrees off:
+            if abs(rotation) > 10:
+                rotation += 90
+
+            # Apply the rotation
+            M = cv2.getRotationMatrix2D((cols/2, rows/2), rotation, 1)
+            img = cv2.warpAffine(img, M, (cols,rows))
+
+            new_list.append(img)
+        return new_list
 
     # Preprocesses provided image
     def prep(self, inimg, inxml):
