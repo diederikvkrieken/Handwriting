@@ -1,12 +1,12 @@
-"""
+'''
 Shell of the handwriting recognition system.
 Pre-processes specified .ppms, extracts features from them,
 trains several classifiers on those and tests them as well.
 
 Next, a similar approach is used on 'novel' pictures.
-"""
+'''
 
-import sys
+import sys, os
 
 import cv2
 
@@ -23,33 +23,39 @@ class Recognizer:
     def __init__(self):
         pass
 
-    def main(self, ppm, inwords):
-        # Read and preprocess
-        prepper = prepImage.PreProcessor()  # Initialize preprocessor
-        words = prepper.prep(ppm, inwords)
+    def main(self, ppm_folder, words_folder):
+        # Initialize pipeline
+        prepper = prepImage.PreProcessor()  # Preprocessor
+        feat = featExtraction.Features()    # Feature extraction
+        features = []                       # List containing all features
+        classes = []                        # List containing class (word) features belong to
 
-        # Debug show
-        for word in words:
-            cv2.imshow('Cropped word: %s' % word[1], word[0])
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+        for file in os.listdir(ppm_folder):
+            if file.endswith('.ppm'):
+                ## Read and preprocess
+                ppm = file
+                inwords = os.path.splitext(file)[0] + '.words'
+                words = prepper.prep(ppm, inwords)
 
-        # # For reference if we want characters
-        # words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
+                # # Debug show
+                # for word in words:
+                #     cv2.imshow('Cropped word: %s' % word[1], word[0])
+                #     cv2.waitKey(0)
+                #     cv2.destroyAllWindows()
 
-        ## Feature extraction
-        feat = featExtraction.Features()
+                # # For reference if we want characters
+                # words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
 
-        # Iterate through words to extract features
-        features = []   # List containing all features
-        classes = []    # List containing class (word) features belong to
-        for word in words:
-            features.append(feat.css(word[0]))
-            classes.append(word[1])
-        # NOTE: these are in order! Do not shuffle or you lose correspondence.
-        # zip() is also possible of course, but I simply do not feel the need. :)
+                ## Feature extraction
 
-        #TODO this is a debug classification problem
+                # Iterate through words to extract features
+                for word in words:
+                    features.append(feat.css(word[0]))
+                    classes.append(word[1])
+                # NOTE: these are in order! Do not shuffle or you lose correspondence.
+                # zip() is also possible of course, but I simply do not feel the need. :)
+
+        # This is a debug classification problem, uncomment for fun. :)
         # features = [ [i, i] for i in range(100)]
         # classes = [0] * 50 + [1] * 50
 
@@ -64,6 +70,6 @@ class Recognizer:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "Usage: %s <image> <input .words file>" % sys.argv[0]
+        print "Usage: %s <image_folder> <.words_folder>" % sys.argv[0]
         sys.exit(1)
     Recognizer().main(sys.argv[1], sys.argv[2])
