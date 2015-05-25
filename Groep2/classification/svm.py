@@ -10,4 +10,4 @@ class SVM(SVC):
             super(SVM, self).fit(feat, goal)
 
         def test(self, feat):
-            super(SVM, self).predict(feat)
+            return super(SVM, self).predict(feat)

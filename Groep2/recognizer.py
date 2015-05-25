@@ -50,7 +50,7 @@ class Recognizer:
         # zip() is also possible of course, but I simply do not feel the need. :)
 
         #TODO this is a debug classification problem
-        # features = range(100)
+        # features = [ [i, i] for i in range(100)]
         # classes = [0] * 50 + [1] * 50
 
         ## Classification
