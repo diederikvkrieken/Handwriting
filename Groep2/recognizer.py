@@ -30,11 +30,19 @@ class Recognizer:
         features = []                       # List containing all features
         classes = []                        # List containing class (word) features belong to
 
+        # # Debug for a single image
+        # words = prepper.prep(ppm_folder, words_folder)
+        # # Debug show
+        # for word in words:
+        #     cv2.imshow('Cropped word: %s' % word[1], word[0])
+        #     cv2.waitKey(0)
+        #     cv2.destroyAllWindows()
+
         for file in os.listdir(ppm_folder):
-            if file.endswith('.ppm'):
+            if file.endswith('.ppm') or file.endswith('.jpg'):
                 ## Read and preprocess
-                ppm = file
-                inwords = os.path.splitext(file)[0] + '.words'
+                ppm = ppm_folder + '/' + file   # ENTIRE path of course..
+                inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
                 words = prepper.prep(ppm, inwords)
 
                 # # Debug show
