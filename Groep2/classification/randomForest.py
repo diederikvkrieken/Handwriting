@@ -8,7 +8,6 @@ class RandomForest(rfc):
             self.name = 'Random Forest'
 
         def train(self, feat, goal):
-            print feat, goal
             super(RandomForest, self).fit(feat, goal)
 
         def test(self, feat):

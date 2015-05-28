@@ -53,6 +53,7 @@ class Classification():
 
         # Consider every algorithm
         for name, classifier in self.classifiers.iteritems():
+            self.perf[name] = []            # Empty dictionary entry
             er = 0                          # No errors at start
             exp = self.predictions[name]    # Get predictions
             # Run over predictions
@@ -72,9 +73,9 @@ class Classification():
     def dispRes(self):
         # Go through all folds
         for i in range(0, len(self.folds)):
-            print 'fold %d:\n\tclassifier\terrors\ttotal' % i+1
-            for name, er in self.perf:
-                print '%s\t%d\t%d' % name, er, len(self.test_idx)
+            print 'fold %d:\nclassifier\terrors\ttotal' % (i+1)
+            for name, er in self.perf.iteritems():
+                print name, '\t', er, '\t', len(self.test_idx)
             print '\n------------------------------------------'
 
     # Applies all classifiers on provided data
