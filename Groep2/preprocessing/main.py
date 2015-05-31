@@ -48,11 +48,14 @@ img = np.uint8(cv2.normalize(sub,sub,0,255,cv2.NORM_MINMAX))
 binary = cv2.threshold(img, 0, 1, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 binary2 = cv2.adaptiveThreshold(img, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 41, 0)
 
-
 binaryRes = binary & binary2
+
+cv2.imwrite('rotate_1.png', binaryRes * 255)
 
 #find contours won't work good with border connected contours, so we use a 1 px border to disconnect them from the border
 binaryRes = cv2.copyMakeBorder(binaryRes, 1, 1, 1, 1, cv2.BORDER_CONSTANT, binaryRes, 255)
+
+
 
 cv2.imshow("binary", binary * 255)
 cv2.imshow("binary2", binary2 * 255)
@@ -76,7 +79,8 @@ binaryRes = binaryRes[1:rows-1, 1:cols-1]
 cv2.imshow("mask", mask)
 cv2.imshow("binaryres after removal", binaryRes * 255)
 
-"""
+binary  = binaryRes
+
 # derotate
 binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (40,1)), None, None, 1)
 binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
@@ -92,8 +96,12 @@ box = cv2.cv.BoxPoints(rect)
 box = np.int0(box)
 cv2.drawContours(img, [box], 0, 255, 2)
 
-cv2.imshow("binaryblob", binary)
+cv2.imshow("binaryblob", binary * 255)
 cv2.imshow("box", img)
+
+cv2.imwrite('rotate_2.png', binary * 255)
+
+cv2.imwrite('rotate_3.png', img)
 
 #derotate:
 rows, cols = img.shape
@@ -108,7 +116,9 @@ if abs(rotation) > 10:
 M = cv2.getRotationMatrix2D((cols/2, rows/2), rotation, 1)
 img = cv2.warpAffine(img, M, (cols,rows))
 cv2.imshow("derotated", img)
-"""
+
+
+cv2.imwrite('rotate_4.png', img)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
