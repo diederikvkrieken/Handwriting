@@ -5,6 +5,7 @@ Container for classification
 import randomForest as RF
 import svm
 from sklearn.cross_validation import KFold as kf
+from sklearn.externals import joblib as jl
 
 class Classification():
 
@@ -38,6 +39,22 @@ class Classification():
         for name, classifier in self.classifiers.iteritems():
             classifier.train([self.feat[idx] for idx in self.train_idx],
                              [self.goal[idx] for idx in self.train_idx])
+
+    # Saves all (trained) classifiers to disk
+    def save(self):
+        # Iterate over classifiers
+        for name, classifier in self.classifiers.iteritems():
+            jl.dump(classifier, name + '.pkl')
+
+    # Loads classifiers mentioned in init from disk
+    def load(self):
+        # Iterate over classifiers
+        for name, classifier in self.classifiers.iteritems():
+            classifier = jl.load(name + '.pkl')
+
+    # Loads a particular classifier
+    def loadClassifier(self, cln):
+        self.classifiers[cln] = jl.load(cln + '.pkl')
 
     # Lets all algorithms predict classes of the current test set
     def test(self):
@@ -77,6 +94,17 @@ class Classification():
             for name, er in self.perf.iteritems():
                 print name, '\t', er, '\t', len(self.test_idx)
             print '\n------------------------------------------'
+
+    # Fully trains one classifier on given set and dumps it afterwards
+    def fullTrain(self, cln, feat, goal):
+        classifier = self.classifiers[cln]  # Get required classifier
+        classifier.train(feat, goal)        # Train on all provided data
+        jl.dump(classifier, cln + '.pkl')   # Save to disk
+
+    # Loads in one classifier which then provides predictions on given data
+    def classify(self, cln, feat):
+        self.loadClassifier(cln)                # Load previously trained classifier
+        return self.classifiers[cln].test(feat) # Return predictions on new features
 
     # Applies all classifiers on provided data
     def fullPass(self, feat, goal):
