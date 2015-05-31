@@ -58,25 +58,22 @@ class PreProcessor:
 
     # Binarizes image and uses that as mask. Returns an image with 0 as background and 255 as object
     def binarize(self, img):
-        # Binarize image with the Otsu method. Set object pixels to 1, background to zero
-        binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-        # Binarize image with adaptive thresholding. This function uses a gaussian kernel to
-        # calculate the threshold value of a certain pixel
-        binary2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 31, 0)
+        # Binarize image with the Otsu method. Set object pixels to 0, background to zero
+        binary = cv2.threshold(img, 0, 1, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+        binary2 = cv2.adaptiveThreshold(img, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 41, 0)
 
-        # Combine the result of both Otsu and the local thresholding method
         binaryRes = binary & binary2
 
-        # Find contours won't work good with border connected contours, so we use a 1 px border to disconnect them from the border
+        #find contours won't work good with border connected contours, so we use a 1 px border to disconnect them from the border
         binaryRes = cv2.copyMakeBorder(binaryRes, 1, 1, 1, 1, cv2.BORDER_CONSTANT, binaryRes, 255)
 
-        # Steps for removing small contours from the binary image
         (cnts, _) = cv2.findContours(binaryRes.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         mask = np.ones(binaryRes.shape[:2], dtype="uint8") * 255
 
+        # loop over the contours
         for c in cnts:
-            # If the contour is bad, draw it on the mask
-            if cv2.contourArea(c) < 200:
+            # if the contour is bad, draw it on the mask
+            if cv2.contourArea(c) < 100:
                 cv2.drawContours(mask, [c], -1, 0, -1)
 
         binaryRes = cv2.bitwise_and(binaryRes, binaryRes, mask=mask)
@@ -84,6 +81,8 @@ class PreProcessor:
         #remove the border:
         rows, cols = binaryRes.shape
         binaryRes = binaryRes[1:rows-1, 1:cols-1]
+
+        binary = binaryRes
 
         # return the resulting binary mask
         return (binaryRes)
