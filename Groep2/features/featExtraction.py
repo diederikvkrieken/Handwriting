@@ -19,9 +19,9 @@ class Features():
         pass
     
     # Extracts HoG features from an image and returns those
-    def hog(self):
-        image = cv2.imread('n_processed.ppm', 0) #reads in image, added for clarity
-        fd, hog_image = hog(image, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualise=True)
+    def hog(self, img):
+        # image = cv2.imread('n_processed.ppm', 0) #reads in image, added for clarity
+        fd, hog_image = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualise=True)
         
         ''' can be used for plotting letters and input images
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4))
@@ -38,6 +38,7 @@ class Features():
             ax2.set_title('Histogram of Oriented Gradients')
             plt.show()
             '''
+        return hog_image
     
     def dali(self):
         # This was not going to work, right?

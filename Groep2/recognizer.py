@@ -21,21 +21,21 @@ class Recognizer:
     """
 
     def __init__(self):
-        pass
+        # Initialize pipeline
+        self.prepper = prepImage.PreProcessor()  # Preprocessor
+        self.feat = featExtraction.Features()    # Feature extraction
+        self.cls = classification.Classification()  # Classification
+        self.features = []                       # List containing all features
+        self.classes = []                        # List containing class (word) features belong to
 
     def fullTrain(self, ppm_folder, words_folder):
-        # Initialize pipeline
-        prepper = prepImage.PreProcessor()  # Preprocessor
-        feat = featExtraction.Features()    # Feature extraction
-        features = []                       # List containing all features
-        classes = []                        # List containing class (word) features belong to
 
         for file in os.listdir(ppm_folder):
             if file.endswith('.ppm') or file.endswith('.jpg'):
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                words = prepper.prep(ppm, inwords)
+                words = self.prepper.prep(ppm, inwords)
 
                 # # Debug show
                 # for word in words:
@@ -50,8 +50,8 @@ class Recognizer:
 
                 # Iterate through words to extract features
                 for word in words:
-                    features.append(feat.css(word[0]))
-                    classes.append(word[1])
+                    self.features.append(self.feat.css(word[0]))
+                    self.classes.append(word[1])
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
 
@@ -60,28 +60,16 @@ class Recognizer:
         # classes = [0] * 50 + [1] * 50
 
         ## Classification
-        cls = classification.Classification()
 
 
     def folders(self, ppm_folder, words_folder):
-        # Initialize pipeline
-        prepper = prepImage.PreProcessor()  # Preprocessor
-        feat = featExtraction.Features()    # Feature extraction
-        features = []                       # List containing all features
-        classes = []                        # List containing class (word) features belong to
-
-        # # Debug show
-        # for word in words:
-        #     cv2.imshow('Cropped word: %s' % word[1], word[0])
-        #     cv2.waitKey(0)
-        #     cv2.destroyAllWindows()
 
         for file in os.listdir(ppm_folder):
             if file.endswith('.ppm') or file.endswith('.jpg'):
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                words = prepper.prep(ppm, inwords)
+                words = self.prepper.prep(ppm, inwords)
 
                 # # Debug show
                 # for word in words:
@@ -96,8 +84,8 @@ class Recognizer:
 
                 # Iterate through words to extract features
                 for word in words:
-                    features.append(feat.css(word[0]))
-                    classes.append(word[1])
+                    self.features.append(self.feat.css(word[0]))
+                    self.classes.append(word[1])
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
 
@@ -106,17 +94,24 @@ class Recognizer:
         # classes = [0] * 50 + [1] * 50
 
         ## Classification
-        cls = classification.Classification()
-
-        cls.fullPass(features, classes) # Just a full run
+        self.cls.fullPass(self.features, self.classes)  # Just a full run
 
         ## results
 
 
     # Standard run for validation by instructors
     def validate(self, ppm, inwords):
-        pass
+        ## Preprocessing
+        words = self.prepper.prep(ppm, inwords)
 
+        ## Character segmentation
+
+        ## Feature extraction
+        for word in words:
+            self.features.append(self.feat.css(word[0]))
+
+        ## Classification
+        self.cls.classify('RF', self.features)
 
 
 if __name__ == "__main__":
