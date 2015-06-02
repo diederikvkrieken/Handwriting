@@ -141,6 +141,22 @@ class PreProcessor:
         return prossed
 
 
+    def accender_decender(self, binary):
+        # smear out the binary image to get one large blob
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (40,1)), None, None, 1)
+        # remove some extended parts of the big blob (the top of f's, bottom of p's etc)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1,20)), None, None, 1)
+
+        cpy = binary.copy()
+        cnt = cv2.findContours(cpy, 0, 2)[0][0]
+
+        # Finds the bounding box of the image and it's rotation
+        x,y,w,h = cv2.boundingRect(cnt)
+        return (y, y+h)
+
+
+
     # Obsolete method using provided code
     # def cut(self, inxml):
     #     # Read in a words xml

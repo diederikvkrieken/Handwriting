@@ -21,6 +21,9 @@ img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
 prepper = prepImage.PreProcessor()
 img = prepper.bgSub(img)
 binary = prepper.binarize(img)
+
+acender, decender = prepper.accender_decender(binary)
+
 thin = thinning.thinning(binary)
 
 #Sum column and find CSC candidates.
@@ -37,21 +40,17 @@ k = 0
 for csc in CSC_columns:
     #print csc
     if csc == 1:
-        #print k - current_k
         if (k - current_k) <= 2:
             sum +=  k
             n += 1
-            print "N: ", n
         else:
             if n > 0:
-                print "FOUND SC"
                 SC_columns.append(int(round(sum/n)))
             else:
                 SC_columns.append(k)
             m += 1
             sum= n= 0
         current_k = k
-        #print current_k
     k += 1
 
 with_lines = thin.copy()
@@ -64,6 +63,9 @@ for x in range(0, thin_width):
 
 for x in SC_columns:
         cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
+
+cv2.line(binary,(0,acender),(with_lines_step3.shape[1] -1,acender),(1),1)
+cv2.line(binary,(0,decender),(with_lines_step3.shape[1],decender),(1),1)
 
 cv2.imshow("img", img)
 cv2.imshow("binary", binary * 255)
