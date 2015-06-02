@@ -67,7 +67,12 @@ class PreProcessor:
         #find contours won't work good with border connected contours, so we use a 1 px border to disconnect them from the border
         binaryRes = cv2.copyMakeBorder(binaryRes, 1, 1, 1, 1, cv2.BORDER_CONSTANT, binaryRes, 255)
 
-        (cnts, _) = cv2.findContours(binaryRes.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        # get contours. Opencv 3 returns an extra value
+        if cv2.__version__[0] == '3':
+            (__, cnts, _) = cv2.findContours(binaryRes.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        else:
+            (cnts, _) = cv2.findContours(binaryRes.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
         mask = np.ones(binaryRes.shape[:2], dtype="uint8") * 255
 
         # loop over the contours
