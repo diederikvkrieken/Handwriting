@@ -20,6 +20,7 @@ class Recognizer:
     Recognizer class
     """
 
+    # Initializes the recognizer by initializing all parts of the pipeline
     def __init__(self):
         # Initialize pipeline
         self.prepper = prepImage.PreProcessor()  # Preprocessor
@@ -28,6 +29,7 @@ class Recognizer:
         self.features = []                       # List containing all features
         self.classes = []                        # List containing class (word) features belong to
 
+    # Trains one classifier on all images and words in specified folders
     def fullTrain(self, ppm_folder, words_folder):
 
         for file in os.listdir(ppm_folder):
@@ -60,6 +62,8 @@ class Recognizer:
         # classes = [0] * 50 + [1] * 50
 
         ## Classification
+        # Fully train specified classifier on data set
+        self.cls.fullTrain('RF', self.features, self.classes)   # Note to set this to best classifier!!
 
     # One run using all files in an images and a words folder
     def folders(self, ppm_folder, words_folder):
