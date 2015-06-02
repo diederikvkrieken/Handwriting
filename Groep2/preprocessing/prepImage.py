@@ -119,7 +119,7 @@ class PreProcessor:
 
             # Apply the rotation
             M = cv2.getRotationMatrix2D((cols/2, rows/2), rotation, 1)
-            img = cv2.warpAffine(img, M, (cols,rows))
+            img = cv2.warpAffine(image, M, (cols,rows))
 
             new_list.append(img)
         return new_list
