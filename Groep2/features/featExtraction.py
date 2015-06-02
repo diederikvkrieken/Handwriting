@@ -38,7 +38,7 @@ class Features():
             ax2.set_title('Histogram of Oriented Gradients')
             plt.show()
             '''
-        return hog_image
+        return fd
     
     def dali(self):
         # This was not going to work, right?

@@ -39,7 +39,7 @@ class Recognizer:
 
                 # # Debug show
                 # for word in words:
-                #     cv2.imshow('Cropped word: %s' % word[1], word[0])
+                #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
                 #     cv2.waitKey(0)
                 #     cv2.destroyAllWindows()
 
@@ -50,7 +50,7 @@ class Recognizer:
 
                 # Iterate through words to extract features
                 for word in words:
-                    self.features.append(self.feat.css(word[0]))
+                    self.features.append(self.feat.hog(word[0]))
                     self.classes.append(word[1])
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
@@ -61,7 +61,7 @@ class Recognizer:
 
         ## Classification
 
-
+    # One run using all files in an images and a words folder
     def folders(self, ppm_folder, words_folder):
 
         for file in os.listdir(ppm_folder):
@@ -73,7 +73,7 @@ class Recognizer:
 
                 # # Debug show
                 # for word in words:
-                #     cv2.imshow('Cropped word: %s' % word[1], word[0])
+                #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
                 #     cv2.waitKey(0)
                 #     cv2.destroyAllWindows()
 
@@ -84,7 +84,7 @@ class Recognizer:
 
                 # Iterate through words to extract features
                 for word in words:
-                    self.features.append(self.feat.css(word[0]))
+                    self.features.append(self.feat.hog(word[0]))
                     self.classes.append(word[1])
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
@@ -99,6 +99,27 @@ class Recognizer:
         ## results
 
 
+    # Trains and tests on a single image
+    def singleFile(self, ppm, inwords):
+        ## Preprocessing
+        words = self.prepper.prep(ppm, inwords)
+
+        # # Debug show
+        # for word in words:
+        #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
+        #     cv2.waitKey(0)
+        #     cv2.destroyAllWindows()
+
+        ## Character segmentation
+
+        ## Feature extraction
+        for word in words:
+            self.features.append(self.feat.hog(word[0]))
+            self.classes.append(word[1])
+
+        ## Classification
+        self.cls.fullPass(self.features, self.classes)
+
     # Standard run for validation by instructors
     def validate(self, ppm, inwords):
         ## Preprocessing
@@ -108,7 +129,7 @@ class Recognizer:
 
         ## Feature extraction
         for word in words:
-            self.features.append(self.feat.css(word[0]))
+            self.features.append(self.feat.hog(word[0]))
 
         ## Classification
         self.cls.classify('RF', self.features)
@@ -125,6 +146,9 @@ if __name__ == "__main__":
         if sys.argv[1] == 'train':
             # Train on full data set
             Recognizer().fullTrain(sys.argv[2], sys.argv[3])
+        elif sys.argv[1] == 'single':
+            # Train and test on one file
+            Recognizer().singleFile(sys.argv[2], sys.argv[3])
         elif sys.argv[1] == 'experiment':
             # Run our experiment
             Recognizer().folders(sys.argv[2], sys.argv[3])
