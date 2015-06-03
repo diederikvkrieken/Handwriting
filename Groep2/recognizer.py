@@ -41,14 +41,19 @@ class Recognizer:
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
                 words = self.prepper.prep(ppm, inwords)
 
-                ## Feature extraction
-
-                # Iterate through words to extract features
+                # Iterate through words
                 for word in words:
-                    self.features.append(self.feat.hog(word[0]))
-                    self.classes.append(word[1])
-                # NOTE: these are in order! Do not shuffle or you lose correspondence.
-                # zip() is also possible of course, but I simply do not feel the need. :)
+                    ## Character segmentation
+                    cuts, chars = self.cs.segment(word[0])  # Make segments
+                    segs = self.cs.annotate(chars, word[2]) # Give annotations to segments
+
+                    ## Feature extraction
+                    # Extract features from each segment
+                    for seg in segs:
+                        self.features.append(self.feat.cheapskate(seg[0]))
+                        self.classes.append(seg[1])
+                        # NOTE: these are in order! Do not shuffle or you lose correspondence.
+                        # zip() is also possible of course, but I simply do not feel the need. :)
 
         # This is a debug classification problem, uncomment for fun. :)
         # features = [ [i, i] for i in range(100)]
@@ -104,12 +109,17 @@ class Recognizer:
         #     cv2.waitKey(0)
         #     cv2.destroyAllWindows()
 
-        ## Character segmentation
-
-        ## Feature extraction
+        # Consider all words
         for word in words:
-            self.features.append(self.feat.hog(word[0]))
-            self.classes.append(word[1])
+            ## Character segmentation
+            cuts, chars = self.cs.segment(word[0])
+            segs = self.cs.annotate(chars, word[2])
+
+            ## Feature extraction
+            # Obtain features of all segments
+            for s in segs:
+                self.features.append(self.feat.cheapskate(word[0]))
+                self.classes.append(word[1])
 
         ## Classification
         self.cls.fullPass(self.features, self.classes)
@@ -124,7 +134,7 @@ class Recognizer:
         # Go through all words
         for word in words:
             ## Character segmentation
-            chars = self.cs.segment(word)
+            cuts, chars = self.cs.segment(word)
 
             # Go through all characters
             for c in chars:

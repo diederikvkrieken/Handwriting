@@ -27,3 +27,5 @@ def annotate(self, crops, ann):
 
         pos += width            # Position is now start of next character
         res.append((img, text)) # Append tuple of (character, text)
+
+    return res
