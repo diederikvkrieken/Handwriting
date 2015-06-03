@@ -6,6 +6,9 @@ from skimage.measure import label
 
 import thinning
 
+class segmenter:
+    pass
+
 #VARIABLES
 alpha = 4
 

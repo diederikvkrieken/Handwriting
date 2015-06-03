@@ -115,7 +115,8 @@ class Classification():
     # Loads in one classifier which then provides predictions on given data
     def classify(self, cln, feat):
         self.loadClassifier(cln)                # Load previously trained classifier
-        return self.classifiers[cln].test(feat) # Return predictions on new features
+        pred = self.classifiers[cln].test(feat) # Predicted characters
+        return self.combineChar(pred)           # Return predicted word
 
     # Applies all classifiers on provided data
     def fullPass(self, feat, goal):

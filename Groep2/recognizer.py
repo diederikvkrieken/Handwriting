@@ -24,11 +24,11 @@ class Recognizer:
     # Initializes the recognizer by initializing all parts of the pipeline
     def __init__(self):
         # Initialize pipeline
-        self.prepper = prepImage.PreProcessor()  # Preprocessor
-        self.cs = cs.
-        self.feat = featExtraction.Features()    # Feature extraction
+        self.prepper = prepImage.PreProcessor()     # Preprocessor
+        self.cs = cs.segmenter()                    # Character segmentation
+        self.feat = featExtraction.Features()       # Feature extraction
         self.cls = classification.Classification()  # Classification
-        self.features = []                       # List containing all features
+        self.features = []                          # List containing all features
         self.classes = []                        # List containing class (word) features belong to
 
     # Trains one classifier on all images and words in specified folders
@@ -39,7 +39,7 @@ class Recognizer:
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                words, chars = self.prepper.prep(ppm, inwords)
+                words = self.prepper.prep(ppm, inwords)
 
                 # # Debug show
                 # for word in words:
@@ -72,7 +72,7 @@ class Recognizer:
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                words, chars = self.prepper.prep(ppm, inwords)
+                words = self.prepper.prep(ppm, inwords)
 
                 # # Debug show
                 # for word in words:
@@ -102,7 +102,7 @@ class Recognizer:
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
         ## Preprocessing
-        words, chars = self.prepper.prep(ppm, inwords)
+        words = self.prepper.prep(ppm, inwords)
 
         # # Debug show
         # for word in words:
@@ -121,40 +121,53 @@ class Recognizer:
         self.cls.fullPass(self.features, self.classes)
 
     # Standard run for validation by instructors
-    def validate(self, ppm, inwords):
+    def validate(self, ppm, inwords, outwords):
         ## Preprocessing
-        words, chars = self.prepper.prep(ppm, inwords)
+        words = self.prepper.wordPrep(ppm, inwords)
 
-        ## Character segmentation
+        predictions = []    # Empty list to contain all predictions
 
-        ## Feature extraction
+        # Go through all words
         for word in words:
-            self.features.append(self.feat.hog(word[0]))
+            ## Character segmentation
+            chars = self.cs.segment(word)
 
-        ## Classification
-        self.cls.classify('RF', self.features)
+            # Go through all characters
+            for c in chars:
+                ## Feature extraction
+                features = self.feat.hog(c)
+
+                ## Classification
+                pred = self.cls.classify('RF', features)
+                predictions.append(pred)    # Store prediction
+
+        self.prepper.saveXML(predictions, inwords, outwords)
 
 
 if __name__ == "__main__":
     # Number of arguments indicates how to run the program
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         # Too little, you screwed up..
-        print "Usage: %s <image> <.words file>" % sys.argv[0]
+        print "Usage: %s <image> <.words file> <output file>" % sys.argv[0]
         sys.exit(1)
-    elif len(sys.argv) > 2:
-        # You know how to treat our program, all its little secrets...
-        if sys.argv[1] == 'train':
-            # Train on full data set
-            Recognizer().fullTrain(sys.argv[2], sys.argv[3])
-        elif sys.argv[1] == 'single':
-            # Train and test on one file
-            Recognizer().singleFile(sys.argv[2], sys.argv[3])
-        elif sys.argv[1] == 'experiment':
-            # Run our experiment
-            Recognizer().folders(sys.argv[2], sys.argv[3])
+    elif len(sys.argv) > 3:
+        if sys.argv[1] == 'dev':
+            # You know how to treat our program, all its little secrets...
+            if sys.argv[2] == 'train':
+                # Train on full data set
+                Recognizer().fullTrain(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'single':
+                # Train and test on one file
+                Recognizer().singleFile(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'experiment':
+                # Run our experiment
+                Recognizer().folders(sys.argv[3], sys.argv[4])
+            else:
+                # Dum dum is trying to be cheeky
+                print "Usage: %s -dev <version> <image_folder> <.words_folder>" % sys.argv[0]
         else:
-            # Either dum dum put in too many arguments, or is trying to be cheeky
-            print "Usage: %s <version> <image_folder> <.words_folder>" % sys.argv[0]
+            # Dum dum put in too many arguments
+            print "Usage: %s <image> <.words file> <output file>" % sys.argv[0]
     else:
         # You are an instructor, who runs our program in the standardized format
-        Recognizer().validate(sys.argv[1], sys.argv[2])
+        Recognizer().validate(sys.argv[1], sys.argv[2], sys.argv[3])

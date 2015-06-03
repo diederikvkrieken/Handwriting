@@ -11,9 +11,6 @@ from skimage.measure import label
 from Groep2.preprocessing import prepImage
 from Groep2.preprocessing import thinning
 
-class segmenter:
-    pass
-
 #VARIABLES
 alpha = 4
 

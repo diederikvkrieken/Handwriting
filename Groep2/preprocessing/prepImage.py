@@ -28,15 +28,13 @@ class PreProcessor:
 
         # Arrays for words and characters
         words = []      # Tuple (cropped image, text)
-        characters = [] # Tuple relative [x-start, x-end], text
 
         # Cut from image
         for line in lines:
             # Iterate over lines
             for word in line:
-                # Add regions (words/characters) to respective arrays
-                words.append((image[word.top:word.bottom,
-                              word.left:word.right], word.text))
+                characters = [] # Tuple relative [x-start, x-end], text
+                # Put all characters in character array
                 for character in word.characters:
                     # Use this to get cropped character images
                     # characters.append((image[character.top:character.bottom,
@@ -46,8 +44,42 @@ class PreProcessor:
                     characters.append((character.left-word.left,
                                        character.right-word.left, character.text))
 
+                # Add regions (words/characters) to respective arrays
+                words.append((image[word.top:word.bottom,
+                              word.left:word.right], word.text, characters))
+
         # Return arrays
-        return words, characters
+        return words
+
+    # Variant of cropCV that purely crops words
+    def cropWords(self, image, inxml):
+        lines, name = wordio.read(inxml)
+
+        # Array for word images
+        words = []      # List of (only!) cropped images
+
+        # Cut from image
+        for line in lines:
+            # Iterate over lines
+            for word in line:
+                words.append(image[word.top:word.bottom, word.left:word.right])
+
+        # Return cropped words
+        return words
+
+    # Saves predictions to specified .words file
+    def saveXML(self, predictions, inxml, outxml):
+        # Very ugly, but we just reuse the file and fill in the blanks. :)
+        lines, name = wordio.read(inxml)
+
+        idx = 0 # Counter which prediction is next
+        # Go through all lines and words
+        for line in lines:
+            for word in line:
+                word.text = predictions[idx]    # Put prediction as word text
+                idx += 1
+
+        wordio.save(lines, outxml)   # Save a new file with the words predicted
 
     # Subtracts background from image
     def bgSub(self, img):
@@ -133,7 +165,7 @@ class PreProcessor:
     def prep(self, inimg, inxml):
         # Crop all words from image
         self.read(inimg)
-        words, characters = self.cropCV(self.orig, inxml)
+        words = self.cropCV(self.orig, inxml)
 
         # For all words, subtract background, binarize and multiply with original
         prossed = []    # New list for tuples because tuples are immutable...
@@ -143,7 +175,23 @@ class PreProcessor:
             prossed.append((pros, w[1]))
 
         # Return pre-processed words
-        return prossed, characters
+        return prossed
+
+    # Variant of prep that only considers words
+    def wordPrep(self, inimg, inxml):
+        # Crop all words from image
+        self.read(inimg)
+        words = self.cropWords(self.orig, inxml)
+
+        # For all words, subtract background, binarize and multiply with original
+        prossed = []    # New list for tuples because tuples are immutable...
+        for w in words:
+            pros = self.bgSub(w)
+            pros = self.binarize(w)
+            prossed.append(pros)
+
+        # Return pre-processed words
+        return prossed
 
 
     def accender_decender(self, binary):
