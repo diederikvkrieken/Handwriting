@@ -1,18 +1,10 @@
 __author__ = 'Diederik, Diederik, Jasper, Sebastiaan, Pieter'
 
-#System modules
-import sys, os
 import cv2
 import numpy as np
-import time
 from skimage.measure import label
 
-#Own Modules
-from Groep2.preprocessing import prepImage
-from Groep2.preprocessing import thinning
-
-class segmenter:
-    pass
+import thinning
 
 #VARIABLES
 alpha = 4
@@ -193,19 +185,3 @@ def crop_sc_areas(SC_columns, image):
 
         prev_x = x
     return (new_SC_columns, crop_list)
-
-
-
-# visualisation
-cv2.imshow("img", img)
-cv2.imshow("acender decender", binary_acender_decender * 255)
-cv2.imshow("thin", thin * 255)
-cv2.imshow("with_lines", with_lines * 255)
-cv2.imshow("with_lines_step3", with_lines_step3 * 255)
-cv2.waitKey(0)
-
-
-cv2.imshow("binary", binary * 255)
-
-# execute the magic
-SC_columns, crop_list = crop_sc_areas(SC_columns, binary)

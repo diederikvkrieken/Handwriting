@@ -11,6 +11,7 @@ import sys, os
 import cv2
 
 from Groep2.preprocessing import prepImage
+from Groep2.segmentation import char_segmentation as cs
 from Groep2.features import featExtraction
 from Groep2.classification import classification
 
@@ -24,6 +25,7 @@ class Recognizer:
     def __init__(self):
         # Initialize pipeline
         self.prepper = prepImage.PreProcessor()  # Preprocessor
+        self.cs = cs.
         self.feat = featExtraction.Features()    # Feature extraction
         self.cls = classification.Classification()  # Classification
         self.features = []                       # List containing all features
@@ -37,16 +39,13 @@ class Recognizer:
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                words = self.prepper.prep(ppm, inwords)
+                words, chars = self.prepper.prep(ppm, inwords)
 
                 # # Debug show
                 # for word in words:
                 #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
                 #     cv2.waitKey(0)
                 #     cv2.destroyAllWindows()
-
-                # # For reference if we want characters
-                # words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
 
                 ## Feature extraction
 
@@ -73,16 +72,13 @@ class Recognizer:
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                words = self.prepper.prep(ppm, inwords)
+                words, chars = self.prepper.prep(ppm, inwords)
 
                 # # Debug show
                 # for word in words:
                 #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
                 #     cv2.waitKey(0)
                 #     cv2.destroyAllWindows()
-
-                # # For reference if we want characters
-                # words, chars = prepper.cropCV(prepper.orig, words)  # Crop words
 
                 ## Feature extraction
 
@@ -106,7 +102,7 @@ class Recognizer:
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
         ## Preprocessing
-        words = self.prepper.prep(ppm, inwords)
+        words, chars = self.prepper.prep(ppm, inwords)
 
         # # Debug show
         # for word in words:
@@ -127,7 +123,7 @@ class Recognizer:
     # Standard run for validation by instructors
     def validate(self, ppm, inwords):
         ## Preprocessing
-        words = self.prepper.prep(ppm, inwords)
+        words, chars = self.prepper.prep(ppm, inwords)
 
         ## Character segmentation
 

@@ -26,9 +26,9 @@ class PreProcessor:
     def cropCV(self, image, inxml):
         lines, name = wordio.read(inxml)
 
-        # Arrays of tuples (cropped images, text)
-        words = []
-        characters = []
+        # Arrays for words and characters
+        words = []      # Tuple (cropped image, text)
+        characters = [] # Tuple relative [x-start, x-end], text
 
         # Cut from image
         for line in lines:
@@ -38,8 +38,13 @@ class PreProcessor:
                 words.append((image[word.top:word.bottom,
                               word.left:word.right], word.text))
                 for character in word.characters:
-                    characters.append((image[character.top:character.bottom,
-                                       character.left:character.right], character.text))
+                    # Use this to get cropped character images
+                    # characters.append((image[character.top:character.bottom,
+                    #                    character.left:character.right], character.text))
+
+                    # Characters are x-start and x-end in respective word and annotated text
+                    characters.append((character.left-word.left,
+                                       character.right-word.left, character.text))
 
         # Return arrays
         return words, characters
@@ -138,7 +143,7 @@ class PreProcessor:
             prossed.append((pros, w[1]))
 
         # Return pre-processed words
-        return prossed
+        return prossed, characters
 
 
     def accender_decender(self, binary):
