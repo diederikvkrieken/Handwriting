@@ -41,12 +41,6 @@ class Recognizer:
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
                 words = self.prepper.prep(ppm, inwords)
 
-                # # Debug show
-                # for word in words:
-                #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
-                #     cv2.waitKey(0)
-                #     cv2.destroyAllWindows()
-
                 ## Feature extraction
 
                 # Iterate through words to extract features

@@ -39,3 +39,7 @@ class Features():
     # Extracts css features from an image and returns those
     def css(self, img):
         return runCSS.run(img)
+
+    # A cheapskate feature extraction that definitely yields vectors of equal length
+    def cheapskate(self, img):
+        return img.shape[0] # Yes, it returns the width of a segment! :D

@@ -70,8 +70,10 @@ class Classification():
         # Consider all characters predicted
         for char in segments:
             # Append a character if it does not contain an underscore, or is the first with it
-            if not '_' in char or '_1' in char:
-                word.append(char[0])    # NOTE: assumes single characters!
+            if not '_' in char:
+                word.append(char)
+            elif '_1' in char:
+                word.append(char.split('_')[0])
 
         return word     # Returns corrected word
 

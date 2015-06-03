@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from skimage.measure import label
 
-import thinning
+import annotate, thinning
 
 class segmenter:
     '''
@@ -14,6 +14,10 @@ class segmenter:
     def __init__(self):
         # Parameters
         self.alpha = 4
+
+    # Function to give the crops an annotation based on character annotations
+    def annotate(self, crops, annotations):
+        return annotate.annotate(crops, annotations)
 
     # Copied from prepImage, don't ask me what it does
     def ascender_descender(self, binary):
