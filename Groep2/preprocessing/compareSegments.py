@@ -2,6 +2,7 @@ __author__ = 'diederik'
 
 from toolbox import wordio
 
+# wordXML contains the coordinates of every letter for every word so: wordXml = [[top, bottom, left, right, label]] for every LETTER
 class Comparator:
 
     def __init__(self):
