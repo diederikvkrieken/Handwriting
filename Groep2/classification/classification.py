@@ -64,6 +64,17 @@ class Classification():
 
         return self.predictions
 
+    # Combines a sequence of character predictions to a word
+    def combineChar(self, segments):
+        word = []   # Empty list to append characters to
+        # Consider all characters predicted
+        for char in segments:
+            # Append a character if it does not contain an underscore, or is the first with it
+            if not '_' in char or '_1' in char:
+                word.append(char[0])    # NOTE: assumes single characters!
+
+        return word     # Returns corrected word
+
     # Assesses performance of all classifiers
     def assess(self):
         #TODO more performance measures?
