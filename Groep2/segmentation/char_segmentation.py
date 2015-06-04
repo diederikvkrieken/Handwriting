@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from skimage.measure import label
 
-import annotate, thinning
+import compareSegments, thinning
 
 class segmenter:
     '''
@@ -16,19 +16,30 @@ class segmenter:
         self.alpha = 4
 
     # Function to give the crops an annotation based on character annotations
-    def annotate(self, crops, annotations):
-        return annotate.annotate(crops, annotations)
+    def annotate(self, cs_columns, annotations):
+        compSeg = compareSegments.Comparator()
+        return compSeg.compare(cs_columns, annotations)
 
     # Copied from prepImage, don't ask me what it does
     def ascender_descender(self, binary):
+
         # smear out the binary image to get one large blob
         binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (40,1)), None, None, 1)
+
         # remove some extended parts of the big blob (the top of f's, bottom of p's etc)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
-        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1,20)), None, None, 1)
+
+        # BUG!!!!!!!!!!!!!!!!!!!!!!!! WHEN MORPHING RECTANGLE IS TO BIG THE BINARY WILL BECOME BLACK FILL IN FOR "ALPHAMORPH" EITHER 10 OR 20
+        ALPHAMORPH = 5
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1,ALPHAMORPH)), None, None, 1)
+
+
+        # cv2.imshow("CPY", binary*255)
+        # cv2.waitKey(0)
 
         cpy = binary.copy()
-        cnt = cv2.findContours(cpy, 0, 2)[0][0]
+        contourCNT = cv2.findContours(cpy, 0, 2)
+        cnt = contourCNT[0][0]
 
         # Finds the bounding box of the image and it's rotation
         x,y,w,h = cv2.boundingRect(cnt)
