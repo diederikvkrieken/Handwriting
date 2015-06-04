@@ -139,7 +139,11 @@ class PreProcessor:
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1,20)), None, None, 1)
 
         cpy = binary.copy()
-        cnt = cv2.findContours(cpy, 0, 2)[0][0]
+        if cv2.__version__[0] == '3':
+            # OpenCV 3 has an extra first return value
+            cnt = cv2.findContours(cpy, 0, 2)[1][0]
+        else:
+            cnt = cv2.findContours(cpy, 0, 2)[0][0]
 
         # Finds the surounding box of the image and it's rotation
         rect = cv2.minAreaRect(cnt)
@@ -172,7 +176,7 @@ class PreProcessor:
         for w in words:
             pros = self.bgSub(w[0])
             pros = self.binarize(w[0])
-            prossed.append((pros, w[1]))
+            prossed.append((pros, w[1], w[2]))
 
         # Return pre-processed words
         return prossed

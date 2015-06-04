@@ -113,7 +113,8 @@ class Recognizer:
         for word in words:
             ## Character segmentation
             cuts, chars = self.cs.segment(word[0])
-            segs = self.cs.annotate(chars, word[2])
+
+            segs = self.cs.annotate(cuts, word[2])
 
             ## Feature extraction
             # Obtain features of all segments
