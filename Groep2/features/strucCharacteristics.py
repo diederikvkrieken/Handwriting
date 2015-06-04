@@ -13,7 +13,6 @@ imgBW = pad(imgBW, 1, mode='constant', constant_values=1)
 
 y_hist = imgBW.sum(axis=0)
 x_hist = imgBW.sum(axis=1)
-
 feature_vector.append(x_hist)
 feature_vector.append(y_hist)
 
