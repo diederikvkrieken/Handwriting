@@ -39,7 +39,11 @@ class segmenter:
 
         cpy = binary.copy()
         contourCNT = cv2.findContours(cpy, 0, 2)
-        cnt = contourCNT[0][0]
+        if cv2.__version__[0] == '3':
+            # OpenCV 3 has an extra first return value
+            cnt = contourCNT[0][1]
+        else:
+            cnt = contourCNT[0][0]
 
         # Finds the bounding box of the image and it's rotation
         x,y,w,h = cv2.boundingRect(cnt)
@@ -119,7 +123,12 @@ class segmenter:
                         mask = cv2.bitwise_or(in_range, mask)
 
                 cpy = mask.copy()
-                cnts = cv2.findContours(cpy, 0, 2)[0]
+
+                if cv2.__version__[0] == '3':
+                    # OpenCV 3 has an extra first return value
+                    cnts = cv2.findContours(cpy, 0, 2)[1]
+                else:
+                    cnts = cv2.findContours(cpy, 0, 2)[0]
                 if len(cnts) != 0:
                     x_start, __, width,__ = cv2.boundingRect(cnts[0])
                     for cnt in cnts:
@@ -188,7 +197,11 @@ class segmenter:
         thin = thinning.thinning(word)
 
         #Sum column and find CSC candidates. (step 2 of paper)
-        column_sum = cv2.reduce(thin, 0, cv2.cv.CV_REDUCE_SUM, dtype=cv2.CV_32F)
+        if cv2.__version__[0] == '3':
+            # OpenCV 3 does not contain the deprecated cv module
+            column_sum = cv2.reduce(thin, 0, cv2.REDUCE_SUM, dtype=cv2.CV_32F)
+        else:
+            column_sum = cv2.reduce(thin, 0, cv2.cv.CV_REDUCE_SUM, dtype=cv2.CV_32F)
         CSC_columns = cv2.threshold(column_sum, 1.0, 1.0,cv2.THRESH_BINARY_INV)[1]
         CSC_columns[0,0] = 1
         CSC_columns[0,-1] = 1

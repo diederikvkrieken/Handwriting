@@ -1,11 +1,12 @@
 __author__ = 'Diederik, Diederik, Jasper, Sebastiaan, Pieter'
 
 '''
+### NOTICE: Deprecated file for referency only! ###
 Functions to annotate character segments based on annotations
 '''
 
 # Provides an annotation for all found segments
-def annotate(self, crops, ann):
+def annotate(crops, ann):
     # crops is an array of segments (images)
     # ann is a tuple of (x-start, x-end, text)
 
