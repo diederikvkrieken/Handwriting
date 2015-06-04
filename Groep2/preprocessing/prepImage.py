@@ -172,7 +172,7 @@ class PreProcessor:
         for w in words:
             pros = self.bgSub(w[0])
             pros = self.binarize(w[0])
-            prossed.append((pros, w[1]))
+            prossed.append((pros, w[1], w[2]))
 
         # Return pre-processed words
         return prossed
