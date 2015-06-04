@@ -1,5 +1,5 @@
 import numpy as np
-
+import timeit
 import matplotlib.pyplot as plt
 
 from utils import gaussian_kernel, compute_curvature
@@ -31,42 +31,40 @@ class CurvatureScaleSpace(object):
         return crossings
 
     def generate_css(self, curve, max_sigma, step_sigma):
-		""" generate_css(curve, max_sigma, step_sigma)
+        """ generate_css(curve, max_sigma, step_sigma)
         Generates a CSS image representation by repetitively smoothing the initial curve L_0 with increasing sigma
         """
-        
-		cols = curve[0, :].size
-        
-		rows = max_sigma // step_sigma
-		css = np.zeros(shape=(rows, cols))
-		
-		fig, ax = plt.subplots()
-		srange = np.linspace(1, max_sigma - 1, rows)
-		
-		for i, sigma in enumerate(srange):
-			kappa, sx, sy = compute_curvature(curve, sigma)
-			
-			# find interest points
-			xs = self.find_zero_crossings(kappa)
-			
-			# Plot after every 500 iterations
-			if i % 200 == 0:
-				ax.plot(sx, sy, linewidth=0.1, color='r')
-			
-            
+
+        cols = curve[0, :].size
+
+        rows = max_sigma // step_sigma
+        css = np.zeros(shape=(rows, cols))
+
+        # fig, ax = plt.subplots()
+        srange = np.linspace(1, max_sigma - 1, rows)
+
+        for i, sigma in enumerate(srange):
+            kappa, sx, sy = compute_curvature(curve, sigma)
+
+            # find interest points
+            xs = self.find_zero_crossings(kappa)
+
+            # Plot after every 500 iterations
+            # if i % 200 == 0:
+                # ax.plot(sx, sy, linewidth=0.1, color='r')
+
             # save the interest points
-			if len(xs) > 0 and sigma < max_sigma - 1:
-				for c in xs:
-					css[i, c] = sigma  # change to any positive
-					
-			else:
-				return css
-		
-		ax.axis('image')
-		ax.set_xticks([])
-		ax.set_yticks([])
-		plt.show()
-	
+            if len(xs) > 0 and sigma < max_sigma - 1:
+                for c in xs:
+                    css[i, c] = sigma  # change to any positive
+
+            else:
+                return css
+
+        # ax.axis('image')
+        # ax.set_xticks([])
+        # ax.set_yticks([])
+        # plt.show()
 
     def generate_visual_css(self, rawcss, closeness, return_all=False):
         """ generate_visual_css(rawcss, closeness)
@@ -125,6 +123,7 @@ class SlicedCurvatureScaleSpace(CurvatureScaleSpace):
     A implementation of the SCSS algorithm as detailed in Okal thesis
 
     """
+
     def __init__(self):
         pass
 

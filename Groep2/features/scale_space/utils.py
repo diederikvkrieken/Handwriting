@@ -2,6 +2,7 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter1d
 from scipy.ndimage import convolve
 
+
 def _gaussian_kernel(sigma, order, t):
     """ _gaussian_kernel(sigma, order, t)
     Calculate a Gaussian kernel of the given sigma and with the given
@@ -99,9 +100,9 @@ def gaussian_kernel(sigma, order=0, N=None, returnt=False):
     sigmaMin = 0.5 + order ** (0.62) / 5
     if sigma < sigmaMin:
         print('WARNING: The scale (sigma) is very small for the given order, '
-                'better use a larger scale!')
+              'better use a larger scale!')
 
-	# Create t vector which indicates the x-position
+    # Create t vector which indicates the x-position
     t = np.arange(-N / 2.0 + 0.5, N / 2.0, 1.0, dtype=np.float64)
 
     # Get kernel
@@ -124,62 +125,65 @@ def gaussian_kernel2D(mu, cov, samples):
     return twod_gaussian
 
 
-
 def smooth_signal(signal, kernel):
-	""" smooth_signal(signal, kernel)
-	Smooth the given 1D signal by convolution with a specified kernel
-	"""
-	
-	"""
-	This code can be made a lot faster!
-	http://stackoverflow.com/questions/6855169/convolution-computations-in-numpy-scipy
-	"""
-	#return np.convolve(signal, kernel, mode='same')
-	return convolve(signal, kernel, mode='wrap')
+    """ smooth_signal(signal, kernel)
+    Smooth the given 1D signal by convolution with a specified kernel
+    """
+
+    """
+    This code can be made a lot faster!
+    http://stackoverflow.com/questions/6855169/convolution-computations-in-numpy-scipy
+    """
+    # return np.convolve(signal, kernel, mode='same')
+    # return convolve(signal, kernel, mode='wrap')
+
+    spec1 = np.fft.fft(signal, axis=0)
+    spec2 = np.fft.fft(kernel, axis=0)
+    return np.fft.ifft(spec1*spec2, axis=0)
 
 
 def compute_curvature(curve, sigma):
-	""" compute_curvature(curve, sigma)
-	Compute the curvature of a 2D curve as given in Mohkatarian et. al.
-	and return the curvature signal at the given sigma
-	
-	Components of the 2D curve are:
-	curve[0,:] and curve[1,:]
-	
-	Parameters
-	-------------
-	curve : numpy matrix
-		Two row matrix representing 2D curve
-	sigma : float
-		Kernel width
-	
-	"""
-	
-	if curve[0, :].size < 2:
-		raise Exception("Curve must have at least 2 points")
+    """ compute_curvature(curve, sigma)
+    Compute the curvature of a 2D curve as given in Mohkatarian et. al.
+    and return the curvature signal at the given sigma
 
-	sigx = curve[0, :]
-	sigy = curve[1, :]
+    Components of the 2D curve are:
+    curve[0,:] and curve[1,:]
 
-	g = gaussian_kernel(sigma, 0, sigx.size, False)
-	g_s = gaussian_kernel(sigma, 1, sigx.size, False)
-	g_ss = gaussian_kernel(sigma, 2, sigx.size, False)
-	
-	X_s = smooth_signal(sigx, g_s)
-	Y_s = smooth_signal(sigy, g_s)
-	X_ss = smooth_signal(sigx, g_ss)
-	Y_ss = smooth_signal(sigy, g_ss)
+    Parameters
+    -------------
+    curve : numpy matrix
+        Two row matrix representing 2D curve
+    sigma : float
+        Kernel width
 
-	"""
-	X_s = gaussian_filter1d(sigx, sigma, order=1)
-	Y_s = gaussian_filter1d(sigy, sigma, order=1)
-	X_ss = gaussian_filter1d(sigx, sigma, order=2)
-	Y_ss = gaussian_filter1d(sigy, sigma, order=2)
-	"""
-	kappa = ((X_s * Y_ss) - (X_ss * Y_s)) / (X_s**2 + Y_s**2)**(1.5)
-	
-	#return kappa, gaussian_filter1d(sigx, sigma, order=0), gaussian_filter1d(sigy, sigma, order=0)
-	return kappa, smooth_signal(sigx,g), smooth_signal(sigy,g)
+    """
+
+    if curve[0, :].size < 2:
+        raise Exception("Curve must have at least 2 points")
+
+    sigx = curve[0, :]
+    sigy = curve[1, :]
+
+    g = gaussian_kernel(sigma, 0, sigx.size, False)
+    g_s = gaussian_kernel(sigma, 1, sigx.size, False)
+    g_ss = gaussian_kernel(sigma, 2, sigx.size, False)
+
+    X_s = smooth_signal(sigx, g_s)
+    Y_s = smooth_signal(sigy, g_s)
+    X_ss = smooth_signal(sigx, g_ss)
+    Y_ss = smooth_signal(sigy, g_ss)
+
+    """
+    X_s = gaussian_filter1d(sigx, sigma, order=1)
+    Y_s = gaussian_filter1d(sigy, sigma, order=1)
+    X_ss = gaussian_filter1d(sigx, sigma, order=2)
+    Y_ss = gaussian_filter1d(sigy, sigma, order=2)
+    """
+    kappa = ((X_s * Y_ss) - (X_ss * Y_s)) / (X_s ** 2 + Y_s ** 2) ** (1.5)
+
+    # return kappa, gaussian_filter1d(sigx, sigma, order=0), gaussian_filter1d(sigy, sigma, order=0)
+    return kappa, smooth_signal(sigx, g), smooth_signal(sigy, g)
 
 
 def rebin(a, shape):

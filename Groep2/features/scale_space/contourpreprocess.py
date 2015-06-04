@@ -107,7 +107,7 @@ class findContour(object):
 		#Normalize
 		self.normalizeContour(nAlpha)
 
-	def run(self, nAlpha =200, iAlpha=1000):
+	def run(self, nAlpha =200, iAlpha=300):
 		
 		# Find contour
 		self.contour(self.imgBW)

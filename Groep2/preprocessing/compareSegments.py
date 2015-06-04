@@ -22,14 +22,14 @@ class Comparator:
                     csc_columnsWithLabel.append([csc, ""])
 
                 #If a csc has a smaller x value then the segments of the letter.
-                if csc <= charSeg[3]:
+                if csc <= charSeg[1]:
 
                     csc_columnsWithLabel[-1][1] = self.sameLetterCheck(n, csc_columnsWithLabel, charSeg, k, wordXml)
                     n += 1
 
                 #Else calculate how much percentage we overlap
                 else:
-                    diff = csc - charSeg[3]
+                    diff = csc - charSeg[1]
                     cscOffset = csc - csc_columns[n-1]
                     percentage = diff / cscOffset
 
@@ -38,7 +38,7 @@ class Comparator:
                         csc_columnsWithLabel[-1][1] = self.sameLetterCheck(n, csc_columnsWithLabel, charSeg, k ,wordXml)
 
                         # When we have undersegmenting break.
-                        if len(wordXml) != (k+1) and csc >= wordXml[k+1][3]:
+                        if len(wordXml) != (k+1) and csc >= wordXml[k+1][1]:
                             break
                         n += 1
 
@@ -52,8 +52,8 @@ class Comparator:
     # Will check whether segments are still the same letter
     def sameLetterCheck(self, n , csc_columnsWithLabel, charSeg, k, wordXml):
 
-        if n!= 0 and charSeg[4] in csc_columnsWithLabel[-2][1] and csc_columnsWithLabel[-2][0] <= wordXml[k-1][3] :
+        if n!= 0 and charSeg[2] in csc_columnsWithLabel[-2][1] and csc_columnsWithLabel[-2][0] <= wordXml[k-1][1] :
             return csc_columnsWithLabel[-2][1] + '*'
         else:
-            return csc_columnsWithLabel[-1][1] + charSeg[4]
+            return csc_columnsWithLabel[-1][1] + charSeg[2]
 
