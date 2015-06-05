@@ -53,7 +53,7 @@ class Comparator:
     def sameLetterCheck(self, n , csc_columnsWithLabel, charSeg, k, wordXml):
 
         if n!= 0 and charSeg[2] in csc_columnsWithLabel[-2][1] and csc_columnsWithLabel[-2][0] <= wordXml[k-1][1] :
-            return csc_columnsWithLabel[-2][1] + '*'
+            return csc_columnsWithLabel[-2][1] + '_'
         else:
             return csc_columnsWithLabel[-1][1] + charSeg[2]
 

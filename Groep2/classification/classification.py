@@ -68,12 +68,22 @@ class Classification():
     def combineChar(self, segments):
         word = []   # Empty list to append characters to
         # Consider all characters predicted
-        for char in segments:
-            # Append a character if it does not contain an underscore, or is the first with it
-            if not '_' in char:
+        idx = 0     # Counter of segment being considered
+        while idx < len(segments):
+            char = segments[idx]    # Store character in question
+            idx += 1                # Prematurely continue to next character
+            if idx < len(segments) and segments[idx] == '_':
+                # Character in question was over-segmented
+                num = 0     # Number of '_' encountered
+                while idx < len(segments) and segments[idx] == '_':
+                    num += 1    # Occurence found! Increment
+                    idx += 1    # Check next segment
+                if num == 1:
+                    # Only add the character if it is the first segment
+                    word.append(char)
+            else:
+                # Either the last (real!) character, or not oversegmented
                 word.append(char)
-            elif '_1' in char:
-                word.append(char.split('_')[0])
 
         return word     # Returns corrected word
 
