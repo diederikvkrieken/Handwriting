@@ -73,18 +73,17 @@ class Recognizer:
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
                 words = self.prepper.prep(ppm, inwords)
 
-                # # Debug show
-                # for word in words:
-                #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
-                #     cv2.waitKey(0)
-                #     cv2.destroyAllWindows()
-
-                ## Feature extraction
-
-                # Iterate through words to extract features
+                # Iterate through words
                 for word in words:
-                    self.features.append(self.feat.hog(word[0]))
-                    self.classes.append(word[1])
+                    ## Character segmentation
+                    cuts, chars = self.cs.segment(word[0])  # Make segments
+                    segs = self.cs.annotate(chars, word[2]) # Give annotations to segments
+
+                    ## Feature extraction
+                    for s in segs:
+                        # Extract features from each segment
+                        self.features.append(self.feat.hog(s[0]))
+                        self.classes.append(s[1])
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
 
@@ -93,9 +92,7 @@ class Recognizer:
         # classes = [0] * 50 + [1] * 50
 
         ## Classification
-        self.cls.fullPass(self.features, self.classes)  # Just a full run
-
-        ## results
+        self.cls.fullPass(self.features, self.classes)  # A full run on the characters
 
 
     # Trains and tests on a single image

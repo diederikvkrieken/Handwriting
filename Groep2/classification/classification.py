@@ -3,7 +3,10 @@ Container for classification
 """
 
 import randomForest as RF
+import gradientBoost as GB
 import svm
+import kMeans as km
+import kNear as kn
 from sklearn.cross_validation import KFold as kf
 from sklearn.externals import joblib as jl
 
@@ -13,7 +16,10 @@ class Classification():
     def __init__(self):
         # Dictionary of all classifiers
         self.classifiers = {'RF': RF.RandomForest(),
-                            'SVM': svm.SVM()}
+                            'GB': GB.GBC(),
+                            'SVM': svm.SVM(),
+                            'KM': km.KMeans(30),
+                            'KN': kn.KNeighbour(3)}
         self.perf = {}  # Dictionary of performances
 
     # Take data and prepare for training and testing
