@@ -82,7 +82,7 @@ class Recognizer:
                     ## Feature extraction
                     for s in segs:
                         # Extract features from each segment
-                        self.features.append(self.feat.hog(s[0]))
+                        self.features.append(self.feat.css(s[0]))
                         self.classes.append(s[1])
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
@@ -116,7 +116,7 @@ class Recognizer:
             ## Feature extraction
             # Obtain features of all segments
             for s in segs:
-                self.features.append(self.feat.cheapskate(word[0]))
+                self.features.append(self.feat.css(word[0]))
                 self.classes.append(word[1])
 
         ## Classification
@@ -137,7 +137,7 @@ class Recognizer:
             # Go through all characters
             for c in chars:
                 ## Feature extraction
-                features = self.feat.hog(c)
+                features = self.feat.css(c)
 
                 ## Classification
                 pred = self.cls.classify('RF', features)

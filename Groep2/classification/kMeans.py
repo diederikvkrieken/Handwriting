@@ -1,4 +1,4 @@
-from sklearn.cluster import k_means as km
+from sklearn.cluster import KMeans as km
 
 
 class KMeans(km):

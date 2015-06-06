@@ -38,7 +38,7 @@ class Features():
     
     # Extracts css features from an image and returns those
     def css(self, img):
-        return runCSS.run(img)
+        return runCSS.runCss().run(img)
 
     # A cheapskate feature extraction that definitely yields vectors of equal length
     def cheapskate(self, img):
