@@ -141,10 +141,10 @@ class segmenter:
                     crop_list.append(def_crop)
 
                     # some visualisation, you may uncomment
-                    cv2.imshow("mask", mask * 255)
-                    cv2.imshow("def crop", def_crop * 255)
-                    cv2.imshow("cropp", crop * 255)
-                    cv2.waitKey(0)
+                    # cv2.imshow("mask", mask * 255)
+                    # cv2.imshow("def crop", def_crop * 255)
+                    # cv2.imshow("cropp", crop * 255)
+                    # cv2.waitKey(5)
 
                 # add the current column to the new list
                 new_SC_columns.append(x)

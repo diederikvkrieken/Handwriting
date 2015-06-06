@@ -27,7 +27,7 @@ class runCss(object):
 		# start = timeit.default_timer()
 		# Run css
 		c = CurvatureScaleSpace()
-		cs = c.generate_css(curve, curve.shape[1], 0.01)
+		cs = c.generate_css(curve, curve.shape[1], 0.04)
 
 		cssFeatures = np.amax(cs, axis=0)
 

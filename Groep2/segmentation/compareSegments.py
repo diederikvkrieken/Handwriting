@@ -31,7 +31,12 @@ class Comparator:
                 else:
                     diff = csc - charSeg[1]
                     cscOffset = csc - csc_columns[n-1]
-                    percentage = diff / cscOffset
+                    if cscOffset == 0:
+                        print "something terriblle has happened!!<<<--------- See line 35 compareSegments.py FIX THIS!!"
+                        print "charSeg: ", charSeg[0], " x: ", charSeg[1], " SC x: ", csc ,"SC-1 x: ", csc_columns[n-1]
+                        percentage = 0.0
+                    else:
+                        percentage = diff / cscOffset
 
                     if percentage < 0.5:
 
