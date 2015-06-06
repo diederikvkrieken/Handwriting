@@ -49,15 +49,11 @@ class Recognizer:
 
                     ## Feature extraction
                     # Extract features from each segment
-                    for seg in segs:
-                        self.features.append(self.feat.cheapskate(seg[0]))
+                    for char, seg in zip(chars, segs):
+                        self.features.append(self.feat.css(char))
                         self.classes.append(seg[1])
                         # NOTE: these are in order! Do not shuffle or you lose correspondence.
                         # zip() is also possible of course, but I simply do not feel the need. :)
-
-        # This is a debug classification problem, uncomment for fun. :)
-        # features = [ [i, i] for i in range(100)]
-        # classes = [0] * 50 + [1] * 50
 
         ## Classification
         # Fully train specified classifier on data set
@@ -80,10 +76,10 @@ class Recognizer:
                     segs = self.cs.annotate(chars, word[2]) # Give annotations to segments
 
                     ## Feature extraction
-                    for s in segs:
+                    for char, s in zip(chars, segs):
                         # Extract features from each segment
-                        self.features.append(self.feat.css(s[0]))
-                        self.classes.append(s[1])
+                        self.features.append(self.feat.hog(char))
+                        self.classes.append(s[1])       # Put the labeling of the segment as class
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
 
@@ -115,9 +111,9 @@ class Recognizer:
 
             ## Feature extraction
             # Obtain features of all segments
-            for s in segs:
-                self.features.append(self.feat.css(word[0]))
-                self.classes.append(word[1])
+            for char, s in zip(chars, segs):
+                self.features.append(self.feat.hog(char))
+                self.classes.append(s[1])       # Put the labeling of the segment as class
 
         ## Classification
         self.cls.fullPass(self.features, self.classes)

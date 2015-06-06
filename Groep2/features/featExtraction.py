@@ -24,10 +24,12 @@ class Features():
 
         if img.shape[0] > 200 or img.shape[1] > 200:
             print "PROBLEM: A segment is larger than our padding code."
-            plt.figure('BW')
-            plt.imshow(img, interpolation='nearest', cmap=plt.cm.gray)
-            plt.show()
+            # plt.figure('BW')
+            # plt.imshow(img, interpolation='nearest', cmap=plt.cm.gray)
+            # plt.show()
+            cv2.imshow('BW', img)
             cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
         img = cv2.copyMakeBorder(img,200-img.shape[0],200-img.shape[0],200-img.shape[1],200-img.shape[1],cv2.BORDER_CONSTANT)
         fd, hog_image = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualise=True)
