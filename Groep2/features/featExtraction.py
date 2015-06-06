@@ -19,19 +19,20 @@ class Features():
         # image = cv2.imread('n_processed.ppm', 0) #reads in image, added for clarity
         print "Hogging away! ", img.shape
 
+        alpha = 120
         # This is incredibly stupid we should fix this otherwise just fuck it
         # img = cv2.resize(img, (40, 40))
 
-        if img.shape[0] > 200 or img.shape[1] > 200:
+        if img.shape[0] > alpha or img.shape[1] > alpha:
             print "PROBLEM: A segment is larger than our padding code."
-            # plt.figure('BW')
-            # plt.imshow(img, interpolation='nearest', cmap=plt.cm.gray)
-            # plt.show()
-            cv2.imshow('BW', img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            plt.figure('BW')
+            plt.imshow(img, interpolation='nearest', cmap=plt.cm.gray)
+            plt.show()
+            # cv2.imshow('BW', img)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
 
-        img = cv2.copyMakeBorder(img,200-img.shape[0],200-img.shape[0],200-img.shape[1],200-img.shape[1],cv2.BORDER_CONSTANT)
+        img = cv2.copyMakeBorder(img,alpha-img.shape[0],alpha-img.shape[0],alpha-img.shape[1],alpha-img.shape[1],cv2.BORDER_CONSTANT)
         fd, hog_image = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualise=True)
         
         ''' can be used for plotting letters and input images
