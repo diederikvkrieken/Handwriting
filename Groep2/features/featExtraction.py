@@ -4,6 +4,10 @@ from scale_space import runCSS
 
 #Import HOG
 from skimage.feature import hog
+import cv2
+import matplotlib.pyplot as plt
+
+from skimage.util import pad
 
 class Features():
     
@@ -13,6 +17,19 @@ class Features():
     # Extracts HOG features from an image and returns those
     def hog(self, img):
         # image = cv2.imread('n_processed.ppm', 0) #reads in image, added for clarity
+        print "Hogging away! ", img.shape
+
+        # This is incredibly stupid we should fix this otherwise just fuck it
+        # img = cv2.resize(img, (40, 40))
+
+        if img.shape[0] > 200 or img.shape[1] > 200:
+            print "PROBLEM: A segment is larger than our padding code."
+            plt.figure('BW')
+            plt.imshow(img, interpolation='nearest', cmap=plt.cm.gray)
+            plt.show()
+            cv2.waitKey(0)
+
+        img = cv2.copyMakeBorder(img,200-img.shape[0],200-img.shape[0],200-img.shape[1],200-img.shape[1],cv2.BORDER_CONSTANT)
         fd, hog_image = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualise=True)
         
         ''' can be used for plotting letters and input images
