@@ -12,8 +12,7 @@ class segmenter:
     '''
 
     def __init__(self):
-        # Parameters
-        self.alpha = 4
+        pass
 
     # Function to give the crops an annotation based on character annotations
     def annotate(self, cs_columns, annotations):
@@ -28,11 +27,6 @@ class segmenter:
 
         # remove some extended parts of the big blob (the top of f's, bottom of p's etc)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
-
-        # BUG!!!!!!!!!!!!!!!!!!!!!!!! WHEN MORPHING RECTANGLE IS TO BIG THE BINARY WILL BECOME BLACK FILL IN FOR "ALPHAMORPH" EITHER 10 OR 20
-        ALPHAMORPH = 5
-        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (1,ALPHAMORPH)), None, None, 1)
-
 
         # cv2.imshow("CPY", binary*255)
         # cv2.waitKey(0)
