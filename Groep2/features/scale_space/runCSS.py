@@ -3,49 +3,48 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from css import CurvatureScaleSpace
-from contourpreprocess import findContour
-import cv2
+from ContourFinder import findContour
 import timeit
 
 
-def run(img):
-	
-	# Find contour
-	start = timeit.default_timer()
-	fc = findContour(img)
-	fc.run()
+class runCss(object):
 
 
-	#Rebuild contour array
-	curve = np.array([fc.contoursNormalized[:,1], fc.contoursNormalized[:,0]])
+	def run(self, img):
+		# Find contour
+		# start = timeit.default_timer()
 
-	stop = timeit.default_timer()
-
-	print stop - start
-	start = timeit.default_timer()
-	#Run css
-	c = CurvatureScaleSpace()
-	cs = c.generate_css(curve, curve.shape[1], 0.01)
-
-	stop = timeit.default_timer()
-	print "Total: ", stop - start
-
-	vcs = c.generate_visual_css(cs, 9)
-	plt.figure('Sample Curve')
-	plt.plot(curve[0,:], curve[1,:],color='r')
-
-	plt.figure('CSS')
-	plt.plot(vcs)
-
-	plt.show()
+		fc = findContour(img)
+		fc.run()
 
 
+		# Rebuild contour array
+		curve = np.array([fc.contoursNormalized[:, 1], fc.contoursNormalized[:, 0]])
 
-if __name__ == '__main__':
-	import sys
+		# stop = timeit.default_timer()
 
-	if len(sys.argv) != 2:
-		print "Usage: %s <image>" % sys.argv[0]
-		sys.exit(1)
+		# print stop - start
+		# start = timeit.default_timer()
+		# Run css
+		c = CurvatureScaleSpace()
+		cs = c.generate_css(curve, curve.shape[1], 0.01)
 
-	run(cv2.imread(sys.argv[1]))
+		cssFeatures = np.amax(cs, axis=0)
+
+		print len(cssFeatures)
+		# stop = timeit.default_timer()
+		# print "Total: ", stop - start
+
+		# vcs = c.generate_visual_css(cs, 9)
+		# plt.figure('Sample Curve')
+		# plt.plot(curve[0,:], curve[1,:],color='r')
+
+		# plt.figure('CSS')
+		# plt.plot(vcs)
+
+		# plt.show()
+
+		return cssFeatures
+
+
+

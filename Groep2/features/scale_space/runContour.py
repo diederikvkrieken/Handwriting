@@ -1,4 +1,4 @@
-from contourpreprocess import findContour
+from ContourFinder import findContour
 from skimage import io
 
 def run():
