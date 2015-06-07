@@ -178,7 +178,7 @@ class PreProcessor:
             pros = self.binarize(w[0])
             prossed.append((pros, w[1], w[2]))
 
-        # Return pre-processed words
+        # Return pre-processed words: (image, text, character(left, right, text))
         return prossed
 
     # Variant of prep that only considers words
@@ -188,7 +188,7 @@ class PreProcessor:
         words = self.cropWords(self.orig, inxml)
 
         # For all words, subtract background, binarize and multiply with original
-        prossed = []    # New list for tuples because tuples are immutable...
+        prossed = []    # New list for word images
         for w in words:
             pros = self.bgSub(w)
             pros = self.binarize(w)

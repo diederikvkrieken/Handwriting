@@ -28,6 +28,9 @@ class Classification():
         self.feat = feat
         self.goal = goal
 
+        # New k-means with as many clusters as classes
+        self.classifiers['KM'] = km.KMeans(len(set(goal)))
+
         # 4-fold cross validation, implying each fold 75% train / 25% test
         self.folds = kf(len(feat), n_folds=4, shuffle=True)
 
@@ -78,10 +81,10 @@ class Classification():
         while idx < len(segments):
             char = segments[idx]    # Store character in question
             idx += 1                # Prematurely continue to next character
-            if idx < len(segments) and segments[idx] == '_':
+            if idx < len(segments) and segments[idx] == "'":
                 # Character in question was over-segmented
                 num = 0     # Number of '_' encountered
-                while idx < len(segments) and segments[idx] == '_':
+                while idx < len(segments) and segments[idx] == "'":
                     num += 1    # Occurence found! Increment
                     idx += 1    # Check next segment
                 if num == 1:
@@ -137,14 +140,22 @@ class Classification():
         return self.combineChar(pred)           # Return predicted word
 
     # Applies all classifiers on provided data
-    def fullPass(self, feat, goal):
+    def fullPass(self, words):
+        # Words: (image, text, characters, segments)
+        feat = []
+        goal = []    # Empty list for features and classes
+        for w in words:
+            for seg in w[3]:
+                # Segments consist of features and classes
+                feat.append(seg[0])
+                goal.append(seg[1])
         self.data(feat, goal)
         # Train and test on each fold
         for n, [train_i, test_i] in enumerate(self.folds):
-            self.n_fold(n)
-            self.train()
-            self.test()
-            self.assess()
+            self.n_fold(n)  # Prepare fold n
+            self.train()    # Train on selected segments
+            self.test()     # Predict characters AND word
+            self.assess()   # Determine performance on characters and words
 
         self.dispRes()
         return self.perf
