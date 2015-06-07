@@ -109,8 +109,11 @@ class Recognizer:
 
             segs = self.cs.annotate(cuts, word[2])
 
+            assert len(chars) == len(segs) #Safety check did the segmenting go correctly
+
             ## Feature extraction
             # Obtain features of all segments
+
             for char, s in zip(chars, segs):
                 self.features.append(self.feat.hog(char))
                 self.classes.append(s[1])       # Put the labeling of the segment as class
