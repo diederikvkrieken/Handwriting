@@ -51,7 +51,7 @@ class Recognizer:
                     # Extract features from each segment
                     for char, seg in zip(chars, segs):
                         self.features.append(self.feat.css(char))
-                        self.classes.append(seg[1])
+                        self.classes.append(''.join(seg[1]))
                         # NOTE: these are in order! Do not shuffle or you lose correspondence.
                         # zip() is also possible of course, but I simply do not feel the need. :)
 
@@ -73,13 +73,15 @@ class Recognizer:
                 for word in words:
                     ## Character segmentation
                     cuts, chars = self.cs.segment(word[0])  # Make segments
-                    segs = self.cs.annotate(chars, word[2]) # Give annotations to segments
+                    segs = self.cs.annotate(cuts, word[2]) # Give annotations to segments
+
+                    assert len(chars) == len(segs) #Safety check did the segmenting go correctly
 
                     ## Feature extraction
                     for char, s in zip(chars, segs):
                         # Extract features from each segment
                         self.features.append(self.feat.hog(char))
-                        self.classes.append(s[1])       # Put the labeling of the segment as class
+                        self.classes.append(''.join(s[1]))       # Put the labeling of the segment as class
                 # NOTE: these are in order! Do not shuffle or you lose correspondence.
                 # zip() is also possible of course, but I simply do not feel the need. :)
 
@@ -116,7 +118,7 @@ class Recognizer:
 
             for char, s in zip(chars, segs):
                 self.features.append(self.feat.hog(char))
-                self.classes.append(s[1])       # Put the labeling of the segment as class
+                self.classes.append(''.join(s[1]))       # Put the labeling of the segment as class
 
         ## Classification
         self.cls.fullPass(self.features, self.classes)
