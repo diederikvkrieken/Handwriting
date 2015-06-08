@@ -29,6 +29,9 @@ class PreProcessor:
         # Arrays for words and characters
         words = []      # Tuple (cropped image, text)
 
+        #Because of bad xml files we sometimes get negative relative coordinates, we then choose to ignore the words.
+        negative = False
+
         # Cut from image
         for line in lines:
             # Iterate over lines
@@ -40,13 +43,21 @@ class PreProcessor:
                     # characters.append((image[character.top:character.bottom,
                     #                    character.left:character.right], character.text))
 
+                    if character.left-word.left < 0 or character.right-word.left < 0:
+                        print "WARNING: Encountered negative coordinates, ignoring word."
+                        negative = True
+                        break
+
                     # Characters are x-start and x-end in respective word and annotated text
                     characters.append((character.left-word.left,
                                        character.right-word.left, character.text))
 
-                # Add regions (words/characters) to respective arrays
-                words.append((image[word.top:word.bottom,
-                              word.left:word.right], word.text, characters))
+                if negative == False:
+                    # Add regions (words/characters) to respective arrays
+                    words.append((image[word.top:word.bottom,
+                                word.left:word.right], word.text, characters))
+                else:
+                    negative == False
 
         # Return arrays
         return words
