@@ -64,6 +64,7 @@ class Recognizer:
     def folders(self, ppm_folder, words_folder):
 
         for file in os.listdir(ppm_folder):
+            print file
             if file.endswith('.ppm') or file.endswith('.jpg'):
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
