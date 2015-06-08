@@ -20,19 +20,35 @@ class Classification():
                             'SVM': svm.SVM(),
                             'KM': km.KMeans(30),
                             'KN': kn.KNeighbour(3)}
-        self.perf = {}  # Dictionary of performances
+        # Dictionary of performances
+        self.perf = {'RF': [],
+                     'GB': [],
+                     'SVM': [],
+                     'KM': [],
+                     'KN': []}
 
     # Take data and prepare for training and testing
-    def data(self, feat, goal):
+    def data(self, words):
+        # Words: (image, text, characters, segments)
         # Store data
-        self.feat = feat
-        self.goal = goal
-
-        # New k-means with as many clusters as classes
-        self.classifiers['KM'] = km.KMeans(len(set(goal)))
+        self.words = []     # Word list containing text, segments, annotations
+        uniq_class = set()  # Temporary container of unique classes
+        for w in words:
+            feat = []   # Empty list for features of segments
+            goal = []   # Empty list for classes of segments
+            for seg in w[3]:
+                # Segments consist of features and classes
+                feat.append(seg[0])
+                goal.append(seg[1])
+            self.words.append((w[1], feat, goal))
+            uniq_class.update(goal) # Add new classes to unique ones
+        # NOTE: self.words will now contain (word text, [segment features], [segment classes])!!
 
         # 4-fold cross validation, implying each fold 75% train / 25% test
-        self.folds = kf(len(feat), n_folds=4, shuffle=True)
+        self.folds = kf(len(self.words), n_folds=4, shuffle=True)
+
+        # New k-means with as many clusters as classes, breaks without enough data...
+        self.classifiers['KM'] = km.KMeans(len(uniq_class)-1)
 
     # Prepares fold n
     def n_fold(self, n):
@@ -45,9 +61,20 @@ class Classification():
 
     # Trains all algorithms on current training set
     def train(self):
+        # First extract all segments and respective text
+        feat = []
+        goal = []
+        train_words = [self.words[idx] for idx in self.train_idx]
+        # Go through all words in the training set
+        for word in train_words:
+            # Go through all segments of that word
+            for seg in range(len(word[1])):
+                # Add contained segment features and classes to respective arrays
+                feat.append(word[1][seg])
+                goal.append(word[2][seg])
         for name, classifier in self.classifiers.iteritems():
-            classifier.train([self.feat[idx] for idx in self.train_idx],
-                             [self.goal[idx] for idx in self.train_idx])
+            # Train all classifiers
+            classifier.train(feat, goal)  # On (segment) features, classes
 
     # Saves all (trained) classifiers to disk
     def save(self):
@@ -67,11 +94,22 @@ class Classification():
 
     # Lets all algorithms predict classes of the current test set
     def test(self):
-        self.predictions = {}   # Dictionary of predictions
+        self.predChar = {}  # Dictionary of character predictions
+        self.predWord = {}  # Dictionary of word predictions
+        self.n_char = 0     # Keep track of amount of segments (for error)
         for name, cls in self.classifiers.iteritems():
-            self.predictions[name] = cls.test([self.feat[idx] for idx in self.test_idx])
-
-        return self.predictions
+            # Initialize dictionary entries
+            self.predChar[name] = []
+            self.predWord[name] = []
+            # Test all classifiers
+            test_words = [self.words[idx] for idx in self.test_idx]
+            for word in test_words:
+                # On all words in the test set
+                prediction = cls.test(word[1])  # Predict the characters
+                self.n_char += len(word[1])
+                # Add to dictionaries
+                self.predChar[name].append(prediction)
+                self.predWord[name].append(self.combineChar(prediction))
 
     # Combines a sequence of character predictions to a word
     def combineChar(self, segments):
@@ -81,11 +119,11 @@ class Classification():
         while idx < len(segments):
             char = segments[idx]    # Store character in question
             idx += 1                # Prematurely continue to next character
-            if idx < len(segments) and segments[idx] == "'":
+            if idx < len(segments) and segments[idx] == "_":
                 # Character in question was over-segmented
                 num = 0     # Number of '_' encountered
-                while idx < len(segments) and segments[idx] == "'":
-                    num += 1    # Occurence found! Increment
+                while idx < len(segments) and segments[idx] == "_":
+                    num += 1    # Occurrence found! Increment
                     idx += 1    # Check next segment
                 if num == 1:
                     # Only add the character if it is the first segment
@@ -102,18 +140,26 @@ class Classification():
 
         # Consider every algorithm
         for name, classifier in self.classifiers.iteritems():
-            self.perf[name] = []            # Empty dictionary entry
-            er = 0                          # No errors at start
-            exp = self.predictions[name]    # Get predictions
-            # Run over predictions
-            for idx in range(0, len(exp)):
-                # Compare prediction with goal
-                if exp[idx] != self.goal[self.test_idx[idx]]:
+            er_char = er_word = 0           # No errors at start
+            # Get test words and predictions
+            test_words = [self.words[idx] for idx in self.test_idx]
+            exp_char = self.predChar[name]
+            exp_word = self.predWord[name]
+            # Run over test words and predictions
+            for idx in range(0, len(test_words)):
+                # Compare word prediction with actual class
+                if exp_word[idx] != test_words[idx][0]:
                     # Incorrect prediction, increment error
-                    er += 1
+                    er_word += 1
+                # Compare character predictions with actual class
+                actual = test_words[idx][2]     # Actual characters
+                for ci in range(len(actual)):
+                    if exp_char[idx][ci] != actual[ci]:
+                        # Incorrect prediction, increment error
+                        er_char += 1
 
             # Store performance in dictionary
-            self.perf[name].append(er)
+            self.perf[name].append((er_word, er_char))
 
         # Return all outcomes
         return self.perf
@@ -122,9 +168,10 @@ class Classification():
     def dispRes(self):
         # Go through all folds
         for i in range(0, len(self.folds)):
-            print 'fold %d:\nclassifier\terrors\ttotal' % (i+1)
+            print 'fold %d:\nclassifier\terror_w\terror_c\ttotal_w\ttotal_c' % (i+1)
             for name, er in self.perf.iteritems():
-                print name, '\t', er, '\t', len(self.test_idx)
+                print name, '\t\t', er[i][0], '\t\t', er[i][1],\
+                    '\t\t', len(self.test_idx), '\t\t', self.n_char
             print '\n------------------------------------------'
 
     # Fully trains one classifier on given set and dumps it afterwards
@@ -142,14 +189,8 @@ class Classification():
     # Applies all classifiers on provided data
     def fullPass(self, words):
         # Words: (image, text, characters, segments)
-        feat = []
-        goal = []    # Empty list for features and classes
-        for w in words:
-            for seg in w[3]:
-                # Segments consist of features and classes
-                feat.append(seg[0])
-                goal.append(seg[1])
-        self.data(feat, goal)
+        self.data(words)    # Prepare data
+        # NOTE: self.words is now different from words!!
         # Train and test on each fold
         for n, [train_i, test_i] in enumerate(self.folds):
             self.n_fold(n)  # Prepare fold n
