@@ -146,8 +146,8 @@ class segmenter:
                     # cv2.imshow("cropp", crop * 255)
                     # cv2.waitKey(5)
 
-                # add the current column to the new list
-                new_SC_columns.append(x)
+                    # add the current column to the new list
+                    new_SC_columns.append(x)
             else:
                 # there are no blobs in the crop, so do not add it to the new SC columns list
                 pass

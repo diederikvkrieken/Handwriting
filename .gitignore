@@ -21,3 +21,4 @@ toolbox/pamImage.pyc
 toolbox/word.pyc
 toolbox/wordio.pyc
 .idea
+*.pyc
