@@ -38,6 +38,10 @@ class PreProcessor:
             for word in line:
                 characters = [] # Tuple relative [x-start, x-end], text
                 # Put all characters in character array
+                if len(word.characters)    < 1:
+                    print "Warning, no character annotations for this word"
+                    continue
+
                 for character in word.characters:
                     # Use this to get cropped character images
                     # characters.append((image[character.top:character.bottom,

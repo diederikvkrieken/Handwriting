@@ -71,8 +71,16 @@ class Recognizer:
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
                 words = self.prepper.prep(ppm, inwords)
 
+
+
                 # Iterate through words
+                counter = 0
                 for word in words:
+                    counter += 1
+                    print counter
+                    cv2.imshow("current_word", word[0] * 255)
+                    cv2.waitKey(1)
+
                     ## Character segmentation
                     cuts, chars = self.cs.segment(word[0])  # Make segments
                     segs = self.cs.annotate(cuts, word[2])  # Give annotations to segments

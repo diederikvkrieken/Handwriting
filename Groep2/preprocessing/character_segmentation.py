@@ -23,8 +23,33 @@ prepper = prepImage.PreProcessor()
 img = prepper.bgSub(img)
 binary = prepper.binarize(img)
 
+# Copied from prepImage, don't ask me what it does
+def ascender_descender(binary):
+
+    # smear out the binary image to get one large blob
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (40,1)), None, None, 1)
+
+    # remove some extended parts of the big blob (the top of f's, bottom of p's etc)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
+
+    # cv2.imshow("CPY", binary*255)
+    # cv2.waitKey(0)
+
+    cpy = binary.copy()
+    contourCNT = cv2.findContours(cpy, 0, 2)
+    if cv2.__version__[0] == '3':
+        # OpenCV 3 has an extra first return value
+        cnt = contourCNT[0][1]
+    else:
+        cnt = contourCNT[0][0]
+
+    # Finds the bounding box of the image and it's rotation
+    x,y,w,h = cv2.boundingRect(cnt)
+    return (y, y+h)
+
+
 # calculate the y coordinates of the acender (e.g. top part f) and decender (e.g. bottom part g) lines
-acender, decender = prepper.accender_decender(binary)
+acender, decender = ascender_descender(binary)
 
 
 # step 1  of paper
@@ -83,8 +108,8 @@ for x in SC_columns:
 
 # draw acender and decender lines
 binary_acender_decender = binary.copy()
-cv2.line(binary_acender_decender,(0,acender),(binary_acender_decender.shape[1] -1,acender),(1),1)
-cv2.line(binary_acender_decender,(0,decender),(binary_acender_decender.shape[1],decender),(1),1)
+cv2.line(binary_acender_decender,(0,acender),(binary_acender_decender.shape[1] -1,acender),(1),2)
+cv2.line(binary_acender_decender,(0,decender),(binary_acender_decender.shape[1],decender),(1),2  )
 
 def crop_acender(acender_x, image):
     """
@@ -177,7 +202,8 @@ def crop_sc_areas(SC_columns, image):
                 crop_list.append(def_crop)
 
                 # some visualisation, you may uncomment
-                cv2.imshow("mask", mask * 255)
+                cv2.imshow("mask", mask * 255) 
+                cv2.imwrite("seg3.png", def_crop * 255)
                 cv2.imshow("def crop", def_crop * 255)
                 cv2.imshow("cropp", crop * 255)
                 cv2.waitKey(0)
@@ -196,9 +222,11 @@ def crop_sc_areas(SC_columns, image):
 # visualisation
 cv2.imshow("img", img)
 cv2.imshow("acender decender", binary_acender_decender * 255)
+cv2.imwrite("seg1.png", binary_acender_decender * 255)
 cv2.imshow("thin", thin * 255)
 cv2.imshow("with_lines", with_lines * 255)
 cv2.imshow("with_lines_step3", with_lines_step3 * 255)
+cv2.imwrite("seg2.png", with_lines_step3 * 255)
 cv2.waitKey(0)
 
 

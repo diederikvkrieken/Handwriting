@@ -103,9 +103,11 @@ class segmenter:
             labeled_crop_mid = labeled[asc:desc, prev_x:x]
             labeled_crop_mid = np.array(labeled_crop_mid, dtype=np.uint8)
 
-
-            min = np.min(labeled_crop_mid)
-            max = np.max(labeled_crop_mid)
+            min = 0
+            max = 0
+            if labeled_crop_mid.size > 0:
+                min = np.min(labeled_crop_mid)
+                max = np.max(labeled_crop_mid)
 
 
             if (max - min) != 0:
@@ -133,8 +135,8 @@ class segmenter:
                             width = wwidth
 
                     # some visualisation
-                    #cv2.line(mask,(x_start,0),(x_start, mask.shape[0] -1),(1),1)
-                    # cv2.line(mask,(x_start + width,0),(x_start + width, mask.shape[0] -1),(1),1)
+                   # cv2.line(mask,(x_start,0),(x_start, mask.shape[0] -1),(1),1)
+                   # cv2.line(mask,(x_start + width,0),(x_start + width, mask.shape[0] -1),(1),1)
 
                     # get the definitive crop and add it to the list
                     def_crop = mask[0:mask.shape[1], x_start: x_start + width]
@@ -204,20 +206,21 @@ class segmenter:
         # apply step 3 and store
         SC_columns = self.step3(CSC_columns, 2)
 
+                # # draw CSC's and CS's
+        # with_lines = thin.copy()
+        with_lines_step3 = thin.copy()
+        thin_height, thin_width = thin.shape
+
+        for x in SC_columns:
+            cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
+
+        cv2.imshow("segments", with_lines_step3 * 255)
+        cv2.waitKey(1)
+        # end of drawing CSC's and CS's
+
+
         return self.crop_sc_areas(SC_columns, ascender, descender, word)
 
-
-        # # draw CSC's and CS's
-        # with_lines = thin.copy()
-        # with_lines_step3 = thin.copy()
-        # thin_height, thin_width = thin.shape
-        #
-        # for x in range(0, thin_width):
-        #     if CSC_columns[x] == 1:
-        #         cv2.line(with_lines,(x,0),(x,thin_height -1),(1),1)
-        # for x in SC_columns:
-        #         cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
-        # # end of drawing CSC's and CS's
 
         # # draw ascender and descender lines
         # asc_desc = word.copy()
