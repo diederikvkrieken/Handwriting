@@ -1,0 +1,1 @@
+def imageProjections(image):
