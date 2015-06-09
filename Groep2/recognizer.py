@@ -76,8 +76,10 @@ class Recognizer:
                 for word in words:
                     counter += 1
                     print counter
-                    # cv2.imshow("current_word", word[0] * 255)
-                    # cv2.waitKey(1)
+
+                    cv2.imshow("current_word", word[0] * 255)
+                    cv2.waitKey(0)
+
 
                     ## Character segmentation
                     cuts, chars = self.cs.segment(word[0])  # Make segments

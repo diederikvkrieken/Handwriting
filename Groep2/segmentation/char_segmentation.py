@@ -73,6 +73,7 @@ class segmenter:
         """
         This function returns the crops coresponding to the SC_columns list
         It does some fancy stuff with connected components to keep the 'f' an 'g' alive.
+        IMPORTANT: DOES NOT WORK WITH OPENCV3!!!!!!!
         :param SC_columns:
         :param asc:
         :param desc:
@@ -217,7 +218,6 @@ class segmenter:
         # cv2.imshow("segments", with_lines_step3 * 255)
         # cv2.waitKey(1)
         # end of drawing CSC's and CS's
-
 
         return self.crop_sc_areas(SC_columns, ascender, descender, word)
 
