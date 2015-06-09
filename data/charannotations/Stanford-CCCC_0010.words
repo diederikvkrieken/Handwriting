@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding = "UTF-8"?>
-<Image name="Stanford-CCCC_0010">
+<Image name="Stanford_4">
     <TextLine no="1" top="473" bottom="557" left="1696" right="1941" shear="0">
         <Word no="1" top="473" bottom="557" left="1696" right="1941" shear="0" text="middan">
-            <Character no="1" top="473" bottom="557" left="1696" right="1761" shear="0" text="m"/>
-            <Character no="2" top="473" bottom="557" left="1761" right="1787" shear="0" text="i"/>
-            <Character no="3" top="473" bottom="557" left="1787" right="1820" shear="0" text="d"/>
-            <Character no="4" top="473" bottom="557" left="1820" right="1852" shear="0" text="d"/>
-            <Character no="5" top="473" bottom="557" left="1852" right="1896" shear="0" text="a"/>
-            <Character no="6" top="473" bottom="557" left="1896" right="1942" shear="0" text="n"/>
+            <Character no="1" top="473" bottom="557" left="1696" right="1764" shear="0" text="m"/>
+            <Character no="2" top="473" bottom="557" left="1764" right="1788" shear="0" text="i"/>
+            <Character no="3" top="473" bottom="557" left="1788" right="1819" shear="0" text="d"/>
+            <Character no="4" top="473" bottom="557" left="1819" right="1853" shear="0" text="d"/>
+            <Character no="5" top="473" bottom="557" left="1853" right="1893" shear="0" text="a"/>
+            <Character no="6" top="473" bottom="557" left="1893" right="1942" shear="0" text="n"/>
         </Word>
     </TextLine>
     <TextLine no="2" top="684" bottom="776" left="348" right="1512" shear="0">
