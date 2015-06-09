@@ -18,7 +18,7 @@ class Features():
     # Extracts HOG features from an image and returns those
     def hog(self, img):
         # image = cv2.imread('n_processed.ppm', 0) #reads in image, added for clarity
-        print "Hogging away! "
+        # print "Hogging away! "
 
         alpha = 200
         # This is incredibly stupid we should fix this otherwise just fuck it
