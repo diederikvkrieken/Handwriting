@@ -105,11 +105,13 @@ class Classification():
             test_words = [self.words[idx] for idx in self.test_idx]
             for word in test_words:
                 # On all words in the test set
-                prediction = cls.test(word[1])  # Predict the characters
-                self.n_char += len(word[1])
-                # Add to dictionaries
-                self.predChar[name].append(prediction)
-                self.predWord[name].append(self.combineChar(prediction))
+                if len(word[1]) > 0:
+                    # If the word actually has characters...
+                    prediction = cls.test(word[1])  # Predict the characters
+                    self.n_char += len(word[1])
+                    # Add to dictionaries
+                    self.predChar[name].append(prediction)
+                    self.predWord[name].append(self.combineChar(prediction))
 
     # Combines a sequence of character predictions to a word
     def combineChar(self, segments):
@@ -193,6 +195,7 @@ class Classification():
         # NOTE: self.words is now different from words!!
         # Train and test on each fold
         for n, [train_i, test_i] in enumerate(self.folds):
+            print 'Initiating fold ', n
             self.n_fold(n)  # Prepare fold n
             self.train()    # Train on selected segments
             self.test()     # Predict characters AND word
