@@ -206,16 +206,16 @@ class segmenter:
         # apply step 3 and store
         SC_columns = self.step3(CSC_columns, 2)
 
-                # # draw CSC's and CS's
+        # # draw CSC's and CS's
         # with_lines = thin.copy()
-        with_lines_step3 = thin.copy()
-        thin_height, thin_width = thin.shape
-
-        for x in SC_columns:
-            cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
-
-        cv2.imshow("segments", with_lines_step3 * 255)
-        cv2.waitKey(1)
+        # with_lines_step3 = thin.copy()
+        # thin_height, thin_width = thin.shape
+        #
+        # for x in SC_columns:
+        #     cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
+        #
+        # cv2.imshow("segments", with_lines_step3 * 255)
+        # cv2.waitKey(1)
         # end of drawing CSC's and CS's
 
 

@@ -38,7 +38,7 @@ class PreProcessor:
             for word in line:
                 characters = [] # Tuple relative [x-start, x-end], text
                 # Put all characters in character array
-                if len(word.characters)    < 1:
+                if len(word.characters) < 1:
                     print "Warning, no character annotations for this word"
                     continue
 

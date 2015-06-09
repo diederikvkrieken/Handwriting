@@ -71,15 +71,13 @@ class Recognizer:
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
                 words = self.prepper.prep(ppm, inwords)
 
-
-
                 # Iterate through words
                 counter = 0
                 for word in words:
                     counter += 1
                     print counter
-                    cv2.imshow("current_word", word[0] * 255)
-                    cv2.waitKey(1)
+                    # cv2.imshow("current_word", word[0] * 255)
+                    # cv2.waitKey(1)
 
                     ## Character segmentation
                     cuts, chars = self.cs.segment(word[0])  # Make segments
@@ -94,10 +92,6 @@ class Recognizer:
                         # Extract features from each segment, include labeling
                         word[3].append((self.feat.hog(char), s[1]))
                     self.words.append(word)     # Word is ready for classification
-
-        # This is a debug classification problem, uncomment for fun. :)
-        # features = [ [i, i] for i in range(100)]
-        # classes = [0] * 50 + [1] * 50
 
         ## Classification
         self.cls.fullPass(self.words)  # A full run on the characters
@@ -130,6 +124,10 @@ class Recognizer:
             for char, s in zip(chars, segs):
                 word[3].append((self.feat.hog(char), s[1]))
             self.words.append(word)     # Add to words container for classification
+
+        # This is a debug classification problem, uncomment for fun. :)
+        # features = [ [i, i] for i in range(100)]
+        # classes = [0] * 50 + [1] * 50
 
         ## Classification
         self.cls.fullPass(self.words)
