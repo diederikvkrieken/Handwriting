@@ -37,6 +37,7 @@ class Recognizer:
 
         for file in os.listdir(ppm_folder):
             if file.endswith('.ppm') or file.endswith('.jpg'):
+                print file
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
@@ -46,12 +47,14 @@ class Recognizer:
                 for word in words:
                     ## Character segmentation
                     cuts, chars = self.cs.segment(word[0])  # Make segments
-                    segs = self.cs.annotate(chars, word[2]) # Give annotations to segments
+                    segs = self.cs.annotate(cuts, word[2]) # Give annotations to segments
+
+                    assert len(chars) == len(segs) #Safety check did the segmenting go correctly
 
                     ## Feature extraction
                     # Extract features from each segment
                     for char, seg in zip(chars, segs):
-                        self.features.append(self.feat.css(char))
+                        self.features.append(self.feat.hog(char))
                         self.classes.append(seg[1])
                         # NOTE: these are in order! Do not shuffle or you lose correspondence.
                         # zip() is also possible of course, but I simply do not feel the need. :)

@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier as rfc
 class RandomForest(rfc):
 
         def __init__(self):
-            super(RandomForest, self).__init__()
+            super(RandomForest, self).__init__(n_jobs=-1)
             self.name = 'Random Forest'
 
         def train(self, feat, goal):
