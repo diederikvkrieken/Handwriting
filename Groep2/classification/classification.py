@@ -148,7 +148,7 @@ class Classification():
             exp_char = self.predChar[name]
             exp_word = self.predWord[name]
             # Run over test words and predictions
-            for idx in range(0, len(test_words)):
+            for idx in range(0, len(exp_word)):
                 # Compare word prediction with actual class
                 if exp_word[idx] != test_words[idx][0]:
                     # Incorrect prediction, increment error
@@ -165,6 +165,13 @@ class Classification():
 
         # Return all outcomes
         return self.perf
+
+    # Displays results after a fold
+    def dispFoldRes(self, n):
+        print 'fold %d:\nclassifier\terror_w\terror_c\ttotal_w\ttotal_c' % n
+        for name, er in self.perf.iteritems():
+            print name, '\t\t', er[n][0], '\t\t', er[n][1],\
+                '\t\t', len(self.test_idx), '\t\t', self.n_char
 
     # Nicely prints results of classifiers
     def dispRes(self):
@@ -197,9 +204,13 @@ class Classification():
         for n, [train_i, test_i] in enumerate(self.folds):
             print 'Initiating fold ', n
             self.n_fold(n)  # Prepare fold n
+            print 'Starting training'
             self.train()    # Train on selected segments
+            print 'Testing'
             self.test()     # Predict characters AND word
+            print 'Determining performance'
             self.assess()   # Determine performance on characters and words
+            self.dispFoldRes(n)  # Print performance on fold beforehand
 
         self.dispRes()
         return self.perf
