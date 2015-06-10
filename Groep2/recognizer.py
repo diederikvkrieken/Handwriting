@@ -77,8 +77,9 @@ class Recognizer:
                     counter += 1
                     print counter
 
-                    cv2.imshow("current_word", word[0] * 255)
-                    cv2.waitKey(0)
+                    # visualisation of image
+                    # cv2.imshow("current_word", word[0] * 255)
+                    # cv2.waitKey(1)
 
 
                     ## Character segmentation
