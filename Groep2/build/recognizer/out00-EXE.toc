@@ -1,0 +1,9 @@
+('/home/diederik/Documents/HWR/handwriting-recognition/Groep2/dist/recognizer',
+ False,
+ False,
+ None,
+ None,
+ [],
+ None,
+ False,
+ 1434034490)
