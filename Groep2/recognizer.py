@@ -138,6 +138,19 @@ class Recognizer:
         ## Classification
         self.cls.fullPass(self.words)
 
+    # Go through folder, train and test on each file
+    def oneFolder(self, ppm_folder, words_folder):
+
+        # Iterate through all files in the image folder
+        for file in os.listdir(ppm_folder):
+            # Print which file is currently worked on
+            print file
+            if file.endswith('.ppm') or file.endswith('.jpg'):
+                ## Pass on to single file procedure
+                ppm = ppm_folder + '/' + file   # ENTIRE path of course..
+                inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
+                self.singleFile(ppm, inwords)
+
     # Standard run for validation by instructors
     def validate(self, ppm, inwords, outwords):
         ## Preprocessing
@@ -178,6 +191,9 @@ if __name__ == "__main__":
             elif sys.argv[2] == 'single':
                 # Train and test on one file
                 Recognizer().singleFile(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'onefolder':
+                # Train and test on each file in a folder
+                Recognizer().oneFolder(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'experiment':
                 # Run our experiment
                 Recognizer().folders(sys.argv[3], sys.argv[4])
