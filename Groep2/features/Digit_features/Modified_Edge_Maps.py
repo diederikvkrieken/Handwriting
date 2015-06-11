@@ -4,17 +4,22 @@ import scipy
 import numpy
 import Image
 import math
+from Groep2.preprocessing import thinning, prepImage
+
 
 #def Edge_Maps(img):
 # load an color image in grayscale
 img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
 
-sigma = 1.4
-imgdata = numpy.array(img, dtype = float)
+#the preprocessor object
+prepper = prepImage.PreProcessor()
+img = prepper.bgSub(img)
+binary = prepper.binarize(img)
+thin = thinning.thinning(binary)
 
-G = ndi.filters.gaussian_filter(imgdata, sigma)
+G = thin
 
-sobelout = Image.new('L', img.shape[:2])                                       #empty image
+sobelout = Image.new('L', thin.shape[:2])                                       #empty image
 gradx = numpy.array(sobelout, dtype = float)
 grady = numpy.array(sobelout, dtype = float)
 
@@ -25,8 +30,8 @@ sobel_y = [[-1,-2,-1],
            [0,0,0],
            [1,2,1]]
 
-width = img.shape[1]
-height = img.shape[0]
+width = thin.shape[1]
+height = thin.shape[0]
 
 for x in range(1, width-1):
     for y in range(1, height-1):
@@ -35,7 +40,6 @@ for x in range(1, width-1):
              (sobel_x[1][1] * G[x][y]) + (sobel_x[1][2] * G[x+1][y]) + \
              (sobel_x[2][0] * G[x-1][y+1]) + (sobel_x[2][1] * G[x][y+1]) + \
              (sobel_x[2][2] * G[x+1][y+1])
-
         py = (sobel_y[0][0] * G[x-1][y-1]) + (sobel_y[0][1] * G[x][y-1]) + \
              (sobel_y[0][2] * G[x+1][y-1]) + (sobel_y[1][0] * G[x-1][y]) + \
              (sobel_y[1][1] * G[x][y]) + (sobel_y[1][2] * G[x+1][y]) + \
