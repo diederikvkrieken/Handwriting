@@ -7,8 +7,10 @@ import os
 import xml.sax.handler
 import xml.sax
 from xml.sax.saxutils import escape
-from word import Word, Character
 import codecs
+
+from word import Word, Character
+
 
 def avg(items):
 	""" Return average value """

@@ -1,8 +1,10 @@
 import gtk
+
 import pamImage
 import croplib
-import wordio
+from Groep2.preprocessing.toolbox import wordio
 import word
+
 
 class Annotator(object):
 	def __init__(self, word_file, img_file, out_file):

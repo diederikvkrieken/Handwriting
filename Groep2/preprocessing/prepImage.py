@@ -4,9 +4,11 @@ Reads in a .ppm image, binarizes to use as mask, apply on original
 and outputs this as .ppm
 """
 
-from toolbox import wordio
-import cv2
 import numpy as np
+
+import cv2
+
+from toolbox import wordio
 
 
 class PreProcessor:
@@ -93,6 +95,7 @@ class PreProcessor:
             for word in line:
                 word.text = predictions[idx]    # Put prediction as word text
                 idx += 1
+                print word.text
 
         wordio.save(lines, outxml)   # Save a new file with the words predicted
 

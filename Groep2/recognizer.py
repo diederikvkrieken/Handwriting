@@ -10,10 +10,10 @@ import sys, os
 
 import cv2
 
-from Groep2.preprocessing import prepImage
-from Groep2.segmentation import char_segmentation as cs
-from Groep2.features import featExtraction
-from Groep2.classification import classification
+from preprocessing import prepImage
+from segmentation import char_segmentation as cs
+from features import featExtraction
+from classification import classification
 
 
 class Recognizer:
@@ -153,7 +153,7 @@ class Recognizer:
             # Go through all characters
             for c in chars:
                 ## Feature extraction
-                features = self.feat.css(c)
+                features = self.feat.hog(c)
 
                 ## Classification
                 pred = self.cls.classify('RF', features)
@@ -162,13 +162,14 @@ class Recognizer:
         self.prepper.saveXML(predictions, inwords, outwords)
 
 
+
 if __name__ == "__main__":
     # Number of arguments indicates how to run the program
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         # Too little, you screwed up..
         print "Usage: %s <image> <.words file> <output file>" % sys.argv[0]
         sys.exit(1)
-    elif len(sys.argv) > 3:
+    elif len(sys.argv) > 4:
         if sys.argv[1] == 'dev':
             # You know how to treat our program, all its little secrets...
             if sys.argv[2] == 'train':
