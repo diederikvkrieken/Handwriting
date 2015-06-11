@@ -23,24 +23,32 @@ class segmenter:
     def ascender_descender(self, binary):
 
         # smear out the binary image to get one large blob
-        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (40,1)), None, None, 1)
+       # binary = cv2.copyMakeBorder(binary, 0, 0, 110, 110, cv2.BORDER_CONSTANT,value=0)
 
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (30,1)), None, None, 2)
         # remove some extended parts of the big blob (the top of f's, bottom of p's etc)
-        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100,1)), None, None, 1)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (100  ,1)), None, None, 1)
 
-        # cv2.imshow("CPY", binary*255)
-        # cv2.waitKey(0)
 
-        cpy = binary.copy()
-        contourCNT = cv2.findContours(cpy, 0, 2)
+        contourFound = False
         if cv2.__version__[0] == '3':
             # OpenCV 3 has an extra first return value
-            cnt = contourCNT[0][1]
+            (__, cnts, _) = cv2.findContours(binary.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         else:
-            cnt = contourCNT[0][0]
+            (cnts, _) = cv2.findContours(binary.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        if len(cnts) >= 1:
+            # get largest contour
+            cnt = sorted(cnts, key = cv2.contourArea, reverse = True)[0]
+            contourFound = True
+
+        y = 0
+        h = binary.shape[0]
 
         # Finds the bounding box of the image and it's rotation
-        x,y,w,h = cv2.boundingRect(cnt)
+        if contourFound:
+            x,y,w,h = cv2.boundingRect(cnt)
+
         return (y, y+h)
 
     def crop_ascender(self, ascender_x, image):
