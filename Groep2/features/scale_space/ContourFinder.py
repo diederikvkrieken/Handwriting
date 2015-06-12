@@ -15,7 +15,7 @@ class findContour(object):
 	def __init__(self, img_file):
 		# self.imgGray = rgb2gray(img_file)
 		# self.imgBW = np.where(self.imgGray > np.mean(self.imgGray),1.0,0.0)
-		self.imgBW = pad(img_file,1, mode='constant', constant_values=1)
+		self.imgBW = pad(img_file,1, mode='constant', constant_values=0)
 
 		
 	def contour(self, inImage):
