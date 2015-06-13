@@ -69,13 +69,13 @@ for x in range(1, height-1):
              (sobel_down[2][0] * thin[x-1][y+1]) + (sobel_down[2][1] * thin[x][y+1]) + \
              (sobel_down[2][2] * thin[x+1][y+1])
 
-        gradx[x][y] = max(px,0)
-        grady[x][y] = max(py,0)
-        gradup[x][y] = max(pup,0)
-        graddown[x][y] = max(pdown,0)
+        gradx[x][y] = max(px-2,0)
+        grady[x][y] = max(py-2,0)
+        gradup[x][y] = max(pup-2,0)
+        graddown[x][y] = max(pdown-2,0)
 
 
 #show the image
-cv2.imshow('image',gradup)
+cv2.imshow('image',gradx)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
