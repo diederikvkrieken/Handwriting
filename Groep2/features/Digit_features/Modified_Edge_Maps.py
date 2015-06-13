@@ -9,7 +9,7 @@ from Groep2.preprocessing import thinning, prepImage
 
 #def Edge_Maps(img):
 # load an color image in grayscale
-img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
 
 #the preprocessor object
 prepper = prepImage.PreProcessor()
@@ -22,7 +22,8 @@ G = thin
 sobelout = Image.new('L', (thin.shape[1],thin.shape[0]))                                       #empty image
 gradx = numpy.array(sobelout, dtype = float)
 grady = numpy.array(sobelout, dtype = float)
-gradtotal = numpy.array(sobelout, dtype = float)
+gradup = numpy.array(sobelout, dtype = float)
+graddown = numpy.array(sobelout, dtype = float)
 
 
 sobel_x = [[-1,2,-1],
@@ -56,13 +57,25 @@ for x in range(1, height-1):
              (sobel_y[1][1] * G[x][y]) + (sobel_y[1][2] * G[x+1][y]) + \
              (sobel_y[2][0] * G[x-1][y+1]) + (sobel_y[2][1] * G[x][y+1]) + \
              (sobel_y[2][2] * G[x+1][y+1])
+
+        pup = (sobel_up[0][0] * G[x-1][y-1]) + (sobel_up[0][1] * G[x][y-1]) + \
+             (sobel_up[0][2] * G[x+1][y-1]) + (sobel_up[1][0] * G[x-1][y]) + \
+             (sobel_up[1][1] * G[x][y]) + (sobel_up[1][2] * G[x+1][y]) + \
+             (sobel_up[2][0] * G[x-1][y+1]) + (sobel_up[2][1] * G[x][y+1]) + \
+             (sobel_up[2][2] * G[x+1][y+1])
+        pdown = (sobel_down[0][0] * G[x-1][y-1]) + (sobel_down[0][1] * G[x][y-1]) + \
+             (sobel_down[0][2] * G[x+1][y-1]) + (sobel_down[1][0] * G[x-1][y]) + \
+             (sobel_down[1][1] * G[x][y]) + (sobel_down[1][2] * G[x+1][y]) + \
+             (sobel_down[2][0] * G[x-1][y+1]) + (sobel_down[2][1] * G[x][y+1]) + \
+             (sobel_down[2][2] * G[x+1][y+1])
+
         gradx[x][y] = px
         grady[x][y] = py
-
-gradtotal = gradx
+        gradup[x][y] = pup
+        graddown[x][y] = pdown
 
 
 #show the image
-cv2.imshow('image',gradtotal)
+cv2.imshow('image',graddown)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
