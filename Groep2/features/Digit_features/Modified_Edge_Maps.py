@@ -1,9 +1,6 @@
 import cv2
-import scipy.ndimage as ndi
-import scipy
 import numpy
 import Image
-import math
 from Groep2.preprocessing import thinning, prepImage
 
 
@@ -11,6 +8,7 @@ from Groep2.preprocessing import thinning, prepImage
 #def Edge_Maps(img):
 # load an color image in grayscale
 img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
+img = cv2.resize(img, (25,25))
 
 #the preprocessor object
 prepper = prepImage.PreProcessor()
@@ -74,8 +72,46 @@ for x in range(1, height-1):
         gradup[x][y] = max(pup-2,0)
         graddown[x][y] = max(pdown-2,0)
 
+horizontal = []
+vertical = []
+upwards = []
+downwards = []
+thimage =[]
+for x in range(0,5):
+    x = x*5
+    for y in range(0,5):
+        y = y*5
+
+        thin_image = thin[x:x + 5, y:y + 5]
+        percent_thin = thin_image.sum() / 125
+        thimage.append(percent_thin)
+
+        hor_image = gradx[x:x + 5, y:y + 5]
+        percen_horizontal = hor_image.sum() / 125
+        horizontal.append(percen_horizontal)
+        
+        ver_image = grady[x:x + 5, y:y + 5]
+        percen_vertical = ver_image.sum() / 125
+        vertical.append(percen_vertical)
+        
+        up_image = gradup[x:x + 5, y:y + 5]
+        percen_upwards = up_image.sum() / 125
+        upwards.append(percen_upwards)
+        
+        down_image = graddown[x:x + 5, y:y + 5]
+        percen_downwards = down_image.sum() / 125
+        downwards.append(percen_downwards)
+
+featurevector = []
+featurevector.append(thimage)
+featurevector.append(horizontal)
+featurevector.append(vertical)
+featurevector.append(upwards)
+featurevector.append(downwards)
 
 #show the image
-cv2.imshow('image',gradx)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+#cv2.imshow('image',grady)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
+
+
