@@ -7,6 +7,7 @@ import math
 from Groep2.preprocessing import thinning, prepImage
 
 
+
 #def Edge_Maps(img):
 # load an color image in grayscale
 img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
@@ -17,7 +18,6 @@ img = prepper.bgSub(img)
 binary = prepper.binarize(img)
 thin = thinning.thinning(binary)
 
-G = thin
 
 sobelout = Image.new('L', (thin.shape[1],thin.shape[0]))                                       #empty image
 gradx = numpy.array(sobelout, dtype = float)
@@ -47,35 +47,35 @@ height = thin.shape[0]
 
 for x in range(1, height-1):
     for y in range(1, width-1):
-        px = (sobel_x[0][0] * G[x-1][y-1]) + (sobel_x[0][1] * G[x][y-1]) + \
-             (sobel_x[0][2] * G[x+1][y-1]) + (sobel_x[1][0] * G[x-1][y]) + \
-             (sobel_x[1][1] * G[x][y]) + (sobel_x[1][2] * G[x+1][y]) + \
-             (sobel_x[2][0] * G[x-1][y+1]) + (sobel_x[2][1] * G[x][y+1]) + \
-             (sobel_x[2][2] * G[x+1][y+1])
-        py = (sobel_y[0][0] * G[x-1][y-1]) + (sobel_y[0][1] * G[x][y-1]) + \
-             (sobel_y[0][2] * G[x+1][y-1]) + (sobel_y[1][0] * G[x-1][y]) + \
-             (sobel_y[1][1] * G[x][y]) + (sobel_y[1][2] * G[x+1][y]) + \
-             (sobel_y[2][0] * G[x-1][y+1]) + (sobel_y[2][1] * G[x][y+1]) + \
-             (sobel_y[2][2] * G[x+1][y+1])
+        px = (sobel_x[0][0] * thin[x-1][y-1]) + (sobel_x[0][1] * thin[x][y-1]) + \
+             (sobel_x[0][2] * thin[x+1][y-1]) + (sobel_x[1][0] * thin[x-1][y]) + \
+             (sobel_x[1][1] * thin[x][y]) + (sobel_x[1][2] * thin[x+1][y]) + \
+             (sobel_x[2][0] * thin[x-1][y+1]) + (sobel_x[2][1] * thin[x][y+1]) + \
+             (sobel_x[2][2] * thin[x+1][y+1])
+        py = (sobel_y[0][0] * thin[x-1][y-1]) + (sobel_y[0][1] * thin[x][y-1]) + \
+             (sobel_y[0][2] * thin[x+1][y-1]) + (sobel_y[1][0] * thin[x-1][y]) + \
+             (sobel_y[1][1] * thin[x][y]) + (sobel_y[1][2] * thin[x+1][y]) + \
+             (sobel_y[2][0] * thin[x-1][y+1]) + (sobel_y[2][1] * thin[x][y+1]) + \
+             (sobel_y[2][2] * thin[x+1][y+1])
 
-        pup = (sobel_up[0][0] * G[x-1][y-1]) + (sobel_up[0][1] * G[x][y-1]) + \
-             (sobel_up[0][2] * G[x+1][y-1]) + (sobel_up[1][0] * G[x-1][y]) + \
-             (sobel_up[1][1] * G[x][y]) + (sobel_up[1][2] * G[x+1][y]) + \
-             (sobel_up[2][0] * G[x-1][y+1]) + (sobel_up[2][1] * G[x][y+1]) + \
-             (sobel_up[2][2] * G[x+1][y+1])
-        pdown = (sobel_down[0][0] * G[x-1][y-1]) + (sobel_down[0][1] * G[x][y-1]) + \
-             (sobel_down[0][2] * G[x+1][y-1]) + (sobel_down[1][0] * G[x-1][y]) + \
-             (sobel_down[1][1] * G[x][y]) + (sobel_down[1][2] * G[x+1][y]) + \
-             (sobel_down[2][0] * G[x-1][y+1]) + (sobel_down[2][1] * G[x][y+1]) + \
-             (sobel_down[2][2] * G[x+1][y+1])
+        pup = (sobel_up[0][0] * thin[x-1][y-1]) + (sobel_up[0][1] * thin[x][y-1]) + \
+             (sobel_up[0][2] * thin[x+1][y-1]) + (sobel_up[1][0] * thin[x-1][y]) + \
+             (sobel_up[1][1] * thin[x][y]) + (sobel_up[1][2] * thin[x+1][y]) + \
+             (sobel_up[2][0] * thin[x-1][y+1]) + (sobel_up[2][1] * thin[x][y+1]) + \
+             (sobel_up[2][2] * thin[x+1][y+1])
+        pdown = (sobel_down[0][0] * thin[x-1][y-1]) + (sobel_down[0][1] * thin[x][y-1]) + \
+             (sobel_down[0][2] * thin[x+1][y-1]) + (sobel_down[1][0] * thin[x-1][y]) + \
+             (sobel_down[1][1] * thin[x][y]) + (sobel_down[1][2] * thin[x+1][y]) + \
+             (sobel_down[2][0] * thin[x-1][y+1]) + (sobel_down[2][1] * thin[x][y+1]) + \
+             (sobel_down[2][2] * thin[x+1][y+1])
 
-        gradx[x][y] = px
-        grady[x][y] = py
-        gradup[x][y] = pup
-        graddown[x][y] = pdown
+        gradx[x][y] = max(px,0)
+        grady[x][y] = max(py,0)
+        gradup[x][y] = max(pup,0)
+        graddown[x][y] = max(pdown,0)
 
 
 #show the image
-cv2.imshow('image',graddown)
+cv2.imshow('image',gradup)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
