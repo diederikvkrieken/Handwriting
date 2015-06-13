@@ -25,12 +25,21 @@ grady = numpy.array(sobelout, dtype = float)
 gradtotal = numpy.array(sobelout, dtype = float)
 
 
-sobel_x = [[-1,0,1],
-           [-1,0,1],
-           [-1,0,1]]
+sobel_x = [[-1,2,-1],
+           [-1,2,-1],
+           [-1,2,-1]]
 sobel_y = [[-1,-1,-1],
-           [0,0,0],
-           [1,1,1]]
+           [2,2,2],
+           [-1,-1,-1]]
+
+sobel_up = [[-1,-1,2],
+           [-1,2,-1],
+           [2,-1,-1]]
+
+sobel_down = [[2,-1,-1],
+           [-1,2,-1],
+           [-1,-1,2]]
+
 
 width = thin.shape[1]
 height = thin.shape[0]
