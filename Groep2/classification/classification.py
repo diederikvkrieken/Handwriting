@@ -147,18 +147,23 @@ class Classification():
             test_words = [self.words[idx] for idx in self.test_idx]
             exp_char = self.predChar[name]
             exp_word = self.predWord[name]
+            real_idx = -1   # Index of real words, which can be different from pred_idx because of empty words...
             # Run over test words and predictions
-            for idx in range(0, len(exp_word)):
-                # Compare word prediction with actual class
-                if exp_word[idx] != test_words[idx][0]:
-                    # Incorrect prediction, increment error
-                    er_word += 1
+            for pred_idx in range(0, len(exp_word)):
+                real_idx += 1   # Increment with pred_idx
                 # Compare character predictions with actual class
-                actual = test_words[idx][2]     # Actual characters
+                actual = test_words[real_idx][2]     # Actual characters
+                while len(actual) != len(exp_char[pred_idx]):
+                    # Account for discrepancy because of empty words
+                    real_idx += 1
                 for ci in range(len(actual)):
-                    if exp_char[idx][ci] != actual[ci]:
+                    if exp_char[pred_idx][ci] != actual[ci]:
                         # Incorrect prediction, increment error
                         er_char += 1
+                # Compare word prediction with actual class
+                if exp_word[pred_idx] != test_words[real_idx][0]:
+                    # Incorrect prediction, increment error
+                    er_word += 1
 
             # Store performance in dictionary
             self.perf[name].append((er_word, er_char))
@@ -202,7 +207,7 @@ class Classification():
         # NOTE: self.words is now different from words!!
         # Train and test on each fold
         for n, [train_i, test_i] in enumerate(self.folds):
-            print 'Initiating fold ', n
+            print 'Initiating fold ', n+1
             self.n_fold(n)  # Prepare fold n
             print 'Starting training'
             self.train()    # Train on selected segments

@@ -1,0 +1,11 @@
+NOTE: These are the bad bad images and their conspiring annotations.
+
+Please add any and all encounters with these vermin. Also specify the reason/what went wrong with this instance.
+
+#KNMP
+KNMP-VIII_F_69______2C2O_0002   -   Not even the original .words cared about words
+KNMP-VIII_F_69______2C2O_0148   -   This .words file does not exist...
+KNMP-VIII_F_69______2C2O_0150   -   Same for this one
+
+#Stanford
+Stanford-CCCC_0074  -   The .words file does not yield enough segments for 4-fold cross validation
