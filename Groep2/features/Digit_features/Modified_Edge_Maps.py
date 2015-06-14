@@ -7,7 +7,6 @@ from Groep2.preprocessing import thinning, prepImage
 
 def Edge_Maps(img):
         # load an color image in grayscale
-        #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (25,25))
 
         #the preprocessor object
@@ -109,10 +108,13 @@ def Edge_Maps(img):
         feature_vector.append(upwards)
         feature_vector.append(downwards)
 
+        #show the image
+        #cv2.imshow('image',graddown)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
         return feature_vector
-#show the image
-#cv2.imshow('image',grady)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
 
+
+#img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
+#Edge_Maps(img)
 
