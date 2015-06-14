@@ -19,3 +19,5 @@ def multiZoning(image):
                 a = image[j:j + width, i:i + height]
                 percentage_black_pixels = a.sum() / imgSize
                 feature_vector.append(percentage_black_pixels)
+
+    return feature_vector
