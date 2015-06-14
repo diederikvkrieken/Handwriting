@@ -10,6 +10,7 @@ class Features():
     
     # Extracts HOG features from an image and returns those
     def HOG(self,img):
+        pass
 
     def dali(self):
         # This was not going to work, right?
