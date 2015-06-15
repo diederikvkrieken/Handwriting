@@ -78,6 +78,7 @@ class ImageProjections():
         return feature_vector
 
     def run(self, img):
+        print "Running Modified Edge Maps"
         img = self.scale(img)
         feature = self.findImageProjections(img)
         return feature

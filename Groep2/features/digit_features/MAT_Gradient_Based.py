@@ -78,6 +78,7 @@ class MAT_Grad():
         #MAT_Grad(img)
 
     def run(self,image):
+        print "Running MAT Gradient"
         image = self.scale(image)
         feature = self.findMATGrad(image)
         return feature

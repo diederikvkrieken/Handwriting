@@ -162,7 +162,7 @@ class ConcavitiesMeasurement():
 
 
     def run(self, img):
-
+        print "Running Concavities Measurement"
         # preprocess
         img, segments = self.scaleAndSegment(img)
 
@@ -174,6 +174,4 @@ class ConcavitiesMeasurement():
         # ax.imshow(img, interpolation='nearest', cmap=plt.cm.gray)
         # plt.show()
         # cv2.waitKey(0)
-
-
         return feature

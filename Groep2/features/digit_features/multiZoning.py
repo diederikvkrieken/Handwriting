@@ -29,5 +29,6 @@ class MultiZoning():
         return feature_vector
 
     def run(self,image):
+        print "Multi Zoning"
         feature = self.doMultiZoning(image)
         return feature

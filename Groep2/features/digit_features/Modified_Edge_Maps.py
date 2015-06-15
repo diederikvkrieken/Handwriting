@@ -120,5 +120,6 @@ class EdgeMaps():
         #Edge_Maps(img)
 
     def run(self,img):
+        print "Running Modified Edge Maps"
         feature = self.findEdgeMaps(img)
         return feature

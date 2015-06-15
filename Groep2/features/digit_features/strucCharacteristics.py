@@ -36,6 +36,7 @@ class StrucCharacteristics():
         return feature_vector
 
     def run(self,image):
+        print "Running Struc Characteristics"
         image = self.scale(image)
         feature = self.findStrucCharacteristics(image)
         return feature
