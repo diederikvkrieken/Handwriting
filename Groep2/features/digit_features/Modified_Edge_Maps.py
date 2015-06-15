@@ -5,9 +5,15 @@ from Groep2.preprocessing import thinning, prepImage
 
 
 
-def Edge_Maps(img):
+class EdgeMaps():
+    def __init__(self):
+        self.xSize = 25
+        self.ySize = 25
+        pass
+
+    def findEdgeMaps(self,img):
         # load an color image in grayscale
-        img = cv2.resize(img, (25,25))
+        img = cv2.resize(img, (self.xSize,self.ySize))
 
         #the preprocessor object
         prepper = prepImage.PreProcessor()
@@ -117,4 +123,6 @@ def Edge_Maps(img):
 
 #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
 #Edge_Maps(img)
-
+    def run(self,img):
+        feature = self.findEdgemaps(img)
+        return feature
