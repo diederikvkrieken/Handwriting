@@ -30,7 +30,7 @@ class Recognizer:
     def wordParallel(self, word):
 
         ## Character segmentation
-        cuts, chars = cs.segment(word[0])
+        cuts, chars = cs.segment(word[0][0], word[0][1])
 
         segs = cs.annotate(cuts, word[2])
 
@@ -42,7 +42,7 @@ class Recognizer:
 
         # Obtain features of all segments
         for char, s in zip(chars, segs):
-            word[3].append((feat.hog(char), s[1]))
+            word[3].append((feat.HOG(char[1]), s[1]))
 
         return word
 
@@ -60,7 +60,9 @@ class Recognizer:
                 # Iterate through words
                 for word in words:
                     ## Character segmentation
-                    cuts, chars = cs.segment(word[0])  # Make segments
+                    cuts, chars = cs.segment(word[0][0], word[0][1])  # Make segments
+
+
                     segs = cs.annotate(cuts, word[2]) # Give annotations to segments
 
                     assert len(chars) == len(segs) #Safety check did the segmenting go correctly
@@ -68,7 +70,7 @@ class Recognizer:
                     ## Feature extraction
                     # Extract features from each segment
                     for char, seg in zip(chars, segs):
-                        features.append(feat.hog(char))
+                        features.append(feat.HOG(char[1]))
                         classes.append(seg[1])
                         # NOTE: these are in order! Do not shuffle or you lose correspondence.
                         # zip() is also possible of course, but I simply do not feel the need. :)
@@ -130,12 +132,12 @@ class Recognizer:
         # Go through all words
         for word in words:
             ## Character segmentation
-            cuts, chars = cs.segment(word)
+            cuts, chars = cs.segment(word[0], word[1])
 
             # Go through all characters
             for c in chars:
-                ## Feature extraction
-                features = feat.hog(c)
+                ## Feature extraction (c[1] for grayscale)
+                features = feat.HOG(c[1])
 
                 ## Classification
                 pred = cls.classify('RF', features)
