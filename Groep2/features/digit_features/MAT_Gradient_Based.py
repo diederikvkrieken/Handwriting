@@ -76,6 +76,7 @@ class MAT_Grad():
         return feature_vector
         #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
         #MAT_Grad(img)
+
     def run(self,image):
         image = self.scale(image)
         feature = self.findMATGrad(image)

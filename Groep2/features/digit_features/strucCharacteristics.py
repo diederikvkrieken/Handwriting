@@ -1,7 +1,5 @@
 import cv2
-import numpy as np
 import math
-from skimage.color import rgb2gray
 from skimage.util import pad
 
 
@@ -23,7 +21,7 @@ class StrucCharacteristics():
         # img = cv2.resize(img, (32,32))
         # imgGray = rgb2gray(img)
         # imgBW = np.where(img > np.mean(imgGray), 1.0, 0.0)
-        imgBW = pad(imgBW, 1, mode='constant', constant_values=1)
+        imgBW = pad(image, 1, mode='constant', constant_values=1)
 
         y_hist = imgBW.sum(axis=0)
         x_hist = imgBW.sum(axis=1)

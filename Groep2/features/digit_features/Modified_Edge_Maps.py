@@ -21,13 +21,11 @@ class EdgeMaps():
         binary = prepper.binarize(img)
         thin = thinning.thinning(binary)
 
-
         sobelout = Image.new('L', (thin.shape[1],thin.shape[0]))                                       #empty image
         gradx = numpy.array(sobelout, dtype = float)
         grady = numpy.array(sobelout, dtype = float)
         gradup = numpy.array(sobelout, dtype = float)
         graddown = numpy.array(sobelout, dtype = float)
-
 
         sobel_x = [[-1,2,-1],
                    [-1,2,-1],
@@ -43,7 +41,6 @@ class EdgeMaps():
         sobel_down = [[2,-1,-1],
                   [-1,2,-1],
                   [-1,-1,2]]
-
 
         width = thin.shape[1]
         height = thin.shape[0]
@@ -119,10 +116,9 @@ class EdgeMaps():
         #cv2.waitKey(0)
         #cv2.destroyAllWindows()
         return feature_vector
+        #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
+        #Edge_Maps(img)
 
-
-#img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
-#Edge_Maps(img)
     def run(self,img):
-        feature = self.findEdgemaps(img)
+        feature = self.findEdgeMaps(img)
         return feature
