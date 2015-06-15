@@ -102,6 +102,100 @@ class Recognizer:
         ## Classification
         self.cls.fullPass(self.words)  # A full run on the characters
 
+    # Running all the features WARNING this will take an extremely long time!
+    def allFeatures(self, ppm_folder, words_folder):
+
+        featureResults = []
+
+        for file in os.listdir(ppm_folder):
+            print file
+            if file.endswith('.ppm') or file.endswith('.jpg'):
+                ## Read and preprocess
+                ppm = ppm_folder + '/' + file   # ENTIRE path of course..
+                inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
+                preppedWords = self.prepper.prep(ppm, inwords)
+
+                # f = feature class and fname = key
+                for fName, f in self.feat.featureMethods.iteritems():
+
+                    featureResults.append([])
+
+                    # Iterate through words
+                    counter = 0
+                    for word in preppedWords:
+                        counter += 1
+                        print counter
+
+                        # visualisation of image
+                        # cv2.imshow("current_word", word[0] * 255)
+                        # cv2.waitKey(1)
+
+
+                        ## Character segmentation
+                        cuts, chars = self.cs.segment(word[0][0], word[0][1])  # Make segments
+                        segs = self.cs.annotate(cuts, word[2])  # Give annotations to segments
+
+                        assert len(chars) == len(segs) #Safety check did the segmenting go correctly
+
+                        ## Feature extraction
+                        word = list(word)
+                        word.append([])     # Add empty list to word for features
+                        for char, s in zip(chars, segs):
+                            # Extract features from each segment, include labeling
+                            if f[1] == 0:
+                                word[3].append((f[0].run(char[0]), s[1]))
+                            elif f[1] == 1:
+                                word[3].append((f[0].run(char[1]), s[1]))
+
+                        featureResults[-1].append(word)     # Word is ready for classification
+
+
+
+        ## Classification
+        for fr in featureResults:
+            self.cls.fullPass(fr)  # A full run on the characters
+
+   # Trains and tests on a single image
+    def singleFileAllFeat(self, ppm, inwords):
+        ## Preprocessing
+        preppedWords = self.prepper.prep(ppm, inwords)
+
+        # # Debug show
+        # for word in words:
+        #     cv2.imshow('Cropped word: %s' % word[1], word[0]*255)
+        #     cv2.waitKey(0)
+        #     cv2.destroyAllWindows()
+
+        featureResults = []
+
+        for fName, f in self.feat.featureMethods.iteritems():
+
+            featureResults.append([])
+            # Consider all words
+            for word in preppedWords:
+                ## Character segmentation
+                cuts, chars = self.cs.segment(word[0][0], word[0][1])
+
+                segs = self.cs.annotate(cuts, word[2])
+
+                assert len(chars) == len(segs) #Safety check did the segmenting go correctly
+
+                ## Feature extraction
+                word = list(word)
+                word.append([])     # Add empty list for features and classes
+                # Obtain features of all segments
+                for char, s in zip(chars, segs):
+                    # Extract features from each segment, include labeling
+                    if f[1] == 0:
+                        word[3].append((f[0].run(char[0]), s[1]))
+                    elif f[1] == 1:
+                        word[3].append((f[0].run(char[1]), s[1]))
+
+                featureResults[-1].append(word)     # Word is ready for classification
+
+        ## Classification
+        for fr in featureResults:
+            self.cls.fullPass(fr)  # A full run on the characters
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
@@ -191,9 +285,15 @@ if __name__ == "__main__":
             elif sys.argv[2] == 'single':
                 # Train and test on one file
                 Recognizer().singleFile(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'singleAllFeat':
+                # Train and test on one file and features
+                Recognizer(). singleFileAllFeat(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'onefolder':
                 # Train and test on each file in a folder
                 Recognizer().oneFolder(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'experimentAllFeat':
+                # Train and test on one file
+                Recognizer(). allFeatures(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'experiment':
                 # Run our experiment
                 Recognizer().folders(sys.argv[3], sys.argv[4])
