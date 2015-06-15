@@ -1,0 +1,3 @@
+sudo apt-get install python-sklearn
+pip install -U scikit-image
+sudo apt-get install libopencv-dev python-opencv
