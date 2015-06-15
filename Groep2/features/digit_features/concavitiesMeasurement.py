@@ -13,9 +13,8 @@ class ConcavitiesMeasurement():
 
     def scaleAndSegment(self, img):
 
-        # Scale to 18 * 15
-        img = cv2.resize(img, (self.xSize, self.ySize))
-        img = np.where(img > np.mean(img),0.0,1.0)
+        # Scale to 18 * 15 !MOOI!
+        img = cv2.resize(img, (self.xSize, self.ySize), interpolation=cv2.INTER_NEAREST)
 
         # Segment
         segments = [[0,8,0,6],[0,8,6,12],[0,8,12,18],[8,16,0,6],[8,16,6,12],[8,15,12,18]]
