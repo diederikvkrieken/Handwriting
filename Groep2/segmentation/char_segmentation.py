@@ -77,7 +77,7 @@ class segmenter:
         return crop_img
 
 
-    def crop_sc_areas(self, SC_columns, asc, desc, image):
+    def crop_sc_areas(self, SC_columns, asc, desc, imageBinary, imageGrayscale):
         """
         This function returns the crops coresponding to the SC_columns list
         It does some fancy stuff with connected components to keep the 'f' an 'g' alive.
@@ -96,14 +96,14 @@ class segmenter:
         # the coordinate of the previous SC_column. We start at x = zero
         prev_x = 0
 
-        asc_crop = self.crop_ascender(asc, image)
-        desc_crop = self.crop_descender(desc, image)
+        asc_crop = self.crop_ascender(asc, imageBinary)
+        desc_crop = self.crop_descender(desc, imageBinary)
 
         # for every element in SC_columns, get the corresponding crop if there are
         # at all pixels in that crop. If so, add the crop to the crop list, and the x coordinate to the new SC columns list
         for x in SC_columns:
-            crop  = image[0:image.shape[0], prev_x:x]
-            extend_right_width = image.shape[1] - crop.shape[1] - prev_x
+            crop  = imageBinary[0:imageBinary.shape[0], prev_x:x]
+            extend_right_width = imageBinary.shape[1] - crop.shape[1] - prev_x
             crop = cv2.copyMakeBorder(crop, 0, 0, prev_x, extend_right_width, cv2.BORDER_CONSTANT,value=0)
 
             crop = cv2.bitwise_or(crop, asc_crop)
@@ -149,13 +149,13 @@ class segmenter:
 
                     # get the definitive crop and add it to the list
                     def_crop = mask[0:mask.shape[1], x_start: x_start + width]
-                    crop_list.append(def_crop)
+                    def_crop_grayscale = imageGrayscale[0:mask.shape[1], x_start: x_start + width]
+                    crop_list.append((def_crop, def_crop_grayscale))
 
                     # some visualisation, you may uncomment
                     # cv2.imshow("mask", mask * 255)
-                    # cv2.imshow("def crop", def_crop * 255)
                     # cv2.imshow("cropp", crop * 255)
-                    # cv2.waitKey(5)
+
 
                     # add the current column to the new list
                     new_SC_columns.append(x)
@@ -194,12 +194,12 @@ class segmenter:
         return SC_columns
 
     # Segments a given word image
-    def segment(self, word):
+    def segment(self, wordBinary, wordGrayscale):
         # calculate the y coordinates of the ascender (e.g. top part f) and descender (e.g. bottom part g) lines
-        ascender, descender = self.ascender_descender(word)
+        ascender, descender = self.ascender_descender(wordBinary)
 
         # step 1  of paper
-        thin = thinning.thinning(word)
+        thin = thinning.thinning(wordBinary)
 
         #Sum column and find CSC candidates. (step 2 of paper)
         if cv2.__version__[0] == '3':
@@ -227,7 +227,7 @@ class segmenter:
         # cv2.waitKey(1)
         # end of drawing CSC's and CS's
 
-        return self.crop_sc_areas(SC_columns, ascender, descender, word)
+        return self.crop_sc_areas(SC_columns, ascender, descender, wordBinary, wordGrayscale)
 
 
         # # draw ascender and descender lines

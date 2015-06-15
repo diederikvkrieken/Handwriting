@@ -191,10 +191,11 @@ class PreProcessor:
 
         # For all words, subtract background, binarize and multiply with original
         prossed = []    # New list for tuples because tuples are immutable...
+        grayscale = [] # List for word images (binary * original)
         for w in words:
             pros = self.bgSub(w[0])
             pros = self.binarize(w[0])
-            prossed.append((pros, w[1], w[2]))
+            prossed.append(((pros, pros * w[0]), w[1], w[2]))
 
         # Return pre-processed words: (image, text, character(left, right, text))
         return prossed
@@ -206,14 +207,15 @@ class PreProcessor:
         words = self.cropWords(self.orig, inxml)
 
         # For all words, subtract background, binarize and multiply with original
-        prossed = []    # New list for word images
+        prossed = []    # New list for word images (binary)
+        grayscale = [] # List for word images (binary * original)
         for w in words:
             pros = self.bgSub(w)
             pros = self.binarize(w)
-            prossed.append(pros)
+            prossed.append(pros, pros * w)
 
         # Return pre-processed words
-        return prossed
+        return (prossed)
 
 
     # Obsolete method using provided code

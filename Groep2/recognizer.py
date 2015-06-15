@@ -46,7 +46,7 @@ class Recognizer:
                 # Iterate through words
                 for word in words:
                     ## Character segmentation
-                    cuts, chars = self.cs.segment(word[0])  # Make segments
+                    cuts, chars = self.cs.segment(word[0][0], word[0][1])  # Make segments
                     segs = self.cs.annotate(cuts, word[2]) # Give annotations to segments
 
                     assert len(chars) == len(segs) #Safety check did the segmenting go correctly
@@ -54,7 +54,7 @@ class Recognizer:
                     ## Feature extraction
                     # Extract features from each segment
                     for char, seg in zip(chars, segs):
-                        self.features.append(self.feat.hog(char))
+                        self.features.append(self.feat.HOG(char[1]))
                         self.classes.append(seg[1])
                         # NOTE: these are in order! Do not shuffle or you lose correspondence.
                         # zip() is also possible of course, but I simply do not feel the need. :)
@@ -86,7 +86,7 @@ class Recognizer:
 
 
                     ## Character segmentation
-                    cuts, chars = self.cs.segment(word[0])  # Make segments
+                    cuts, chars = self.cs.segment(word[0][0], word[0][1])  # Make segments
                     segs = self.cs.annotate(cuts, word[2])  # Give annotations to segments
 
                     assert len(chars) == len(segs) #Safety check did the segmenting go correctly
@@ -96,7 +96,7 @@ class Recognizer:
                     word.append([])     # Add empty list to word for features
                     for char, s in zip(chars, segs):
                         # Extract features from each segment, include labeling
-                        word[3].append((self.feat.hog(char), s[1]))
+                        word[3].append((self.feat.HOG(char[1]), s[1]))
                     self.words.append(word)     # Word is ready for classification
 
         ## Classification
@@ -117,7 +117,7 @@ class Recognizer:
         # Consider all words
         for word in words:
             ## Character segmentation
-            cuts, chars = self.cs.segment(word[0])
+            cuts, chars = self.cs.segment(word[0][0], word[0][1])
 
             segs = self.cs.annotate(cuts, word[2])
 
@@ -128,7 +128,7 @@ class Recognizer:
             word.append([])     # Add empty list for features and classes
             # Obtain features of all segments
             for char, s in zip(chars, segs):
-                word[3].append((self.feat.hog(char), s[1]))
+                word[3].append((self.feat.HOG(char[1]), s[1]))
             self.words.append(word)     # Add to words container for classification
 
         # This is a debug classification problem, uncomment for fun. :)
@@ -161,12 +161,12 @@ class Recognizer:
         # Go through all words
         for word in words:
             ## Character segmentation
-            cuts, chars = self.cs.segment(word)
+            cuts, chars = self.cs.segment(word[0], word[1])
 
             # Go through all characters
             for c in chars:
                 ## Feature extraction
-                features = self.feat.hog(c)
+                features = self.feat.HOG(c[1])
 
                 ## Classification
                 pred = self.cls.classify('RF', features)
