@@ -1,0 +1,19 @@
+Whitaker's Words Latin to English dictionary
+
+
+26/2/2011
+  
+  * Recompiled dictionary without compression, as believe this was creating
+    some errors when searching around the 'm' area. 
+
+8/2/2011
+
+ * kindlegen is required to compile the .opf file. The .opf file is based
+   on the Advanced Dictionary sample at mobipocket.com.[1]
+ * When running the python file from command line, the output should be 
+   redirected, otherwise it will dump content into the terminal. ie. 
+   $ python words_convert.py > dict.html
+ * The filename of the output (dict.html) is hardcoded into the .opf HTML file.
+ * This dictionary does not support inflections, perhaps this can be added. 
+
+[1]http://www.mobipocket.com/dev/prcgen/samples/ebooktypes/Advanced_Dictionary.zip
