@@ -1,14 +1,17 @@
 "Skeleton for feature extraction"
 
-from scale_space import runCSS
-
-#Import HOG
-from skimage.feature import hog
+# Standard libararies
 import cv2
-import matplotlib.pyplot as plt
 import math
 
-from skimage.util import pad
+# Import CSS
+from scale_space import runCSS
+
+# Import HOG
+from skimage.feature import hog
+
+# Import Digit Features
+from digit_features import concavitiesMeasurement as cm
 
 class Features():
     
@@ -68,13 +71,12 @@ class Features():
             '''
         return fd
     
-    def dali(self):
-        # This was not going to work, right?
-        pass
-    
     # Extracts css features from an image and returns those
     def css(self, img):
         return runCSS.runCss().run(img)
+
+    def concavitiesMeasurement(self, img):
+        return cm.ConcavitiesMeasurement().run(img)
 
     # A cheapskate feature extraction that definitely yields vectors of equal length
     def cheapskate(self, img):

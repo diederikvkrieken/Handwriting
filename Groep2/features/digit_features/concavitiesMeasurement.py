@@ -18,7 +18,7 @@ class ConcavitiesMeasurement():
         img = np.where(img > np.mean(img),0.0,1.0)
 
         # Segment
-        segments = [[0,8,0,6],[0,8,6,12],[0,8,12,17],[8,15,0,6],[8,15,6,12],[8,15,12,17]]
+        segments = [[0,8,0,6],[0,8,6,12],[0,8,12,18],[8,16,0,6],[8,16,6,12],[8,15,12,18]]
 
         return img, segments
 
@@ -43,9 +43,9 @@ class ConcavitiesMeasurement():
         SegmentFeature = np.zeros(13)
 
         # iterate through every white pixel in segment
-        for x in range(seg[2],seg[3]):
-            for y in range(seg[0], seg[1]):
-                if img[x,y] == 0:
+        for x in range(seg[0],seg[1]):
+            for y in range(seg[2], seg[3]):
+                if img[y,x] == 0:
 
                      # Calculate in what direction we find black pixels.
                     fDir = self.freemanPixel(img,x,y)
@@ -86,19 +86,19 @@ class ConcavitiesMeasurement():
         freemanDirections = [0,0,0,0]
 
         #direction 0
-        if 1 in img[x,0:y]:
+        if 1 in img[0:y,x]:
             freemanDirections[0] = 1
 
         # direction 1
-        if 1 in img[x:self.xSize,y]:
+        if 1 in img[y,x:self.xSize]:
             freemanDirections[1] = 1
 
         # direction 2
-        if 1 in img[x,y:self.ySize]:
+        if 1 in img[y:self.ySize,x]:
             freemanDirections[2] = 1
 
         # direction 4
-        if 1 in img[0:x,y]:
+        if 1 in img[y,0:x]:
             freemanDirections[3] = 1
 
         return freemanDirections
@@ -115,7 +115,7 @@ class ConcavitiesMeasurement():
             x2 -= 1
             y2 -= 1
 
-            if img[x2,y2] == 1:
+            if img[y2,x2] == 1:
                 sList[1] = 0
                 break
 
@@ -123,11 +123,11 @@ class ConcavitiesMeasurement():
         x2 = x
         y2 = y
 
-        while x2 != self.xSize and y2 != 0:
+        while x2 != self.xSize-1 and y2 != 0:
             x2 += 1
             y2 -= 1
 
-            if img[x2,y2] == 1:
+            if img[y2,x2] == 1:
                 sList[2] = 0
                 break
 
@@ -135,11 +135,11 @@ class ConcavitiesMeasurement():
         x2 = x
         y2 = y
 
-        while x2 != 0 and y2 != self.ySize:
+        while x2 != 0 and y2 != self.ySize-1:
             x2 -= 1
             y2 += 1
 
-            if img[x2,y2] == 1:
+            if img[y2,x2] == 1:
                 sList[3] = 0
                 break
 
@@ -147,11 +147,11 @@ class ConcavitiesMeasurement():
         x2 = x
         y2 = y
 
-        while x2 != self.xSize and y2 != self.ySize:
+        while x2 != self.xSize-1 and y2 != self.ySize-1:
             x2 += 1
             y2 += 1
 
-            if img[x2,y2] == 1:
+            if img[y2,x2] == 1:
                 sList[4] = 0
                 break
 
