@@ -6,6 +6,8 @@ import math
 from skimage.feature import hog
 
 class HOG():
+    def __init__(self):
+        self.opencv_hog= cv2.HOGDescriptor((4,4), (4,4), (4,4), (4,4), 4)
 
     # Extracts HOG features from an image and returns those
     def performHOG(self, img):
@@ -38,9 +40,15 @@ class HOG():
 
         assert img.shape[0] == 200 and img.shape[1] == 200
 
-        fd, hog_image = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualise=True)
+        h1 = self.opencv_hog.compute(img)
+        #h2 = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1))
 
-        return fd
+        #print len(h1) #, len(h2)
+
+        ##fd, hog_image = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1), visualise=True)
+        result = h1[:,0]
+        #return [0.0]
+        return result
 
     def run(self, img):
         print "Hogging"
