@@ -166,8 +166,8 @@ class Classification():
     def test(self):
         self.predChar = {}  # Dictionary of character predictions
         self.predWord = {}  # Dictionary of word predictions
-        self.n_char = 0     # Keep track of amount of segments (for error)
         for name, cls in self.classifiers.iteritems():
+            self.n_char = 0     # Keep track of amount of segments (for error)
             # Initialize dictionary entries
             self.predChar[name] = []
             self.predWord[name] = []
@@ -249,6 +249,7 @@ class Classification():
                 actual = test_words[real_idx][2]     # Actual characters
                 while len(actual) != len(exp_char[pred_idx]):
                     # Account for discrepancy because of empty words
+                    print 'skipping empty word'
                     real_idx += 1
                 for ci in range(len(actual)):
                     if exp_char[pred_idx][ci] != actual[ci]:
@@ -267,7 +268,7 @@ class Classification():
 
     # Displays results after a fold
     def dispFoldRes(self, n):
-        print 'fold %d:\nclassifier\terror_w\terror_c\ttotal_w\ttotal_c' % n
+        print 'fold %d:\nclassifier\terror_w\terror_c\ttotal_w\ttotal_c' % (n+1)
         for name, er in self.perf.iteritems():
             print name, '\t\t', er[n][0], '\t\t', er[n][1],\
                 '\t\t', len(self.test_idx), '\t\t', self.n_char
@@ -314,7 +315,8 @@ class Classification():
 
         # Print table
         print 'word error\tsegment error\ttotal words\ttotal segments'
-        print er_word, '\t\t', er_char, '\t\t', len(self.test_idx), '\t\t', self.n_char
+        print er_word, '\t\t\t', er_char, '\t\t\t', len(self.test_idx),\
+            '\t\t\t', self.n_char
 
         # Return all outcomes
         return self.perf
