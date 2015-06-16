@@ -25,6 +25,7 @@ class Classification():
                             'KN': kn.KNeighbour(3)}
         # Dictionary of performances
         self.perf = {'RF': [],
+                     'WRF': [],
                      'GB': [],
                      'SVM': [],
                      'KM': [],
@@ -127,24 +128,20 @@ class Classification():
         # Empty features and goals again for word training
         feat = []
         goal = []
-        self.predChar = {'RF': []}  # Dictionary of character predictions
-        self.n_char = 0     # Keep track of amount of segments (for error)
         # Go through all words in the word training set
         for word in train2_words:
             # Predict characters
             if len(word[1]) > 0:
                 # If the word actually has characters...
                 prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
-                self.n_char += len(word[1])
+                # Convert prediction into ascii
+                pp = [ord(c) for c in ''.join(prediction)]
                 # Pad prediction with non-classes
-                pp = prediction
                 while len(pp) < self.max_seg:
-                    pp.append('!na#')
+                    pp.append(ord(' '))
                 # Use prediction as feature, word text as class
                 feat.append(pp)
                 goal.append(word[0])
-                # Add to dictionary
-                self.predChar['RF'].append(prediction)
 
         # Train word classifier on predicted characters
         self.classifiers['WRF'].train(feat, goal)
@@ -188,6 +185,7 @@ class Classification():
 
     # Test word classification
     def wordTest(self):
+        self.predChar = {'RF': []}      # Dictionary of segment predictions
         self.predWord = {'WRF': []}     # Dictionary of word predictions
         self.n_char = 0     # Keep track of amount of segments (for error)
         test_words = [self.words[idx] for idx in self.test_idx]
@@ -197,10 +195,11 @@ class Classification():
                 # If the word actually has characters...
                 prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
                 self.n_char += len(word[1])
+                # Convert prediction into ascii
+                pp = [ord(c) for c in ''.join(prediction)]
                 # Pad to proper input length
-                pp = prediction
-                while len(prediction) < self.max_seg:
-                    pp.append('!na#')
+                while len(pp) < self.max_seg:
+                    pp.append(ord(' '))
                 # Predict word based on padded prediction
                 wordpred = self.classifiers['WRF'].test(pp)
 
@@ -283,10 +282,42 @@ class Classification():
                     '\t\t', len(self.test_idx), '\t\t', self.n_char
             print '\n------------------------------------------'
 
-    # Print neatly the results of a run with word recognition by classification
+    # Caculate and print neatly the results of a run with word recognition by classification
     def wordRes(self):
-        #TODO implement showing results
-        pass
+        er_char = er_word = 0           # No errors at start
+        # Get test words and predictions
+        test_words = [self.words[idx] for idx in self.test_idx]
+        exp_char = self.predChar['RF']
+        exp_word = self.predWord['WRF']
+        real_idx = -1   # Index of real words, which can be different from pred_idx because of empty words...
+        # Run over test words and predictions
+        for pred_idx in range(0, len(exp_word)):
+            real_idx += 1   # Increment with pred_idx
+            # Compare character predictions with actual class
+            actual = test_words[real_idx][2]     # Actual characters
+            while len(actual) != len(exp_char[pred_idx]):
+                # Account for discrepancy because of empty words
+                print 'skipping empty word'
+                real_idx += 1
+            for ci in range(len(actual)):
+                if exp_char[pred_idx][ci] != actual[ci]:
+                    # Incorrect prediction, increment error
+                    er_char += 1
+            # Compare word prediction with actual class
+            if exp_word[pred_idx] != test_words[real_idx][0]:
+                # Incorrect prediction, increment error
+                er_word += 1
+
+        # Store performances in dictionary
+        self.perf['RF'].append(er_char)
+        self.perf['WRF'].append(er_word)
+
+        # Print table
+        print 'word error\tsegment error\ttotal words\ttotal segments'
+        print er_word, '\t\t', er_char, '\t\t', len(self.test_idx), '\t\t', self.n_char
+
+        # Return all outcomes
+        return self.perf
 
     # Fully trains one classifier on given set and dumps it afterwards
     def fullTrain(self, cln, feat, goal):
@@ -305,7 +336,7 @@ class Classification():
         self.splitData(words)   # Make custom split of data
         self.wordTrain()        # Train character and word classifiers
         self.wordTest()         # Predict characters and words
-        self.wordRes()           # Determine character and word recognition
+        self.wordRes()          # Determine character and word recognition
 
     # Applies all classifiers on provided data
     def fullPass(self, words):
