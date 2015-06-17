@@ -107,6 +107,10 @@ class Recognizer:
 
         featureResults = []
 
+        #TODO Refactor this.
+        for fName, f in self.feat.featureMethods.iteritems():
+            featureResults.append([])
+
         for file in os.listdir(ppm_folder):
             print file
             if file.endswith('.ppm') or file.endswith('.jpg'):
@@ -116,9 +120,8 @@ class Recognizer:
                 preppedWords = self.prepper.prep(ppm, inwords)
 
                 # f = feature class and fname = key
+                featureCount = 0
                 for fName, f in self.feat.featureMethods.iteritems():
-
-                    featureResults.append([])
 
                     # Iterate through words
                     counter = 0
@@ -147,9 +150,9 @@ class Recognizer:
                             elif f[1] == 1:
                                 word[3].append((f[0].run(char[1]), s[1]))
 
-                        featureResults[-1].append(word)     # Word is ready for classification
+                        featureResults[featureCount].append(word)     # Word is ready for classification
 
-
+                    featureCount += 1
 
         ## Classification
         for fr in featureResults:
@@ -171,6 +174,7 @@ class Recognizer:
         for fName, f in self.feat.featureMethods.iteritems():
 
             featureResults.append([])
+
             # Consider all words
             for word in preppedWords:
                 ## Character segmentation
