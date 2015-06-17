@@ -5,6 +5,7 @@ from Groep2.preprocessing import thinning, prepImage
 
 
 
+
 class EdgeMaps():
     def __init__(self):
         self.xSize = 25
@@ -110,12 +111,11 @@ class EdgeMaps():
         feature_vector.append(vertical)
         feature_vector.append(upwards)
         feature_vector.append(downwards)
+         #Combine feature
+        featureMerged = [item for sublist in feature_vector for item in sublist]
 
-        #show the image
-        #cv2.imshow('image',graddown)
-        #cv2.waitKey(0)
+        return featureMerged
         #cv2.destroyAllWindows()
-        return feature_vector
         #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
         #Edge_Maps(img)
 
@@ -123,3 +123,5 @@ class EdgeMaps():
         print "Running Modified Edge Maps"
         feature = self.findEdgeMaps(img)
         return feature
+
+

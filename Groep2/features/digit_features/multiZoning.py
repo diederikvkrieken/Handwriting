@@ -1,4 +1,5 @@
-
+import cv2
+import math
 
 class MultiZoning():
 
@@ -17,18 +18,26 @@ class MultiZoning():
             height = int(imgheight / y_cuts)
             width = int(imgwidth / x_cuts)
             imgSize = height * width
-
+            temp_vector = []
             for i in range(0, y_cuts):
                 i = i * height
                 for j in range(0, x_cuts):
                     j = j * width
                     a = image[j:j + width, i:i + height]
                     percentage_black_pixels = a.sum() / imgSize
-                    feature_vector.append(percentage_black_pixels)
+                    temp_vector.append(percentage_black_pixels)
 
-        return feature_vector
+            feature_vector.append(temp_vector)
+
+        featureMerged = [item for sublist in feature_vector for item in sublist]
+        return featureMerged
 
     def run(self,image):
         print "Multi Zoning"
         feature = self.doMultiZoning(image)
         return feature
+
+img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
+value = MultiZoning().run(img)
+
+print value

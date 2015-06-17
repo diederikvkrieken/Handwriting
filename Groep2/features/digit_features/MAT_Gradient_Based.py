@@ -73,7 +73,11 @@ class MAT_Grad():
                     count = sum(a==p)
                     feature_vector.append(count)
 
-        return feature_vector
+        featureMerged = []
+        for f in feature_vector:
+            featureMerged += f.tolist()
+
+        return featureMerged
         #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
         #MAT_Grad(img)
 
@@ -82,3 +86,9 @@ class MAT_Grad():
         image = self.scale(image)
         feature = self.findMATGrad(image)
         return feature
+
+
+img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
+value = MAT_Grad().run(img)
+
+print value
