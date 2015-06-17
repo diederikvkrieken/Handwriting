@@ -270,7 +270,8 @@ if __name__ == "__main__":
             # You know how to treat our program, all its little secrets...
             if sys.argv[2] == 'train':
                 # Train on full data set
-                r.fullTrain(sys.argv[3], sys.argv[4])
+                # r.fullTrain(sys.argv[3], sys.argv[4])
+                print "NOT YET PARALLEL IMPLEMENTED"
             elif sys.argv[2] == 'single':
                 # Train and test on one file
                 r.singleFile(sys.argv[3], sys.argv[4])
