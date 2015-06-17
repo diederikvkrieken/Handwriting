@@ -7,11 +7,12 @@ from skimage.feature import hog
 
 class HOG():
     def __init__(self):
-        self.opencv_hog= cv2.HOGDescriptor((4,4), (4,4), (4,4), (4,4), 4)
+       pass
 
     # Extracts HOG features from an image and returns those
     def performHOG(self, img):
 
+        opencv_hog= cv2.HOGDescriptor((4,4), (4,4), (4,4), (4,4), 4)
         # print "Hogging away! "
         alpha = 200
 
@@ -40,7 +41,7 @@ class HOG():
 
         assert img.shape[0] == 200 and img.shape[1] == 200
 
-        h1 = self.opencv_hog.compute(img)
+        h1 = opencv_hog.compute(img)
         #h2 = hog(img, orientations=4, pixels_per_cell=(4, 4), cells_per_block=(1, 1))
 
         #print len(h1) #, len(h2)
