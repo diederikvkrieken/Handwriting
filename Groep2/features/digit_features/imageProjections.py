@@ -75,7 +75,12 @@ class ImageProjections():
         feature_vector.append(hist_top)
         feature_vector.append(hist_down)
 
-        return feature_vector
+        #Combine feature
+        featureMerged = []
+        for f in feature_vector:
+            featureMerged += f.tolist()
+
+        return featureMerged
 
     def run(self, img):
         print "Running Modified Edge Maps"
