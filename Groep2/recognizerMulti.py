@@ -22,6 +22,9 @@ import time
 def unwrap_self_wordParallel(arg, **kwarg):
     return Recognizer.wordParallel(*arg, **kwarg)
 
+def unwrap_self_wordParallelMultiFeat(arg, **kwarg):
+    return Recognizer.allFeatParallel(*arg, **kwarg)
+
 class Recognizer:
     """
     Recognizer class
@@ -45,6 +48,66 @@ class Recognizer:
             word[3].append((feat.HOG(char[1]), s[1]))
 
         return word
+
+    def wordParallelMultiFeat(self, combined):
+
+        print "RUNNING AL FEAT PARALLEL"
+        word = combined[0]
+        f = combined[1]
+
+        ## Character segmentation
+        cuts, chars = cs.segment(word[0][0], word[0][1])
+
+        segs = cs.annotate(cuts, word[2])
+
+        assert len(chars) == len(segs) #Safety check did the segmenting go correctly
+
+        # Feature extraction
+        word = list(word)
+        word.append([])     # Add empty list for features and classes
+
+        # Obtain features of all segments
+        for char, s in zip(chars, segs):
+            # Extract features from each segment, include labeling
+            if f[1] == 0:
+                word[3].append((f[0].run(char[0]), s[1]))
+            elif f[1] == 1:
+                word[3].append((f[0].run(char[1]), s[1]))
+
+        return word
+
+    def allFeatParallel(self, combined):
+
+        featureResults = []
+
+        preppedWords = combined[0]
+        f = combined[1]
+
+        print f
+        # Consider all words
+        for word in preppedWords:
+            ## Character segmentation
+            cuts, chars = cs.segment(word[0][0], word[0][1])
+
+            segs = cs.annotate(cuts, word[2])
+
+            assert len(chars) == len(segs) #Safety check did the segmenting go correctly
+
+            ## Feature extraction
+            word = list(word)
+            word.append([])     # Add empty list for features and classes
+
+            # Obtain features of all segments
+            for char, s in zip(chars, segs):
+                # Extract features from each segment, include labeling
+                if f[1] == 0:
+                    word[3].append((f[0].run(char[0]), s[1]))
+                elif f[1] == 1:
+                    word[3].append((f[0].run(char[1]), s[1]))
+
+            featureResults.append(word)     # Word is ready for classification
+
+        return featureResults
 
     # Trains one classifier on all images and words in specified folders
     def fullTrain(self, ppm_folder, words_folder):
@@ -108,6 +171,32 @@ class Recognizer:
         ## Classification
         cls.fullPass(jobs)
 
+    # Trains and tests on a single image and all features
+    def singleFileAllFeat(self, ppm, inwords):
+
+        ## Preprocessing
+        wordsInter = prepper.prep(ppm, inwords)
+
+        featureResults = []
+
+        # USELESS PEACE OF SHIT CODE
+        combined = []
+
+        for fName, f in feat.featureMethods.iteritems():
+            combined.append([wordsInter, f])
+
+        ## Prarallel feature extraction.
+        print "Starting job"
+        jobs = pool.map(unwrap_self_wordParallelMultiFeat, zip([self]*len(combined), combined))
+
+        ## Classification
+        counter = 0
+        for fr in jobs:
+            print combined[counter][1]
+            counter += 1
+            cls.fullPass(fr)  # A full run on the characters
+            # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
+            # cv2.waitKey(0)
 
     # Go through folder, train and test on each file
     def oneFolder(self, ppm_folder, words_folder):
@@ -176,6 +265,9 @@ if __name__ == "__main__":
             elif sys.argv[2] == 'single':
                 # Train and test on one file
                 r.singleFile(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'singleAllFeat':
+                # Train and test on one file
+                r.singleFileAllFeat(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'onefolder':
                 # Train and test on each file in a folder
                 r.oneFolder(sys.argv[3], sys.argv[4])
@@ -192,6 +284,7 @@ if __name__ == "__main__":
         # You are an instructor, who runs our program in the standardized format
         r.validate(sys.argv[1], sys.argv[2], sys.argv[3])
 
+    # Neatly close pool
     pool.close()
     pool.join()
 

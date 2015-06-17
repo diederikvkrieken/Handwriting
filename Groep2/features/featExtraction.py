@@ -23,14 +23,12 @@ class Features():
     def __init__(self):
         # Dictionary of all classifiers 0 = blackwhite image, 1 = gray scale image!
         self.featureMethods = {'HOG': [hog.HOG(), 1],
-                            'CSS': [runCSS.runCss(), 0],
                             'CM': [cm.ConcavitiesMeasurement(), 0],
                             'EM': [em.EdgeMaps(),1],
                             'MZ': [mz.MultiZoning(),0],
                             'MAT': [mat.MAT_Grad(),1],
                             'SC': [sc.StrucCharacteristics(),1],
                             'IP': [ip.ImageProjections(),0]}
-        pass
     
     # Extracts HOG features from an image and returns those
     def HOG(self, img):
