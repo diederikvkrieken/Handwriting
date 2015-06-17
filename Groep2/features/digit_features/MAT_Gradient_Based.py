@@ -86,9 +86,3 @@ class MAT_Grad():
         image = self.scale(image)
         feature = self.findMATGrad(image)
         return feature
-
-
-img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
-value = MAT_Grad().run(img)
-
-print value

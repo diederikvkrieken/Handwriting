@@ -36,8 +36,3 @@ class MultiZoning():
         print "Multi Zoning"
         feature = self.doMultiZoning(image)
         return feature
-
-img = cv2.imread('cenfura.jpg', cv2.IMREAD_GRAYSCALE)
-value = MultiZoning().run(img)
-
-print value
