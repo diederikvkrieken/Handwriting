@@ -168,6 +168,41 @@ class Recognizer:
         ## Classification
         cls.fullPass(jobs)  # A full run on the characters
 
+    # Running all the features WARNING this will take an extremely long time!
+    def allFeatures(self, ppm_folder, words_folder):
+
+        wordsInter = []
+
+        for file in os.listdir(ppm_folder):
+            print file
+            if file.endswith('.ppm') or file.endswith('.jpg'):
+                ## Read and preprocess
+                ppm = ppm_folder + '/' + file   # ENTIRE path of course..
+                inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
+                wordsInter.append(prepper.prep(ppm, inwords))
+
+        #Combine words
+        wordsMerged = []
+        for w in wordsInter:
+            w = np.array(w)
+            wordsMerged += w.tolist()
+
+        # USELESS PEACE OF SHIT CODE
+        combined = []
+
+        for fName, f in feat.featureMethods.iteritems():
+            combined.append([wordsMerged, f])
+
+        ## Prarallel feature extraction.
+        print "Starting job"
+        jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
+
+        ## Classification
+        for fr in jobs:
+            cls.fullPass(fr)  # A full run on the characters
+            # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
+            # cv2.waitKey(0)
+
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
 
@@ -281,6 +316,9 @@ if __name__ == "__main__":
             elif sys.argv[2] == 'onefolder':
                 # Train and test on each file in a folder
                 r.oneFolder(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'experimentAllFeat':
+                # Train and test on one file
+                r.allFeatures(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'experiment':
                 # Run our experiment
                 r.folders(sys.argv[3], sys.argv[4])
