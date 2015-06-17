@@ -9,6 +9,7 @@ Next, a similar approach is used on 'novel' pictures.
 import sys, os
 
 import cv2
+import numpy as np
 
 from preprocessing import prepImage
 from segmentation import char_segmentation as cs
@@ -22,7 +23,7 @@ import time
 def unwrap_self_wordParallel(arg, **kwarg):
     return Recognizer.wordParallel(*arg, **kwarg)
 
-def unwrap_self_wordParallelMultiFeat(arg, **kwarg):
+def unwrap_self_allFeatParallel(arg, **kwarg):
     return Recognizer.allFeatParallel(*arg, **kwarg)
 
 class Recognizer:
@@ -145,16 +146,24 @@ class Recognizer:
     # One run using all files in an images and a words folder
     def folders(self, ppm_folder, words_folder):
 
+        wordsInter = []
+
         for file in os.listdir(ppm_folder):
             print file
             if file.endswith('.ppm') or file.endswith('.jpg'):
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                wordsInter = prepper.prep(ppm, inwords)
+                wordsInter.append(prepper.prep(ppm, inwords))
 
-                ## Prarallel feature extraction.
-                jobs = pool.map(unwrap_self_wordParallel, zip([self]*len(wordsInter), wordsInter))
+        #Combine words
+        wordsMerged = []
+        for w in wordsInter:
+            w = np.array(w)
+            wordsMerged += w.tolist()
+
+        ## Prarallel feature extraction.
+        jobs = pool.map(unwrap_self_wordParallel, zip([self]*len(wordsMerged), wordsMerged))
 
         ## Classification
         cls.fullPass(jobs)  # A full run on the characters
@@ -187,7 +196,7 @@ class Recognizer:
 
         ## Prarallel feature extraction.
         print "Starting job"
-        jobs = pool.map(unwrap_self_wordParallelMultiFeat, zip([self]*len(combined), combined))
+        jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         ## Classification
         counter = 0
