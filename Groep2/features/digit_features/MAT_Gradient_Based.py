@@ -1,6 +1,5 @@
 import cv2
 import numpy
-import Image
 import math
 import scipy
 
@@ -19,11 +18,10 @@ class MAT_Grad():
     def findMATGrad(self,img):
         # load an color image in grayscale
         # img = cv2.resize(img, (32,32))
-
-        sobelout = Image.new('L', (img.shape[1],img.shape[0]))                                       #empty image
-        gradx = numpy.array(sobelout, dtype = float)
-        grady = numpy.array(sobelout, dtype = float)
-        sobelDirec = numpy.array(sobelout, dtype = float)
+        sobelout = numpy.zeros((img.shape[0],img.shape[1],1), numpy.float)                                  #empty image
+        gradx = sobelout.copy()
+        grady = sobelout.copy()
+        sobelDirec = sobelout.copy()
 
         sobel_x = [[-1,0,1],
                   [-2,0,2],

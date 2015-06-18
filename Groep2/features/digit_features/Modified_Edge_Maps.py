@@ -1,10 +1,6 @@
 import cv2
 import numpy
-import Image
 from Groep2.preprocessing import thinning, prepImage
-
-
-
 
 class EdgeMaps():
     def __init__(self):
@@ -22,11 +18,11 @@ class EdgeMaps():
         binary = prepper.binarize(img)
         thin = thinning.thinning(binary)
 
-        sobelout = Image.new('L', (thin.shape[1],thin.shape[0]))                                       #empty image
-        gradx = numpy.array(sobelout, dtype = float)
-        grady = numpy.array(sobelout, dtype = float)
-        gradup = numpy.array(sobelout, dtype = float)
-        graddown = numpy.array(sobelout, dtype = float)
+        sobelout = numpy.zeros((img.shape[0],img.shape[1],1), numpy.float)                                         #empty image
+        gradx = sobelout.copy()
+        grady = sobelout.copy()
+        gradup = sobelout.copy()
+        graddown = sobelout.copy()
 
         sobel_x = [[-1,2,-1],
                    [-1,2,-1],
