@@ -32,7 +32,7 @@ class Recognizer:
         self.classes = []                           # List containing class (word) features belong to
         self.words = []                             # Complete word container for experiments
 
-    # Trains one classifier on all images and words in specified folders
+    # Trains a character and a word classifier on all images and words in folders
     def fullTrain(self, ppm_folder, words_folder):
 
         for file in os.listdir(ppm_folder):
@@ -52,16 +52,16 @@ class Recognizer:
                     assert len(chars) == len(segs) #Safety check did the segmenting go correctly
 
                     ## Feature extraction
-                    # Extract features from each segment
+                    word = list(word)
+                    word.append([])     # Add empty list to word for features
                     for char, seg in zip(chars, segs):
-                        self.features.append(self.feat.HOG(char[1]))
-                        self.classes.append(seg[1])
-                        # NOTE: these are in order! Do not shuffle or you lose correspondence.
-                        # zip() is also possible of course, but I simply do not feel the need. :)
+                        # Extract features from each segment, include labeling
+                        word[3].append((self.feat.HOG(char[1]), seg[1]))
+                    self.words.append(word)     # Word is ready for classification
 
         ## Classification
-        # Fully train specified classifier on data set
-        self.cls.fullTrain('RF', self.features, self.classes)   # Note to set this to best classifier!!
+        # Fully train character and word classifier on data
+        self.cls.fullWordTrain(self.words)
 
     # One run using all files in an images and a words folder
     def folders(self, ppm_folder, words_folder):
@@ -254,21 +254,22 @@ class Recognizer:
         ## Preprocessing
         words = self.prepper.wordPrep(ppm, inwords)
 
-        predictions = []    # Empty list to contain all predictions
+        features = []       # Empty list of features for classification
 
         # Go through all words
         for word in words:
             ## Character segmentation
             cuts, chars = self.cs.segment(word[0], word[1])
 
-            # Go through all characters
+            f = []  # Empty feature vector which will contain features of this word's characters
+            # Go through all segments (binary, grayscale)
             for c in chars:
                 ## Feature extraction
-                features = self.feat.HOG(c[1])
+                f.append(self.feat.HOG(c[1]))   # Extract features from segment
+            features.append(f)                  # Add features of all segments to all features
 
-                ## Classification
-                pred = self.cls.classify('RF', features)
-                predictions.append(pred)    # Store prediction
+        ## Classification
+        predictions = self.cls.classify(features)
 
         self.prepper.saveXML(predictions, inwords, outwords)
 

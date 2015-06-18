@@ -149,12 +149,9 @@ class Classification():
             # Predict characters
             if len(word[1]) > 0:
                 # If the word actually has characters...
-                prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
-                # Pad prediction with non-classes
-                pp = self.pad(prediction)
                 # Use prediction as feature, word text as class
-                feat.append(pp)
-                goal.append(word[0])
+                feat.append(self.pad(self.classifiers['RF'].test(word[1]))) # Highly efficient line!
+                goal.append(word[0])    # Word text is true class
 
         # Train word classifier on predicted characters
         print 'Training word classifier!'
@@ -332,6 +329,7 @@ class Classification():
         # Return all outcomes
         return self.perf
 
+    # NOTICE: This function is deprecated! Might be looked at again in the future
     # Fully trains one classifier on given set and dumps it afterwards
     def fullTrain(self, cln, feat, goal):
         classifier = self.classifiers[cln]  # Get required classifier
@@ -343,47 +341,29 @@ class Classification():
         print 'This is classification 2.0, delivering a full train for your pleasure!'
         # Prepare data and split
         self.data(words)    # Going to use self.words from here on!
-        train1_idx, train2_idx = self.halfSplit(len(self.words))
-        # Initialize feature and classes lists
-        feat = []
-        goal = []
-        # Train character classifier on all word characters in train1
-        for word in [self.words[idx] for idx in train1_idx]:
-            # Consider all segments in a word
-            for f, g in zip(word[1], word[2]):
-                feat.append(f)
-                goal.append(g)
-        # Train character classifier and save to disk
-        print 'Training character classifier!'
-        self.classifiers['RF'].train(feat, goal)
-        jl.dump(self.classifiers['RF'], 'RF.pkl')   # Save to disk
-
-        # Train word classifier on character predictions in train2
-        # Empty features and classes again
-        feat = []
-        goal = []
-        # Consider all words in train2
-        for word in [self.words[idx] for idx in train2_idx]:
-            # Predict characters, acting as features for word classifier
-            if len(word[1]) > 0:
-                # If the word actually has characters...
-                # Highly efficient line to add padded prediction as feature
-                feat.append(self.pad(self.classifiers['RF'].test(word[1])))
-                goal.append(word[0])    # Word text is true class
-
-        # Train word classifier on predicted characters and save to disk
-        print 'Training word classifier!'
-        self.classifiers['WRF'].train(feat, goal)
-        jl.dump(self.classifiers['WRF'], 'WRF.pkl')   # Save to disk
+        self.train1_idx, self.train2_idx = self.halfSplit(len(self.words))
+        # Train character and word classifiers
+        self.wordTrain()
+        # Save to disk
+        jl.dump(self.classifiers['RF'], 'RF.pkl')
+        jl.dump(self.classifiers['WRF'], 'WRF.pkl')
         print 'Classification 2.0 greenified your hard disk with two random forests.\n',\
             'Thanks for your consideration of the environment!'
 
-    # Loads in one classifier which then provides predictions on given data
-    def classify(self, cln, feat):
-        self.loadClassifier(cln)                # Load previously trained classifier
-        pred = self.classifiers[cln].test(feat) # Predicted characters
-        # NOTE: this incorporates word classification as postprocessing!!
-        return self.combineChar(pred)           # Return predicted word
+    # Loads in a character and a word classifier which then predict words on given features
+    # NOTE: this function incorporates word classification as postprocessing!!
+    def classify(self, feat):
+        # Load previously trained character and word classifiers
+        self.loadClassifier('RF')       # Characters
+        self.loadClassifier('WRF')      # Words
+        predictions = []                # Empty list for predicted words
+        # Assumes feat is a list of feature vectors
+        for vector in feat:
+            # Predict characters
+            chars = self.classifiers['RF'].test(vector)
+            # Predict word based on predicted characters and add to predictions
+            predictions.append(self.classifiers['WRF'].test(self.pad(chars)))
+        return predictions              # Return predicted words
 
     def oneWordsRun(self, words):
         self.splitData(words)   # Make custom split of data
