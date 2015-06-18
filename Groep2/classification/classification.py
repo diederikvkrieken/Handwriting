@@ -33,6 +33,25 @@ class Classification():
         # Length character vectors should be appended to for word classification
         self.max_seg = 25
 
+    # Takes a list of characters, converts to ASCII and pads with non characters
+    def pad(self, characters):
+        # Mash characters together and convert to ASCII
+        padded = [ord(c) for c in ''.join(characters)]
+        while len(padded) < self.max_seg:
+            padded.append(ord(' '))
+        # Return ASCII characters padded to max_seq
+        return padded
+
+    # Randomly assigns half of indices to one and half to another grouping
+    def halfSplit(self, length):
+        # Random assignment
+        split = np.random.uniform(0, 1, length) <= 0.50
+        # Put indices in corresponding halve
+        half1 = [idx for idx, el in enumerate(split) if el == True]
+        half2 = [idx for idx, el in enumerate(split) if el == False]
+        # Return indices
+        return half1, half2
+
     # Split data for training with word classification
     def splitData(self, words):
         # Words: (image, text, characters, segments)
@@ -49,15 +68,11 @@ class Classification():
         # NOTE: self.words will now contain (word text, [segment features], [segment classes])!!
 
         # Prepare segment training, word training and testing instances
-        split1 = np.random.uniform(0, 1, len(self.words)) <= 0.50
-        # Store train1 indices
-        self.train1_idx = [idx for idx, el in enumerate(split1) if el == True]
-        # Temporary indices of other half
-        temp_idx = [idx for idx, el in enumerate(split1) if el == False]
-        split2 = np.random.uniform(0, 1, len(temp_idx)) <= 0.50
+        self.train1_idx, temp_idx = self.halfSplit(len(self.words))
+        train2_idx, test_idx = self.halfSplit(len(temp_idx))
         # Store train2 and test indices
-        self.train2_idx = [temp_idx[idx] for idx, el in enumerate(split2) if el == True]
-        self.test_idx = [temp_idx[idx] for idx, el in enumerate(split2) if el == False]
+        self.train2_idx = [temp_idx[idx] for idx in train2_idx]
+        self.test_idx = [temp_idx[idx] for idx in test_idx]
 
     # Take data and prepare for training and testing
     def data(self, words):
@@ -123,6 +138,7 @@ class Classification():
                 feat.append(word[1][seg])
                 goal.append(word[2][seg])
         # Train a random forest for character classification
+        print 'Training character classifier!'
         self.classifiers['RF'].train(feat, goal)
 
         # Empty features and goals again for word training
@@ -134,16 +150,14 @@ class Classification():
             if len(word[1]) > 0:
                 # If the word actually has characters...
                 prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
-                # Convert prediction into ascii
-                pp = [ord(c) for c in ''.join(prediction)]
                 # Pad prediction with non-classes
-                while len(pp) < self.max_seg:
-                    pp.append(ord(' '))
+                pp = self.pad(prediction)
                 # Use prediction as feature, word text as class
                 feat.append(pp)
                 goal.append(word[0])
 
         # Train word classifier on predicted characters
+        print 'Training word classifier!'
         self.classifiers['WRF'].train(feat, goal)
 
     # Saves all (trained) classifiers to disk
@@ -195,11 +209,8 @@ class Classification():
                 # If the word actually has characters...
                 prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
                 self.n_char += len(word[1])
-                # Convert prediction into ascii
-                pp = [ord(c) for c in ''.join(prediction)]
                 # Pad to proper input length
-                while len(pp) < self.max_seg:
-                    pp.append(ord(' '))
+                pp = self.pad(prediction)
                 # Predict word based on padded prediction
                 wordpred = self.classifiers['WRF'].test(pp)
 
@@ -327,11 +338,51 @@ class Classification():
         classifier.train(feat, goal)        # Train on all provided data
         jl.dump(classifier, cln + '.pkl')   # Save to disk
 
-    #TODO adapt this code to incorporate post-processing
+    # Trains a character classifier on 50% of the data, a word classifier on te other half
+    def fullWordTrain(self, words):
+        print 'This is classification 2.0, delivering a full train for your pleasure!'
+        # Prepare data and split
+        self.data(words)    # Going to use self.words from here on!
+        train1_idx, train2_idx = self.halfSplit(len(self.words))
+        # Initialize feature and classes lists
+        feat = []
+        goal = []
+        # Train character classifier on all word characters in train1
+        for word in [self.words[idx] for idx in train1_idx]:
+            # Consider all segments in a word
+            for f, g in zip(word[1], word[2]):
+                feat.append(f)
+                goal.append(g)
+        # Train character classifier and save to disk
+        print 'Training character classifier!'
+        self.classifiers['RF'].train(feat, goal)
+        jl.dump(self.classifiers['RF'], 'RF.pkl')   # Save to disk
+
+        # Train word classifier on character predictions in train2
+        # Empty features and classes again
+        feat = []
+        goal = []
+        # Consider all words in train2
+        for word in [self.words[idx] for idx in train2_idx]:
+            # Predict characters, acting as features for word classifier
+            if len(word[1]) > 0:
+                # If the word actually has characters...
+                # Highly efficient line to add padded prediction as feature
+                feat.append(self.pad(self.classifiers['RF'].test(word[1])))
+                goal.append(word[0])    # Word text is true class
+
+        # Train word classifier on predicted characters and save to disk
+        print 'Training word classifier!'
+        self.classifiers['WRF'].train(feat, goal)
+        jl.dump(self.classifiers['WRF'], 'WRF.pkl')   # Save to disk
+        print 'Classification 2.0 greenified your hard disk with two random forests.\n',\
+            'Thanks for your consideration of the environment!'
+
     # Loads in one classifier which then provides predictions on given data
     def classify(self, cln, feat):
         self.loadClassifier(cln)                # Load previously trained classifier
         pred = self.classifiers[cln].test(feat) # Predicted characters
+        # NOTE: this incorporates word classification as postprocessing!!
         return self.combineChar(pred)           # Return predicted word
 
     def oneWordsRun(self, words):
