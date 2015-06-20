@@ -17,12 +17,12 @@ class Classification():
     # Prepare all classifiers
     def __init__(self):
         # Dictionary of all classifiers
-        self.classifiers = {'RF': RF.RandomForest(),
-                            'WRF': RF.RandomForest(),   # Another Random Forest for word classification
-                            'GB': GB.GBC(),
-                            'SVM': svm.SVM(),
-                            'KM': km.KMeans(30),
-                            'KN': kn.KNeighbour(3)}
+        self.classifiers = {'RF': RF.RandomForest('RF'),
+                            'WRF': RF.RandomForest('WRF'),   # Another Random Forest for word classification
+                            'GB': GB.GBC('GB'),
+                            'SVM': svm.SVM('SVM'),
+                            'KM': km.KMeans(30, 'KM'),
+                            'KN': kn.KNeighbour(3, 'KN')}
         # Dictionary of performances
         self.perf = {'RF': [],
                      'WRF': [],
@@ -95,7 +95,7 @@ class Classification():
         self.folds = kf(len(self.words), n_folds=4, shuffle=True)
 
         # New k-means with as many clusters as classes, breaks without enough data...
-        self.classifiers['KM'] = km.KMeans(len(uniq_class)-1)
+        self.classifiers['KM'] = km.KMeans(len(uniq_class)-1, 'KM')
 
     # Prepares fold n
     def n_fold(self, n):
@@ -121,6 +121,7 @@ class Classification():
                 goal.append(word[2][seg])
         for name, classifier in self.classifiers.iteritems():
             # Train all classifiers
+            print "Training: ", name
             classifier.train(feat, goal)  # On (segment) features, classes
 
     # Trains character and word classifiers
