@@ -14,7 +14,7 @@ import numpy as np
 from preprocessing import prepImage
 from segmentation import char_segmentation as cs
 from features import featExtraction
-from classification import classification
+from classification import classificationMulti
 
 # Parallel packages
 from multiprocessing import Pool
@@ -110,7 +110,7 @@ class Recognizer:
 
         return featureResults
 
-    # Trains one classifier on all images and words in specified folders
+    # Trains a character and a word classifier on all images and words in folders
     def fullTrain(self, ppm_folder, words_folder):
 
         for file in os.listdir(ppm_folder):
@@ -119,29 +119,27 @@ class Recognizer:
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                words = self.prepper.prep(ppm, inwords)
+                wordsIn = prepper.prep(ppm, inwords)
 
                 # Iterate through words
-                for word in words:
+                for word in wordsIn:
                     ## Character segmentation
                     cuts, chars = cs.segment(word[0][0], word[0][1])  # Make segments
-
-
                     segs = cs.annotate(cuts, word[2]) # Give annotations to segments
 
                     assert len(chars) == len(segs) #Safety check did the segmenting go correctly
 
                     ## Feature extraction
-                    # Extract features from each segment
+                    word = list(word)
+                    word.append([])     # Add empty list to word for features
                     for char, seg in zip(chars, segs):
-                        features.append(feat.HOG(char[1]))
-                        classes.append(seg[1])
-                        # NOTE: these are in order! Do not shuffle or you lose correspondence.
-                        # zip() is also possible of course, but I simply do not feel the need. :)
+                        # Extract features from each segment, include labeling
+                        word[3].append((feat.HOG(char[1]), seg[1]))
+                    words.append(word)     # Word is ready for classification
 
         ## Classification
-        # Fully train specified classifier on data set
-        self.cls.fullTrain('RF', features, classes)   # Note to set this to best classifier!!
+        # Fully train character and word classifier on data
+        cls.fullWordTrain(words)
 
     # One run using all files in an images and a words folder
     def folders(self, ppm_folder, words_folder):
@@ -198,8 +196,11 @@ class Recognizer:
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         ## Classification
+        fcounter = 0
         for fr in jobs:
+            print "Training for feature: ", combined[fcounter][1]
             cls.fullPass(fr)  # A full run on the characters
+            fcounter += 1
             # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
             # cv2.waitKey(0)
 
@@ -236,7 +237,7 @@ class Recognizer:
         ## Classification
         counter = 0
         for fr in jobs:
-            print combined[counter][1]
+            print "Training for feature: ", combined[counter][1]
             counter += 1
             cls.fullPass(fr)  # A full run on the characters
             # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
@@ -260,24 +261,24 @@ class Recognizer:
         ## Preprocessing
         words = prepper.wordPrep(ppm, inwords)
 
-        predictions = []    # Empty list to contain all predictions
+        features = []       # Empty list of features for classification
 
         # Go through all words
         for word in words:
             ## Character segmentation
             cuts, chars = cs.segment(word[0], word[1])
 
-            # Go through all characters
+            f = []  # Empty feature vector which will contain features of this word's characters
+            # Go through all segments (binary, grayscale)
             for c in chars:
-                ## Feature extraction (c[1] for grayscale)
-                features = feat.HOG(c[1])
+                ## Feature extraction
+                f.append(feat.HOG(c[1]))   # Extract features from segment
+            features.append(f)                  # Add features of all segments to all features
 
-                ## Classification
-                pred = cls.classify('RF', features)
-                predictions.append(pred)    # Store prediction
+        ## Classification
+        predictions = cls.classify(features)
 
         prepper.saveXML(predictions, inwords, outwords)
-
 
 
 if __name__ == "__main__":
@@ -287,11 +288,11 @@ if __name__ == "__main__":
     prepper = prepImage.PreProcessor()     # Preprocessor
     cs = cs.segmenter()                    # Character segmentation
     feat = featExtraction.Features()       # Feature extraction
-    cls = classification.Classification()  # Classification
     features = []                          # List containing all features
     classes = []                           # List containing class (word) features belong to
     words = []                             # Complete word container for experiments
     pool = Pool(processes=4)               # Initialize pool with 8 processes
+    cls = classificationMulti.Classification()  # Classification
 
     r = Recognizer()
 
@@ -305,7 +306,7 @@ if __name__ == "__main__":
             # You know how to treat our program, all its little secrets...
             if sys.argv[2] == 'train':
                 # Train on full data set
-                # r.fullTrain(sys.argv[3], sys.argv[4])
+                r.fullTrain(sys.argv[3], sys.argv[4])
                 print "NOT YET PARALLEL IMPLEMENTED"
             elif sys.argv[2] == 'single':
                 # Train and test on one file
