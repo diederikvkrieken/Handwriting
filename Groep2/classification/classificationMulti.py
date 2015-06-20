@@ -26,14 +26,14 @@ class Classification():
         # Dictionary of all classifiers
         self.classifiers = {'RF': RF.RandomForest('RF'),
                             'WRF': RF.RandomForest('WRF'),   # Another Random Forest for word classification
-                            'GB': GB.GBC('GB'),
+                            # 'GB': GB.GBC('GB'),
                             'SVM': svm.SVM('SVM'),
                             'KM': km.KMeans(30, 'KM'),
                             'KN': kn.KNeighbour(3, 'KN')}
         # Dictionary of performances
         self.perf = {'RF': [],
                      'WRF': [],
-                     'GB': [],
+                     # 'GB': [],
                      'SVM': [],
                      'KM': [],
                      'KN': []}
@@ -286,11 +286,15 @@ class Classification():
             for pred_idx in range(0, len(exp_word)):
                 real_idx += 1   # Increment with pred_idx
                 # Compare character predictions with actual class
-                actual = test_words[real_idx][2]     # Actual characters
-                while len(actual) != len(exp_char[pred_idx]):
+                actual = test_words[real_idx][2]        # Actual characters
+                while real_idx < len(test_words) and len(actual) != len(exp_char[pred_idx]):
                     # Account for discrepancy because of empty words
                     print 'skipping empty word'
                     real_idx += 1
+                    actual = test_words[real_idx][2]     # Actual characters
+                if real_idx >= len(test_words):
+                    print 'Something went horribly wrong. Comparison incomplete.'
+                    break
                 for ci in range(len(actual)):
                     if exp_char[pred_idx][ci] != actual[ci]:
                         # Incorrect prediction, increment error
@@ -335,11 +339,15 @@ class Classification():
         for pred_idx in range(0, len(exp_word)):
             real_idx += 1   # Increment with pred_idx
             # Compare character predictions with actual class
-            actual = test_words[real_idx][2]     # Actual characters
-            while len(actual) != len(exp_char[pred_idx]):
+            actual = test_words[real_idx][2]        # Actual characters
+            while real_idx < len(test_words) and len(actual) != len(exp_char[pred_idx]):
                 # Account for discrepancy because of empty words
                 print 'skipping empty word'
                 real_idx += 1
+                actual = test_words[real_idx][2]    # Actual characters
+            if real_idx >= len(test_words):
+                    print 'Something went horribly wrong. Comparison incomplete.'
+                    break
             for ci in range(len(actual)):
                 if exp_char[pred_idx][ci] != actual[ci]:
                     # Incorrect prediction, increment error
@@ -424,4 +432,4 @@ class Classification():
         return self.perf
 
 
-pool = Pool(processes=4)
+pool = Pool(processes=8)
