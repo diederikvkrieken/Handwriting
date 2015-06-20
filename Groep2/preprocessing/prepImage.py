@@ -93,10 +93,12 @@ class PreProcessor:
         # Go through all lines and words
         for line in lines:
             for word in line:
-                word.text = predictions[idx]    # Put prediction as word text
+                word.text = ''.join(predictions[idx])   # Put prediction as word text
                 idx += 1
-                print word.text
+                # print word.text
 
+        if idx < len(predictions):
+            print 'Warning: more predictions than words.'
         wordio.save(lines, outxml)   # Save a new file with the words predicted
 
     # Subtracts background from image
@@ -207,15 +209,14 @@ class PreProcessor:
         words = self.cropWords(self.orig, inxml)
 
         # For all words, subtract background, binarize and multiply with original
-        prossed = []    # New list for word images (binary)
-        grayscale = [] # List for word images (binary * original)
+        prossed = []    # New list for word images (binary, grayscale)
         for w in words:
             pros = self.bgSub(w)
             pros = self.binarize(w)
-            prossed.append(pros, pros * w)
+            prossed.append((pros, pros * w))
 
         # Return pre-processed words
-        return (prossed)
+        return prossed
 
 
     # Obsolete method using provided code
