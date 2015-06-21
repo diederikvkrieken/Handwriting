@@ -173,25 +173,48 @@ class segmenter:
         :param threshold:
         :return: returns a list with the SC columns
         """
-        m= n= sum = 0
+        n= sum = 0
         current_k = 0
         k = 0
         SC_columns = []
         for csc in list:
             if csc == 1:
                 if (k - current_k) <= threshold and k != (len(list) -1):
-                    sum +=  k
+                    sum += k
                     n += 1
                 else:
                     if n > 0:
                         SC_columns.append(int(round(sum/n)))
                     else:
                         SC_columns.append(k)
-                    m += 1
                     sum= n= 0
                 current_k = k
             k += 1
         return SC_columns
+
+    def step3_revisited(self, list, threshold):
+        """
+        This function does the same as step 3, but acts on an list without 'zero' elements
+        :param list:
+        :param threshold:
+        :return: returns a list with the SC columns
+        """
+        sum = n = 0
+        SC_columns = []
+        for k in range(len(list) -1):
+            if list[k + 1] - list[k] <= threshold:
+                sum += list[k]
+                n += 1
+            else:
+                if n > 0:
+                    SC_columns.append(int(round((sum + list[k]) / (n + 1))))
+                    sum = n = 0
+                else:
+                    SC_columns.append(list[k])
+
+        SC_columns.append(list[len(list) -1])
+        return SC_columns
+
 
     # Segments a given word image
     def segment(self, wordBinary, wordGrayscale):
@@ -215,16 +238,24 @@ class segmenter:
         # apply step 3 and store
         SC_columns = self.step3(CSC_columns, 2)
 
+
         # # draw CSC's and CS's
         # with_lines = thin.copy()
         # with_lines_step3 = thin.copy()
+        # with_lines_step3_revised = thin.copy()
         # thin_height, thin_width = thin.shape
         #
         # for x in SC_columns:
         #     cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
+
+      #  SC_columns = self.step3_revisited(SC_columns, 8)
+
+        # for x in SC_columns:
+        #     cv2.line(with_lines_step3_revised,(x,0),(x,thin_height -1),(1),1)
         #
         # cv2.imshow("segments", with_lines_step3 * 255)
-        # cv2.waitKey(1)
+        # cv2.imshow("segments revisited", with_lines_step3_revised * 255)
+        # cv2.waitKey(0)
         # end of drawing CSC's and CS's
 
         return self.crop_sc_areas(SC_columns, ascender, descender, wordBinary, wordGrayscale)
