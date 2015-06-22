@@ -25,18 +25,20 @@ class Classification():
     def __init__(self):
         # Dictionary of all classifiers
         self.classifiers = {'RF': RF.RandomForest('RF'),
-                            'WRF': RF.RandomForest('WRF'),   # Another Random Forest for word classification
+                            #'WRF': RF.RandomForest('WRF'),   # Another Random Forest for word classification
                             # 'GB': GB.GBC('GB'),
-                            'SVM': svm.SVM('SVM'),
-                            'KM': km.KMeans(30, 'KM'),
-                            'KN': kn.KNeighbour(3, 'KN')}
+                            #'SVM': svm.SVM('SVM'),
+                            #'KM': km.KMeans(30, 'KM'),
+                            #'KN': kn.KNeighbour(3, 'KN')
+                            }
         # Dictionary of performances
         self.perf = {'RF': [],
-                     'WRF': [],
+                     #'WRF': [],
                      # 'GB': [],
-                     'SVM': [],
-                     'KM': [],
-                     'KN': []}
+                     #'SVM': [],
+                     #'KM': [],
+                     #'KN': []
+                     }
         # Length character vectors should be appended to for word classification
         self.max_seg = 25
 
@@ -110,7 +112,9 @@ class Classification():
         self.folds = kf(len(self.words), n_folds=4, shuffle=True)
 
         # New k-means with as many clusters as classes, breaks without enough data...
-        self.classifiers['KM'] = km.KMeans(len(uniq_class)-1, 'KM')
+
+        if 'KM' in self.perf:
+            self.classifiers['KM'] = km.KMeans(len(uniq_class)-1, 'KM')
 
     # Prepares fold n
     def n_fold(self, n):
