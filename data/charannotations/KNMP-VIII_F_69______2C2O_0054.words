@@ -291,8 +291,8 @@
             <Character no="1" top="1264" bottom="1329" left="597" right="633" shear="0" text="i"/>
             <Character no="2" top="1264" bottom="1329" left="633" right="653" shear="0" text="l"/>
             <Character no="3" top="1264" bottom="1329" left="653" right="692" shear="0" text="l"/>
-            <Character no="4" top="1264" bottom="1329" left="692" right="618" shear="0" text="u"/>
-            <Character no="5" top="1264" bottom="1329" left="618" right="710" shear="0" text="s"/>
+            <Character no="4" top="1264" bottom="1329" left="692" right="700" shear="0" text="u"/>
+            <Character no="5" top="1264" bottom="1329" left="700" right="710" shear="0" text="s"/>
             <Character no="6" top="1264" bottom="1329" left="710" right="728" shear="0" text="t"/>
             <Character no="7" top="1264" bottom="1329" left="728" right="755" shear="0" text="r"/>
             <Character no="8" top="1264" bottom="1329" left="755" right="781" shear="0" text="i"/>

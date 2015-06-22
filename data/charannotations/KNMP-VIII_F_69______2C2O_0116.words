@@ -91,8 +91,8 @@
             <Character no="3" top="501" bottom="567" left="1163" right="1186" shear="0" text="a"/>
             <Character no="4" top="501" bottom="567" left="1186" right="1210" shear="0" text="r"/>
             <Character no="5" top="501" bottom="567" left="1210" right="1228" shear="0" text="c"/>
-            <Character no="6" top="501" bottom="567" left="1228" right="1074" shear="0" text="i"/>
-            <Character no="7" top="501" bottom="567" left="1074" right="1260" shear="0" text="s"/>
+            <Character no="6" top="501" bottom="567" left="1228" right="1244" shear="0" text="i"/>
+            <Character no="7" top="501" bottom="567" left="1244" right="1260" shear="0" text="s"/>
         </Word>
         <Word no="2" top="493" bottom="567" left="1464" right="1608" shear="0" text="Certe">
             <Character no="1" top="493" bottom="567" left="1464" right="1496" shear="0" text="C"/>
