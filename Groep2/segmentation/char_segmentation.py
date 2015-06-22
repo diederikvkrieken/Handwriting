@@ -148,8 +148,8 @@ class segmenter:
                    # cv2.line(mask,(x_start + width,0),(x_start + width, mask.shape[0] -1),(1),1)
 
                     # get the definitive crop and add it to the list
-                    def_crop = mask[0:mask.shape[1], x_start: x_start + width]
-                    def_crop_grayscale = imageGrayscale[0:mask.shape[1], x_start: x_start + width]
+                    def_crop = mask[0:mask.shape[0], prev_x: x_start + width]
+                    def_crop_grayscale = imageGrayscale[0:mask.shape[0], prev_x: x_start + width]
                     crop_list.append((def_crop, def_crop_grayscale))
 
                     # some visualisation, you may uncomment
@@ -249,6 +249,16 @@ class segmenter:
         #     cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
 
         SC_columns = self.step3_revisited(SC_columns, 8)
+
+        result = []
+        for SC_column in SC_columns:
+            if SC_column > 6:
+                result.append(SC_column)
+
+        if len(result) == 0:
+            result.append(wordBinary.shape[1])
+
+        SC_columns = result
 
         # for x in SC_columns:
         #     cv2.line(with_lines_step3_revised,(x,0),(x,thin_height -1),(1),1)

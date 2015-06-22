@@ -164,7 +164,7 @@ class Recognizer:
         jobs = pool.map(unwrap_self_wordParallel, zip([self]*len(wordsMerged), wordsMerged))
 
         ## Classification
-        cls.fullPass(jobs)  # A full run on the characters
+        cls.oneWordsRun(jobs)  # A full run on the characters
 
     # Running all the features WARNING this will take an extremely long time!
     def allFeatures(self, ppm_folder, words_folder):
@@ -196,13 +196,17 @@ class Recognizer:
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         ## Classification
-        fcounter = 0
+        """
+        counter = 0
         for fr in jobs:
-            print "Training for feature: ", combined[fcounter][1]
-            cls.fullPass(fr)  # A full run on the characters
-            fcounter += 1
+            print "Training for feature: ", combined[counter][1]
+            counter += 1
+            cls.oneWordsRun(fr)  # A full run on the characters
             # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
             # cv2.waitKey(0)
+        """
+
+        cls.oneWordRunAllFeat(jobs)
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
@@ -235,13 +239,17 @@ class Recognizer:
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         ## Classification
+        """
         counter = 0
         for fr in jobs:
             print "Training for feature: ", combined[counter][1]
             counter += 1
-            cls.fullPass(fr)  # A full run on the characters
+            cls.oneWordsRun(fr)  # A full run on the characters
             # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
             # cv2.waitKey(0)
+        """
+
+        cls.oneWordRunAllFeat(jobs)
 
     # Go through folder, train and test on each file
     def oneFolder(self, ppm_folder, words_folder):

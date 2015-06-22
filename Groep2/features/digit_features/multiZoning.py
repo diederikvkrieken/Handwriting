@@ -8,7 +8,7 @@ class MultiZoning():
 
     def doMultiZoning(self,image):
         cuts = [(3, 1), (1, 3), (2, 3), (3, 2), (3, 3), (1, 4), (4, 1), (4, 4), (6, 1), (1, 6), (6, 2), (2, 6), (6, 6)]
-        imgwidth, imgheight = image.shape[:2]
+        imgheight, imgwidth = image.shape[:2]
 
         feature_vector = []
 
@@ -25,7 +25,11 @@ class MultiZoning():
                     j = j * width
                     a = image[j:j + width, i:i + height]
                     percentage_black_pixels = a.sum() / imgSize
-                    temp_vector.append(percentage_black_pixels)
+
+                    if math.isnan(percentage_black_pixels):
+                        temp_vector.append(0)
+                    else:
+                        temp_vector.append(percentage_black_pixels)
 
             feature_vector.append(temp_vector)
 
