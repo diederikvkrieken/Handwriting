@@ -40,7 +40,7 @@ class Classification():
                      #'KN': []
                      }
         # Length character vectors should be appended to for word classification
-        self.max_seg = 25
+        self.max_seg = 30
 
         self.allPredictions = []
 
