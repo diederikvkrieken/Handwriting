@@ -8,7 +8,7 @@ class MultiZoning():
 
     def doMultiZoning(self,image):
         cuts = [(3, 1), (1, 3), (2, 3), (3, 2), (3, 3), (1, 4), (4, 1), (4, 4), (6, 1), (1, 6), (6, 2), (2, 6), (6, 6)]
-        imgwidth, imgheight = image.shape[:2]
+        imgheight, imgwidth = image.shape[:2]
 
         feature_vector = []
 
