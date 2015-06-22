@@ -14,6 +14,9 @@ class Comparator:
         k = 0
         for charSeg in wordXml:
 
+            if k != 0:
+                assert wordXml[k][0] >= wordXml[k-1][1], ("WORD is not correctly annotated!: ", wordXml)
+
             for csc in csc_columns[n:]:
 
                 #Only add a new csc when we do not have undersegmenting

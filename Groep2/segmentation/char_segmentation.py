@@ -248,7 +248,7 @@ class segmenter:
         # for x in SC_columns:
         #     cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
 
-      #  SC_columns = self.step3_revisited(SC_columns, 8)
+        SC_columns = self.step3_revisited(SC_columns, 8)
 
         # for x in SC_columns:
         #     cv2.line(with_lines_step3_revised,(x,0),(x,thin_height -1),(1),1)
@@ -256,7 +256,7 @@ class segmenter:
         # cv2.imshow("segments", with_lines_step3 * 255)
         # cv2.imshow("segments revisited", with_lines_step3_revised * 255)
         # cv2.waitKey(0)
-        # end of drawing CSC's and CS's
+        #end of drawing CSC's and CS's
 
         return self.crop_sc_areas(SC_columns, ascender, descender, wordBinary, wordGrayscale)
 

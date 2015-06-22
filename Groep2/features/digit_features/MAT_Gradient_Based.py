@@ -32,7 +32,7 @@ class MAT_Grad():
 
         width = img.shape[1]
         height = img.shape[0]
-
+        print img
         for x in range(1, height-1):
             for y in range(1, width-1):
                 px = (sobel_x[0][0] * img[x-1][y-1]) + (sobel_x[0][1] * img[x][y-1]) + \
@@ -68,14 +68,11 @@ class MAT_Grad():
                 y = y*(width/4)
                 a = sobelDirec[x:x + height, y:y + width]
                 for p in range(45,9*45, 45):
-                    count = sum(a==p)
+                    count = (a==p).sum()
                     feature_vector.append(count)
 
-        featureMerged = []
-        for f in feature_vector:
-            featureMerged += f.tolist()
 
-        return featureMerged
+        return feature_vector
         #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
         #MAT_Grad(img)
 
