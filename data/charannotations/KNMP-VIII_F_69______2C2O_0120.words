@@ -219,8 +219,8 @@
         <Word no="1" top="1907" bottom="1974" left="1214" right="1311" shear="0" text="hoc">
             <Character no="1" top="1907" bottom="1974" left="1214" right="1251" shear="0" text=":"/>
             <Character no="2" top="1907" bottom="1974" left="1251" right="1278" shear="0" text="h"/>
-            <Character no="3" top="1907" bottom="1974" left="1278" right="1219" shear="0" text="o"/>
-            <Character no="4" top="1907" bottom="1974" left="1219" right="1312" shear="0" text="c"/>
+            <Character no="3" top="1907" bottom="1974" left="1278" right="1295" shear="0" text="o"/>
+            <Character no="4" top="1907" bottom="1974" left="1295" right="1312" shear="0" text="c"/>
         </Word>
     </TextLine>
     <TextLine no="22" top="2090" bottom="2136" left="887" right="1223" shear="0">

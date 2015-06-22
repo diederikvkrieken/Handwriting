@@ -28,9 +28,9 @@
     </TextLine>
     <TextLine no="3" top="253" bottom="339" left="425" right="1665" shear="0">
         <Word no="1" top="253" bottom="310" left="1624" right="1665" shear="0" text="k">
-            <Character no="1" top="253" bottom="310" left="1624" right="1662" shear="0" text=":"/>
-            <Character no="2" top="253" bottom="310" left="1662" right="1627" shear="0" text="k"/>
-            <Character no="3" top="253" bottom="310" left="1627" right="1666" shear="0" text=":"/>
+            <Character no="1" top="253" bottom="310" left="1624" right="1627" shear="0" text=":"/>
+            <Character no="2" top="253" bottom="310" left="1627" right="1662" shear="0" text="k"/>
+            <Character no="3" top="253" bottom="310" left="1662" right="1666" shear="0" text=":"/>
         </Word>
         <Word no="2" top="272" bottom="339" left="425" right="495" shear="0" text="@cum_cu~">
             <Character no="1" top="272" bottom="339" left="425" right="452" shear="0" text="c"/>
