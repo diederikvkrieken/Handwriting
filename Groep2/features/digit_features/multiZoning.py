@@ -25,7 +25,11 @@ class MultiZoning():
                     j = j * width
                     a = image[j:j + width, i:i + height]
                     percentage_black_pixels = a.sum() / imgSize
-                    temp_vector.append(percentage_black_pixels)
+
+                    if math.isnan(percentage_black_pixels):
+                        temp_vector.append(0)
+                    else:
+                        temp_vector.append(percentage_black_pixels)
 
             feature_vector.append(temp_vector)
 
