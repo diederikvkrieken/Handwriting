@@ -25,7 +25,7 @@ class Classification():
     def __init__(self):
         # Dictionary of all classifiers
         self.classifiers = {'RF': RF.RandomForest('RF'),
-                            #'WRF': RF.RandomForest('WRF'),   # Another Random Forest for word classification
+                            'WRF': RF.RandomForest('WRF'),   # Another Random Forest for word classification
                             # 'GB': GB.GBC('GB'),
                             #'SVM': svm.SVM('SVM'),
                             #'KM': km.KMeans(30, 'KM'),
@@ -33,7 +33,7 @@ class Classification():
                             }
         # Dictionary of performances
         self.perf = {'RF': [],
-                     #'WRF': [],
+                     'WRF': [],
                      # 'GB': [],
                      #'SVM': [],
                      #'KM': [],
@@ -41,6 +41,8 @@ class Classification():
                      }
         # Length character vectors should be appended to for word classification
         self.max_seg = 25
+
+        self.allPredictions = []
 
     def trainParallel(self, combined):
 
@@ -62,6 +64,8 @@ class Classification():
     # Randomly assigns half of indices to one and half to another grouping
     def halfSplit(self, length):
         # Random assignment
+        print "WARNING!! RANDOM SPLIT IT NOT RANDOM ANNYMORE!!!!!!!!!!"
+        np.random.seed(23353634)
         split = np.random.uniform(0, 1, length) <= 0.50
         # Put indices in corresponding halve
         half1 = [idx for idx, el in enumerate(split) if el == True]
@@ -251,6 +255,83 @@ class Classification():
                 self.predChar['RF'].append(prediction)
                 self.predWord['WRF'].append(wordpred)
 
+    def wordVoteTest(self):
+        self.predChar = {'RF': []}      # Dictionary of segment predictions
+        self.predWord = {'WRF': []}     # Dictionary of word predictions
+        self.n_char = 0     # Keep track of amount of segments (for error)
+        test_words = [self.words[idx] for idx in self.test_idx]
+
+        # Add a new prediction list for this feature
+        self.allPredictions.append([])
+
+        for word in test_words:
+            # On all words in the test set
+            if len(word[1]) > 0:
+                # If the word actually has characters...
+                prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
+                self.n_char += len(word[1])
+
+                self.allPredictions[-1].append(prediction)
+
+
+
+    def startVoting(self):
+
+        self.votePrediction()
+
+        for prediction in self.votedPredictions:
+
+            # Pad to proper input length
+            pp = self.pad(prediction)
+
+            # Predict word based on padded prediction
+            wordpred = self.classifiers['WRF'].test(pp)
+
+            # Add to dictionaries
+            self.predChar['RF'].append(prediction)
+            self.predWord['WRF'].append(wordpred)
+
+    def votePrediction(self):
+
+        # This will stored the predictions after we have voted
+        self.votedPredictions = []
+
+        # This will be the dictionary where we count every character for every word
+        voteDictionary = {}
+
+        countWord = 0
+        for word in self.allPredictions[0]:
+
+            # All the voted characters will be stored in this.
+            votedWord = []
+
+            countChar = 0
+            for wordChar in word:
+                for prediction in self.allPredictions:
+
+                    # Check if we already have encounterd the char.
+                    if prediction[countWord][countChar] in voteDictionary:
+                        voteDictionary[prediction[countWord][countChar]] += 1
+                    else:
+                        voteDictionary[prediction[countWord][countChar]] = 1
+
+
+                #See which chars has the most votes!
+                maxx = max(voteDictionary.values())             #finds the max value
+                keys = [x for x,y in voteDictionary.items() if y == maxx]
+
+                #Add the votedword
+                votedWord.append(keys[0])
+
+                #Empty the vote dictionary again.
+                voteDictionary = {}
+
+                countChar += 1
+
+            countWord += 1
+
+            self.votedPredictions.append(votedWord)
+
     # Combines a sequence of character predictions to a word
     def combineChar(self, segments):
         word = []   # Empty list to append characters to
@@ -413,6 +494,17 @@ class Classification():
         self.wordTrain()        # Train character and word classifiers
         self.wordTest()         # Predict characters and words
         self.wordRes()          # Determine character and word recognition
+
+    # This will run the one words function hower we use a simple voting scheme between features.
+    def oneWordRunAllFeat(self, featureWords):
+
+        for words in featureWords:
+            self.splitData(words)   # Make custom split
+            self.wordTrain()        # Train character and word classifiers
+            self.wordVoteTest()     # Add all the prediction to one large array.
+
+        self.startVoting()          # Vote which prediction are best.
+        self.wordRes()              # Determine character and word recognition
 
     # Applies all classifiers on provided data
     def fullPass(self, words):
