@@ -251,7 +251,7 @@ class segmenter:
         SC_columns = self.step3_revisited(SC_columns, 8)
 
         result = []
-        for SC_column in CSC_columns:
+        for SC_column in SC_columns:
             if SC_column > 6:
                 result.append(SC_column)
 
