@@ -78,5 +78,5 @@ class MAT_Grad():
         print "Running MAT Gradient"
         image = self.scale(image)
         feature = self.findMATGrad(image)
-        featureFirstOnly = [row[0] for row in feature]
-        return featureFirstOnly
+        #featureFirstOnly = [row[0] for row in feature]
+        return feature
