@@ -483,10 +483,15 @@ class Classification():
         predictions = []                # Empty list for predicted words
         # Assumes feat is a list of feature vectors
         for vector in feat:
-            # Predict characters
-            chars = self.classifiers['RF'].test(vector)
-            # Predict word based on predicted characters and add to predictions
-            predictions.append(self.classifiers['WRF'].test(self.pad(chars)))
+            if len(vector) > 0:
+                # If features have really been extracted
+                # Predict characters
+                chars = self.classifiers['RF'].test(vector)
+                # Predict word based on predicted characters and add to predictions
+                predictions.append(self.classifiers['WRF'].test(self.pad(chars)))
+            else:
+                # If no features were extracted, classify as most common word
+                predictions.append('o')
         return predictions              # Return predicted words
 
     def oneWordsRun(self, words):

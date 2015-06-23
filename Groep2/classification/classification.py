@@ -31,7 +31,7 @@ class Classification():
                      'KM': [],
                      'KN': []}
         # Length character vectors should be appended to for word classification
-        self.max_seg = 25
+        self.max_seg = 30
 
     # Takes a list of characters, converts to ASCII and pads with non characters
     def pad(self, characters):
@@ -360,10 +360,15 @@ class Classification():
         predictions = []                # Empty list for predicted words
         # Assumes feat is a list of feature vectors
         for vector in feat:
-            # Predict characters
-            chars = self.classifiers['RF'].test(vector)
-            # Predict word based on predicted characters and add to predictions
-            predictions.append(self.classifiers['WRF'].test(self.pad(chars)))
+            if len(vector) > 0:
+                # If the vector actually is a feature vector...
+                # Predict characters
+                chars = self.classifiers['RF'].test(vector)
+                # Predict word based on predicted characters and add to predictions
+                predictions.append(self.classifiers['WRF'].test(self.pad(chars)))
+            else:
+                # If no features were extracted for a word, just classify it as the most common word
+                predictions.append('o')
         return predictions              # Return predicted words
 
     def oneWordsRun(self, words):
