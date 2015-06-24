@@ -11,6 +11,7 @@ import kMeans as km
 import kNear as kn
 from sklearn.cross_validation import KFold as kf
 from sklearn.externals import joblib as jl
+from sklearn.metrics import confusion_matrix as cm
 from latindictionary import buildDictionary
 # Parallel packages
 from multiprocessing import Pool
@@ -39,6 +40,14 @@ class Classification():
                      #'KM': [],
                      #'KN': []
                      }
+        # Confusion matrices
+        self.cm = {'RF': [],
+                   'WRF': [],
+                   # 'GB': [],
+                   # 'SVM': [],
+                   # 'KM': [],
+                   # 'KN': []
+                   }
         # Length character vectors should be appended to for word classification
         self.max_seg = 30
 
@@ -366,6 +375,11 @@ class Classification():
             test_words = [self.words[idx] for idx in self.test_idx]
             exp_char = self.predChar[name]
             exp_word = self.predWord[name]
+            # For confusion matrices
+            cl_true = []
+            cl_pred = []
+            wl_true = []
+            wl_pred = []
             real_idx = -1   # Index of real words, which can be different from pred_idx because of empty words...
             # Run over test words and predictions
             for pred_idx in range(0, len(exp_word)):
@@ -381,16 +395,23 @@ class Classification():
                     print 'Something went horribly wrong. Comparison incomplete.'
                     break
                 for ci in range(len(actual)):
+                    # Add for confusion matrix
+                    cl_true.append(actual[ci])
+                    cl_pred.append(exp_char[pred_idx][ci])
                     if exp_char[pred_idx][ci] != actual[ci]:
                         # Incorrect prediction, increment error
                         er_char += 1
                 # Compare word prediction with actual class
+                # Add for confusion matrix
+                wl_true.append(test_words[real_idx][0])
+                wl_pred.append(exp_word[pred_idx])
                 if exp_word[pred_idx] != test_words[real_idx][0]:
                     # Incorrect prediction, increment error
                     er_word += 1
 
             # Store performance in dictionary
             self.perf[name].append((er_word, er_char))
+            self.cm[name].append((cm(cl_true, cl_pred), cm(wl_true, wl_pred)))
 
         # Return all outcomes
         return self.perf
@@ -419,6 +440,11 @@ class Classification():
         test_words = [self.words[idx] for idx in self.test_idx]
         exp_char = self.predChar['RF']
         exp_word = self.predWord['WRF']
+        # For confusion matrices
+        cl_true = []
+        cl_pred = []
+        wl_true = []
+        wl_pred = []
         real_idx = -1   # Index of real words, which can be different from pred_idx because of empty words...
         # Run over test words and predictions
         for pred_idx in range(0, len(exp_word)):
@@ -434,10 +460,16 @@ class Classification():
                     print 'Something went horribly wrong. Comparison incomplete.'
                     break
             for ci in range(len(actual)):
+                # Add for confusion matrix
+                cl_true.append(actual[ci])
+                cl_pred.append(exp_char[pred_idx][ci])
                 if exp_char[pred_idx][ci] != actual[ci]:
                     # Incorrect prediction, increment error
                     er_char += 1
             # Compare word prediction with actual class
+            # Add for confusion matrix
+            wl_true.append(test_words[real_idx][0])
+            wl_pred.append(exp_word[pred_idx])
             if exp_word[pred_idx] != test_words[real_idx][0]:
                 # Incorrect prediction, increment error
                 er_word += 1
@@ -445,6 +477,8 @@ class Classification():
         # Store performances in dictionary
         self.perf['RF'].append(er_char)
         self.perf['WRF'].append(er_word)
+        self.cm['RF'].append(cm(cl_true, cl_pred))
+        self.cm['WRF'].append(cm(wl_true, wl_pred))
 
         # Print table
         print 'word error\tsegment error\ttotal words\ttotal segments'
