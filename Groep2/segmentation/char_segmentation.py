@@ -3,6 +3,7 @@ __author__ = 'Diederik, Diederik, Jasper, Sebastiaan, Pieter'
 import cv2
 import numpy as np
 from skimage.measure import label
+import sys
 
 import compareSegments, thinning
 
@@ -155,9 +156,12 @@ class segmenter:
                    # cv2.line(mask,(x_start + width,0),(x_start + width, mask.shape[0] -1),(1),1)
 
                     # get the definitive crop and add it to the list
-                    def_crop = mask[y_start:y_start + height, prev_x: x_start + width]
-                    def_crop_grayscale = imageGrayscale[y_start:y_start + height, prev_x: x_start + width]
+                    def_crop = mask[y_start:y_start + height, x_start: x_start + width]
+                    def_crop_grayscale = imageGrayscale[y_start:y_start + height, x_start: x_start + width]
                     crop_list.append((def_crop, def_crop_grayscale))
+
+                    if def_crop.shape[1] < 1:
+                        pass
 
                     # some visualisation, you may uncomment
                     #cv2.imshow("mask", def_crop * 255)
