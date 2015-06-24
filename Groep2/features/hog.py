@@ -12,7 +12,7 @@ class HOG():
     # Extracts HOG features from an image and returns those
     def performHOG(self, img):
 
-        opencv_hog= cv2.HOGDescriptor((4,4), (4,4), (4,4), (4,4), 4)
+        opencv_hog= cv2.HOGDescriptor((8,8), (8,8), (8,8), (8,8), 9)
         # print "Hogging away! "
         alpha = 200
 
