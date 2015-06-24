@@ -77,7 +77,7 @@ class segmenter:
         return crop_img
 
 
-    def crop_sc_areas(self, SC_columns, asc, desc, imageBinary, imageGrayscale):
+    def crop_sc_areas(self, SC_columns, asc, desc, imageBinary, imageGrayscale, xStart):
         """
         This function returns the crops coresponding to the SC_columns list
         It does some fancy stuff with connected components to keep the 'f' an 'g' alive.
@@ -86,6 +86,9 @@ class segmenter:
         :param asc:
         :param desc:
         :param image:
+        :param xStart: this is the value that should be added to the SC_columns result list.
+                        this value should be the x-part that is removed from the orginal image
+                        before entering this function.
         :return: the new SC_colums lists and the crops list
         """
 
@@ -135,30 +138,34 @@ class segmenter:
                 else:
                     cnts = cv2.findContours(cpy, 0, 2)[0]
                 if len(cnts) != 0:
-                    x_start, __, width,__ = cv2.boundingRect(cnts[0])
+                    x_start, y_start, width,height = cv2.boundingRect(cnts[0])
                     for cnt in cnts:
-                        xx_start,__,wwidth,__ = cv2.boundingRect(cnt)
+                        xx_start,yy_start,wwidth,hheight = cv2.boundingRect(cnt)
                         if x_start > xx_start:
                             x_start = xx_start
                         if width < wwidth:
                             width = wwidth
+                        if yy_start < y_start:
+                            y_start = yy_start
+                        if height < hheight:
+                            height = hheight
 
                     # some visualisation
                    # cv2.line(mask,(x_start,0),(x_start, mask.shape[0] -1),(1),1)
                    # cv2.line(mask,(x_start + width,0),(x_start + width, mask.shape[0] -1),(1),1)
 
                     # get the definitive crop and add it to the list
-                    def_crop = mask[0:mask.shape[0], prev_x: x_start + width]
-                    def_crop_grayscale = imageGrayscale[0:mask.shape[0], prev_x: x_start + width]
+                    def_crop = mask[y_start:y_start + height, prev_x: x_start + width]
+                    def_crop_grayscale = imageGrayscale[y_start:y_start + height, prev_x: x_start + width]
                     crop_list.append((def_crop, def_crop_grayscale))
 
                     # some visualisation, you may uncomment
-                    # cv2.imshow("mask", mask * 255)
-                    # cv2.imshow("cropp", crop * 255)
-
+                    #cv2.imshow("mask", def_crop * 255)
+                    #cv2.imshow("cropp", def_crop_grayscale)
+                    #cv2.waitKey(0)
 
                     # add the current column to the new list
-                    new_SC_columns.append(x)
+                    new_SC_columns.append(x + xStart)
             else:
                 # there are no blobs in the crop, so do not add it to the new SC columns list
                 pass
@@ -218,6 +225,42 @@ class segmenter:
 
     # Segments a given word image
     def segment(self, wordBinary, wordGrayscale):
+
+        # let's delete empty space first and remember how much x-axis pixels we removed from the left
+        #   ----------
+        #   |        |    ------
+        #   |  abcd  | => |abcd|
+        #   |        |    ------
+        #   ----------
+
+        cpy = wordBinary.copy()
+
+        if cv2.__version__[0] == '3':
+            # OpenCV 3 has an extra first return value
+            cnts = cv2.findContours(cpy, 0, 2)[1]
+        else:
+            cnts = cv2.findContours(cpy, 0, 2)[0]
+
+        x_start, y_start, width,height = cv2.boundingRect(cnts[0])
+        x_end = x_start + width;
+        for cnt in cnts:
+            xx_start,yy_start,width,hheight = cv2.boundingRect(cnt)
+            if xx_start < x_start:
+                x_start = xx_start
+            if yy_start < y_start:
+                y_start = yy_start
+            if x_end < (xx_start + width):
+                x_end = xx_start + width
+            if height < hheight:
+                height = hheight
+
+        # img[y: y + h, x: x + w]
+        wordBinary = wordBinary[y_start:y_start + height, x_start: x_end]
+        wordGrayscale = wordGrayscale[y_start:y_start + height, x_start: x_end]
+
+        #cv2.imshow("grayscale", wordGrayscale)
+        #cv2.waitKey(1)
+
         # calculate the y coordinates of the ascender (e.g. top part f) and descender (e.g. bottom part g) lines
         ascender, descender = self.ascender_descender(wordBinary)
 
@@ -250,6 +293,7 @@ class segmenter:
 
         SC_columns = self.step3_revisited(SC_columns, 8)
 
+
         result = []
         for SC_column in SC_columns:
             if SC_column > 6:
@@ -268,7 +312,7 @@ class segmenter:
         # cv2.waitKey(0)
         #end of drawing CSC's and CS's
 
-        return self.crop_sc_areas(SC_columns, ascender, descender, wordBinary, wordGrayscale)
+        return self.crop_sc_areas(SC_columns, ascender, descender, wordBinary, wordGrayscale, x_start)
 
 
         # # draw ascender and descender lines
