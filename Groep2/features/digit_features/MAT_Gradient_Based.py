@@ -1,13 +1,17 @@
 import cv2
 import numpy
+import numpy as np
 import math
 import scipy
+from bisect import bisect_left
 
 class MAT_Grad():
 
     def __init__(self):
         self.xSize = 32
         self.ySize = 32
+        self.orientations = [-180, -135,-90,-45,0,45,90,135,180]
+        self.directions = [-135,-90,-45,1,45,90,135,180]
         pass
 
     def scale(self, img):
@@ -15,64 +19,52 @@ class MAT_Grad():
         img = cv2.resize(img, (self.xSize, self.ySize))
         return img
 
+    def closestValue(self, value):
+        pos = bisect_left(self.orientations, value)
+        if pos == 0:
+            return self.orientations[0]
+        if pos == len(self.orientations):
+            return self.orientations[-1]
+        before = self.orientations[pos - 1]
+        after = self.orientations[pos]
+        if after - value < value - before:
+            return after
+        else:
+            return before
+
     def findMATGrad(self,img):
-        # load an color image in grayscale
-        # img = cv2.resize(img, (32,32))
-        sobelout = numpy.zeros((img.shape[0],img.shape[1],1), numpy.float)                                  #empty image
-        gradx = sobelout.copy()
-        grady = sobelout.copy()
-        sobelDirec = sobelout.copy()
+        sobelDirec = numpy.zeros((img.shape[0],img.shape[1],1), numpy.float)                                  #empty image
 
-        sobel_x = [[-1,0,1],
-                  [-2,0,2],
-                  [-1,0,1]]
-        sobel_y = [[-1,-2,-1],
-                  [0,0,0],
-                  [1,2,1]]
+        #grab both edges for sobelx
+        sobelx = cv2.Sobel(img,cv2.CV_64F,1,0,ksize=-1)
 
-        width = img.shape[1]
-        height = img.shape[0]
-        for x in range(1, height-1):
-            for y in range(1, width-1):
-                px = (sobel_x[0][0] * img[x-1][y-1]) + (sobel_x[0][1] * img[x][y-1]) + \
-                     (sobel_x[0][2] * img[x+1][y-1]) + (sobel_x[1][0] * img[x-1][y]) + \
-                     (sobel_x[1][1] * img[x][y]) + (sobel_x[1][2] * img[x+1][y]) + \
-                     (sobel_x[2][0] * img[x-1][y+1]) + (sobel_x[2][1] * img[x][y+1]) + \
-                     (sobel_x[2][2] * img[x+1][y+1])
-                py = (sobel_y[0][0] * img[x-1][y-1]) + (sobel_y[0][1] * img[x][y-1]) + \
-                     (sobel_y[0][2] * img[x+1][y-1]) + (sobel_y[1][0] * img[x-1][y]) + \
-                     (sobel_y[1][1] * img[x][y]) + (sobel_y[1][2] * img[x+1][y]) + \
-                     (sobel_y[2][0] * img[x-1][y+1]) + (sobel_y[2][1] * img[x][y+1]) + \
-                     (sobel_y[2][2] * img[x+1][y+1])
+        #both edges for sobely
+        sobely = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=-1)
 
-                gradx[x][y] = px
-                grady[x][y] = py
-                if(px>0):
-                    sobelDirec[x][y] = scipy.arctan(py^2/px^2)
-
-        for x in range(height):
-            for y in range(width):
-                if sobelDirec[x][y] >= 0 and sobelDirec[x][y]<(360*(1/16)) \
-                    or sobelDirec[x][y] > (360*(15/16)) and sobelDirec[x][y] <= 360:
-                    sobelDirec[x][y] = 360
-
-                for i in range(1,15,2):
-                    if sobelDirec[x][y] >= (360*(i/16)) and sobelDirec[x][y]<(360*(i/16)):
-                        sobelDirec[x][y] = (2*i)/16
+        for x in range(32):
+            for y in range(32):
+                px = sobelx[x][y]
+                py = sobely[x][y]
+                if math.sqrt((px*px)+(py*py))!=0:
+                    sobelDirec[x][y] = math.atan2(py,px)*(180/math.pi)
+                    pos = self.closestValue(sobelDirec[x][y])
+                    if pos ==-180:
+                        pos = 180
+                    if pos == 0:
+                        pos = 1
+                    sobelDirec[x][y] = pos
 
         feature_vector = []
         for x in range(0,4):
-            x = x*(height/4)
+            x = x*(32/4)
             for y in range(0,4):
-                y = y*(width/4)
-                a = sobelDirec[x:x + height, y:y + width]
-                for p in range(45,9*45, 45):
+                y = y*(32/4)
+                a = sobelDirec[x:x + 8, y:y + 8]
+                for p in self.directions:
                     count = (a==p).sum()
                     feature_vector.append(count)
-
         return feature_vector
-        #img = cv2.imread('h.jpg', cv2.IMREAD_GRAYSCALE)
-        #MAT_Grad(img)
+
 
     def run(self,image):
         print "Running MAT Gradient"
