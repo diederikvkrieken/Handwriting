@@ -11,7 +11,7 @@ import kMeans as km
 import kNear as kn
 from sklearn.cross_validation import KFold as kf
 from sklearn.externals import joblib as jl
-
+from latindictionary import buildDictionary
 # Parallel packages
 from multiprocessing import Pool
 import time
@@ -510,6 +510,21 @@ class Classification():
 
         self.startVoting()          # Vote which prediction are best.
         self.wordRes()              # Determine character and word recognition
+
+    def buildClassificationDictionary(self, featureWords, name):
+
+        for words in featureWords:
+            self.splitData(words)   # Make custom split
+            self.wordTrain()        # Train character and word classifiers
+            self.wordVoteTest()     # Add all the prediction to one large array.
+
+        BD = buildDictionary.DictionaryBuilder()
+
+        test_words = [featureWords[0][idx] for idx in self.test_idx]
+        BD.writeFeatDict(self.allPredictions, test_words, name)
+
+
+
 
     # Applies all classifiers on provided data
     def fullPass(self, words):

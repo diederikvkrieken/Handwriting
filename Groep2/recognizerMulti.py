@@ -15,6 +15,7 @@ from preprocessing import prepImage
 from segmentation import char_segmentation as cs
 from features import featExtraction
 from classification import classificationMulti
+from latindictionary import buildDictionary
 
 # Parallel packages
 from multiprocessing import Pool
@@ -163,8 +164,44 @@ class Recognizer:
         ## Prarallel feature extraction.
         jobs = pool.map(unwrap_self_wordParallel, zip([self]*len(wordsMerged), wordsMerged))
 
+
         ## Classification
         cls.oneWordsRun(jobs)  # A full run on the characters
+
+    def buildDict(self, ppm_folder, words_folder):
+
+        wordsInter = []
+
+        for file in os.listdir(ppm_folder):
+            print file
+            if file.endswith('.ppm') or file.endswith('.jpg'):
+                ## Read and preprocess
+                ppm = ppm_folder + '/' + file   # ENTIRE path of course..
+                inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
+                wordsInter.append(prepper.prep(ppm, inwords))
+
+        #Combine words
+        wordsMerged = []
+        for w in wordsInter:
+            w = np.array(w)
+            wordsMerged += w.tolist()
+
+        ## Prarallel feature extraction.
+        jobs = pool.map(unwrap_self_wordParallel, zip([self]*len(wordsMerged), wordsMerged))
+
+        # Build Dictionary
+        buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPDICT.dat')
+
+        # USELESS PEACE OF SHIT CODE
+        combined = []
+
+        for fName, f in feat.featureMethods.iteritems():
+            combined.append([wordsMerged, f])
+
+        ## Prarallel feature extraction.
+        jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
+
+        cls.buildClassificationDictionary(jobs, 'KNMPTEST.dat')
 
     # Running all the features WARNING this will take an extremely long time!
     def allFeatures(self, ppm_folder, words_folder):
@@ -196,7 +233,7 @@ class Recognizer:
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         ## Classification
-        """
+        '''
         counter = 0
         for fr in jobs:
             print "Training for feature: ", combined[counter][1]
@@ -204,7 +241,7 @@ class Recognizer:
             cls.oneWordsRun(fr)  # A full run on the characters
             # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
             # cv2.waitKey(0)
-        """
+        '''
 
         cls.oneWordRunAllFeat(jobs)
 
@@ -331,6 +368,10 @@ if __name__ == "__main__":
             elif sys.argv[2] == 'experiment':
                 # Run our experiment
                 r.folders(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'BuildDictionary':
+                # Run our experiment
+                r.buildDict(sys.argv[3], sys.argv[4])
+
             else:
                 # Dum dum is trying to be cheeky
                 print "Usage: %s -dev <version> <image_folder> <.words_folder>" % sys.argv[0]
