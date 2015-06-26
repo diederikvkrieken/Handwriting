@@ -130,7 +130,7 @@ class Classification():
         for name, classifier in self.classifiers.iteritems():
             # Train all classifiers
             print "Training: ", name
-            classifier.train(feat, goal)  # On (segment) features, classes
+            classifier.trainAll(feat, goal)  # On (segment) features, classes
 
     # Trains character and word classifiers
     def wordTrain(self):
@@ -148,7 +148,7 @@ class Classification():
                 goal.append(word[2][seg])
         # Train a random forest for character classification
         print 'Training character classifier!'
-        self.classifiers['RF'].train(feat, goal)
+        self.classifiers['RF'].trainAll(feat, goal)
 
         # Empty features and goals again for word training
         feat = []
@@ -164,7 +164,7 @@ class Classification():
 
         # Train word classifier on predicted characters
         print 'Training word classifier!'
-        self.classifiers['WRF'].train(feat, goal)
+        self.classifiers['WRF'].trainAll(feat, goal)
 
     # Saves all (trained) classifiers to disk
     def save(self):
@@ -375,7 +375,7 @@ class Classification():
     # Fully trains one classifier on given set and dumps it afterwards
     def fullTrain(self, cln, feat, goal):
         classifier = self.classifiers[cln]  # Get required classifier
-        classifier.train(feat, goal)        # Train on all provided data
+        classifier.trainAll(feat, goal)        # Train on all provided data
         jl.dump(classifier, cln + '.pkl')   # Save to disk
 
     # Trains a character classifier on 50% of the data, a word classifier on te other half
