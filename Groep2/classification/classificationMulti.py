@@ -12,7 +12,7 @@ import kNear as kn
 from sklearn.cross_validation import KFold as kf
 from sklearn.externals import joblib as jl
 from sklearn.metrics import confusion_matrix as cm
-from latindictionary import buildDictionary
+from Groep2.latindictionary import buildDictionary
 # Parallel packages
 from multiprocessing import Pool
 import time
@@ -50,6 +50,8 @@ class Classification():
                    }
         # Length character vectors should be appended to for word classification
         self.max_seg = 30
+
+        self.predChar = {}  # Dictionary of segment predictions for character classifiers
 
         self.trainPredictions = []  # List of predictions for word training
         self.testPredictions = []   # List of predictions for word testing
@@ -270,6 +272,20 @@ class Classification():
                     # Add to dictionaries
                     self.predChar[name].append(prediction)
                     self.predWord[name].append(self.combineChar(prediction))
+
+    # Predicts and gives top most likely candidates for feature fName
+    def characterTest(self, fName, n):
+        # Get train 2 words
+        train2_words = [self.words[idx] for idx in self.train2_idx]
+        self.predChar[fName] = []   # Dictionary of segment predictions
+        for word in train2_words:
+            # On all words in the test set
+            if len(word[1]) > 0:
+                # If the word actually has characters...
+                prediction = self.classifiers['RF'].testTopN(word[1], n)  # Predict the characters
+
+                # Add to dictionaries
+                self.predChar[fName].append(prediction)
 
     # Test word classification
     def wordTest(self):
@@ -615,11 +631,19 @@ class Classification():
         self.wordTest()             # Test word classifier
         self.wordRes()              # Determine character and word recognition
 
+    def featureClassification(self, featureWords, n):
+        for name, feature_res in featureWords.iteritems():
+            self.splitData(feature_res)     # Make custom split
+            self.characterTrain()           # Train character classifier
+            self.characterTest(name, n)        # Predict on train 2 set
+
+        return self.predChar    # Return predictions for every feature
+
     # This will run the one words function however we use a simple voting scheme between features.
     def oneWordRunAllFeat(self, featureWords):
 
-        for words in featureWords:
-            self.splitData(words)       # Make custom split
+        for name, feature_res in featureWords.iteritems():
+            self.splitData(feature_res)       # Make custom split
             self.characterTrain()       # Train character classifier
             self.characterTestVote()    # Add all the prediction to one large array.
 
@@ -630,8 +654,8 @@ class Classification():
 
     def buildClassificationDictionary(self, featureWords, name):
 
-        for words in featureWords:
-            self.splitData(words)       # Make custom split
+        for feature_res in featureWords:
+            self.splitData(feature_res)       # Make custom split
             self.characterTrain()       # Train character classifier
             self.characterTestVote()    # Add all the prediction to one large array.
 

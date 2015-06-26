@@ -232,6 +232,12 @@ class Recognizer:
         print "Starting job"
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
+        jobsAsDictonary = {}
+
+        for idx, job in enumerate(jobs):
+            jobsAsDictonary[combined[idx][1]] = job
+
+
         ## Classification
         '''
         counter = 0
@@ -243,7 +249,10 @@ class Recognizer:
             # cv2.waitKey(0)
         '''
 
-        cls.oneWordRunAllFeat(jobs)
+        cls.featureClassification(jobs, 5)     # The all new super duper feature voting thingy
+
+        ## Post processing
+
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
@@ -262,8 +271,6 @@ class Recognizer:
 
         ## Preprocessing
         wordsInter = prepper.prep(ppm, inwords)
-
-        featureResults = []
 
         # USELESS PEACE OF SHIT CODE
         combined = []
