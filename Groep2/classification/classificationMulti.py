@@ -26,7 +26,8 @@ class Classification():
     def __init__(self):
         # Dictionary of all classifiers
         self.classifiers = {'RF': RF.RandomForest('RF'),
-                            'WRF': RF.RandomForest('WRF'),   # Another Random Forest for word classification
+                            'VRF': RF.RandomForest('VRF'),  # Random Forest for stacking
+                            'WRF': RF.RandomForest('WRF'),  # Another Random Forest for word classification
                             # 'GB': GB.GBC('GB'),
                             #'SVM': svm.SVM('SVM'),
                             #'KM': km.KMeans(30, 'KM'),
@@ -34,6 +35,7 @@ class Classification():
                             }
         # Dictionary of performances
         self.perf = {'RF': [],
+                     'VRF': [],
                      'WRF': [],
                      # 'GB': [],
                      #'SVM': [],
@@ -42,6 +44,7 @@ class Classification():
                      }
         # Confusion matrices
         self.cm = {'RF': [],
+                   'VRF': [],
                    'WRF': [],
                    # 'GB': [],
                    # 'SVM': [],
@@ -51,7 +54,10 @@ class Classification():
         # Length character vectors should be appended to for word classification
         self.max_seg = 30
 
-        self.predChar = {}  # Dictionary of segment predictions for character classifiers
+        # Dictionary of segment predictions of character classifiers for training of stacking
+        self.predTrainChar = {}
+        # Dictionary of segment predictions of character classifiers for the test set
+        self.predTestChar = {}
 
         self.trainPredictions = []  # List of predictions for word training
         self.testPredictions = []   # List of predictions for word testing
@@ -63,6 +69,17 @@ class Classification():
         trainingAlgorithm = combined[2] # I found it scarry to name this value classifier since it is actually a classifier, for example SVM
         print trainingAlgorithm
         return trainingAlgorithm.trainAll(feat, goal)
+
+    # Converts segment text into ASCII and gives unique values for strings
+    def asciiSeg(self, segment):
+        # Convert segment (string) into ascii
+        ascii = [ord(c) for c in ''.join(segment)]
+        res = 0     # res will become final value of contained string
+        for idx, char in enumerate(ascii):
+            res += char*(256**idx)
+
+        # res = char1*1 + char2*2^8 + char3*2^16 ...
+        return res
 
     # Takes a list of characters, converts to ASCII and pads with non characters
     def pad(self, characters):
@@ -188,6 +205,40 @@ class Classification():
         print 'Training character classifier!'
         self.classifiers['RF'].train(feat, goal)
 
+    # Trains the stacking classifier on predictions of all features
+    def voterTrain(self):
+        # Get words of training set 2
+        train2_words = [self.words[idx] for idx in self.train2_idx]
+        # Get predictions of all features
+        predictions = self.predTrainChar.values()
+
+        # Loop over predictions of all features for every segment
+        feat = []   # Input for voting
+        goal = []   # Desired output of voting
+        for segment in zip(*predictions):
+            seg_pred = []   # Top predictions of this segment
+            # Concatenate top predictions, repeat for all features
+            for feat_pred in segment:
+                seg_pred += [self.asciiSeg(pred) for pred in feat_pred]
+
+            # Add as input for voting
+            feat.append(seg_pred)
+
+        # Go through all words in the training set to extract goals
+        for word in train2_words:
+            if len(word[1]) > 0:
+                # If the word actually has characters...
+                goal.append(word[1])    # Characters will be goal
+
+        # Train stacking classifier on predicted characters
+        print 'Training stacking approach!'
+        self.classifiers['VRF'].train(feat, goal)
+
+    def voterTest(self):
+        # Get words from test set
+        test_words = [self.words[idx] for idx in self.test_idx]
+
+
     # Trains a word classifier for word classification as pre-processing
     # NOTICE: depends on a call to characterTrain()!!
     def wordTrain(self):
@@ -277,7 +328,7 @@ class Classification():
     def characterTest(self, fName, n):
         # Get train 2 words
         train2_words = [self.words[idx] for idx in self.train2_idx]
-        self.predChar[fName] = []   # Dictionary of segment predictions
+        self.predTrainChar[fName] = []   # Dictionary of segment predictions for stacking
         for word in train2_words:
             # On all words in the test set
             if len(word[1]) > 0:
@@ -285,7 +336,19 @@ class Classification():
                 prediction = self.classifiers['RF'].testTopN(word[1], n)  # Predict the characters
 
                 # Add to dictionaries
-                self.predChar[fName].append(prediction)
+                self.predTrainChar[fName].append(prediction)
+
+        # Get test words
+        test_words = [self.words[idx] for idx in self.test_idx]
+        self.predTestChar[fName] = []   # Dictionary of segment predictions for testing
+        for word in test_words:
+            # On all words in the test set
+            if len(word[1]) > 0:
+                # If the word actually has characters...
+                prediction = self.classifiers['RF'].testTopN(word[1], n)  # Predict the characters
+
+                # Add to dictionaries
+                self.predTestChar[fName].append(prediction)
 
     # Test word classification
     def wordTest(self):
@@ -631,13 +694,20 @@ class Classification():
         self.wordTest()             # Test word classifier
         self.wordRes()              # Determine character and word recognition
 
+    # Classification version using character classifiers and stacking for obtaining most probable character.
+    # The n most probable characters for every segment are passed on to post processing.
     def featureClassification(self, featureWords, n):
+        # Consider all features
         for name, feature_res in featureWords.iteritems():
             self.splitData(feature_res)     # Make custom split
             self.characterTrain()           # Train character classifier
-            self.characterTest(name, n)        # Predict on train 2 set
+            self.characterTest(name, n)     # Predict on train 2 and test set
 
-        return self.predChar    # Return predictions for every feature
+        self.voterTrain()   # Train stacking approach
+        self.voterTest()    # Test stacking approach
+
+        # Send on to post processing
+        return self.predTestChar    # Return predictions of stacking approach
 
     # This will run the one words function however we use a simple voting scheme between features.
     def oneWordRunAllFeat(self, featureWords):
@@ -667,9 +737,6 @@ class Classification():
 
         test_words = [featureWords[0][idx] for idx in self.test_idx]
         BD.writeFeatDict(self.trainPredictions + self.testPredictions, test_words, name)
-
-
-
 
     # Applies all classifiers on provided data
     def fullPass(self, words):

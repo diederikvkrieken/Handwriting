@@ -226,16 +226,18 @@ class Recognizer:
         combined = []
 
         for fName, f in feat.featureMethods.iteritems():
-            combined.append([wordsMerged, f])
+            combined.append([wordsMerged, f, fName])
 
         ## Prarallel feature extraction.
         print "Starting job"
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
+        # Turn jobs into dictionary
         jobsAsDictonary = {}
 
         for idx, job in enumerate(jobs):
-            jobsAsDictonary[combined[idx][1]] = job
+            # Simply add job under key, which is the name of a feature
+            jobsAsDictonary[combined[idx][2]] = job
 
 
         ## Classification
@@ -249,10 +251,11 @@ class Recognizer:
             # cv2.waitKey(0)
         '''
 
-        cls.featureClassification(jobs, 5)     # The all new super duper feature voting thingy
+        predictions = cls.featureClassification(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
 
         ## Post processing
-
+        # A debug print to ensure correct format of classification output
+        print predictions[0:9]
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
