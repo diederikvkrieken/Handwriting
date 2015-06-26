@@ -83,7 +83,7 @@ class ImageProjections():
         return featureMerged
 
     def run(self, img):
-        print "Running Modified Edge Maps"
+        print "Running Image Projections"
         img = self.scale(img)
         feature = self.findImageProjections(img)
         return feature
