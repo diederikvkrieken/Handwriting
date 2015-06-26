@@ -38,7 +38,7 @@ class StrucCharacteristics():
             k = k * 5
             total = 0
             for i in range(0, 15):
-                total = total + image[abs(16 - i * math.sin(k)), abs(16 + i * math.cos(k))]
+                total = total + image[int(round(abs(16 - i * math.sin(k)))), int(round(abs(16 + i * math.cos(k))))]
             temp_vector.append(total)
 
         feature_vector.append(temp_vector)
@@ -47,7 +47,7 @@ class StrucCharacteristics():
         for k in range(0, 72):
             k = k * 5
             for i in range(0, 15):
-                value = image[abs(16 - i * math.sin(k)), abs(16 + i * math.cos(k))]
+                value = image[int(round(abs(16 - i * math.sin(k)))), int(round(abs(16 + i * math.cos(k))))]
                 if value:
                     #radial_in[abs(16 - i * math.sin(k)), abs(16 + i * math.cos(k))] = value
                     break
@@ -59,7 +59,7 @@ class StrucCharacteristics():
         for k in range(0, 72):
             k = k * 5
             for i in range(15, 0,-1):
-                value = image[abs(16 - i * math.sin(k)), abs(16 + i * math.cos(k))]
+                value = image[int(round(abs(16 - i * math.sin(k)))), int(round(abs(16 + i * math.cos(k))))]
                 if value:
                     #radial_out[abs(16 - i * math.sin(k)), abs(16 + i * math.cos(k))] = value
                     break

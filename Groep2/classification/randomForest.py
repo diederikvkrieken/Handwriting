@@ -12,3 +12,6 @@ class RandomForest(rfc):
 
         def test(self, feat):
             return super(RandomForest, self).predict(feat)
+
+        def testTopN(self, feat, n_feat = 1):
+            topList = super(RandomForest, self).predict_proba(feat)

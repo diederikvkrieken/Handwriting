@@ -336,7 +336,7 @@ if __name__ == "__main__":
     features = []                          # List containing all features
     classes = []                           # List containing class (word) features belong to
     words = []                             # Complete word container for experiments
-    pool = Pool(processes=4)               # Initialize pool with 8 processes
+    pool = Pool(processes=8)               # Initialize pool with 8 processes
     cls = classificationMulti.Classification()  # Classification
 
     r = Recognizer()
