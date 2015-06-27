@@ -756,6 +756,7 @@ class Classification():
         self.wordVoteTest()         # Test word classifier
         self.wordRes()              # Determine character and word recognition
 
+
     def buildClassificationDictionary(self, featureWords, name):
 
         for feature_res in featureWords:
@@ -763,14 +764,11 @@ class Classification():
             self.characterTrain()       # Train character classifier
             self.characterTestVote()    # Add all the prediction to one large array.
 
-        self.votePrediction()       # Vote which predictions are best
-        self.wordVoteTrain()        # Train on voted predictions
-        self.wordVoteTest()         # Test word classifier
-
         BD = buildDictionary.DictionaryBuilder()
 
         test_words = [featureWords[0][idx] for idx in self.test_idx]
-        BD.writeFeatDict(self.trainPredictions + self.testPredictions, test_words, name)
+        # test_words.extend([featureWords[0][idx] for idx in self.train2_idx])
+        BD.writeFeatDict(self.testPredictions, test_words, name)
 
     # Applies all classifiers on provided data
     def fullPass(self, words):
