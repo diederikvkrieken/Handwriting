@@ -672,11 +672,13 @@ class Classification():
         # Return all outcomes
         return self.perf
 
-    # Fully trains one classifier on given set and dumps it afterwards
-    def fullTrain(self, cln, feat, goal):
-        classifier = self.classifiers[cln]  # Get required classifier
-        classifier.train(feat, goal)        # Train on all provided data
-        jl.dump(classifier, cln + '.pkl')   # Save to disk
+    # Fully trains character classifiers for all features,
+    # as well as a stacking classifier and dumps them afterwards
+    def fullTrain(self, featureWords, n):
+        #TODO adapt this function
+        classifier = self.classifiers['RF']  # Get required classifier
+        #classifier.train(feat, goal)        # Train on all provided data
+        jl.dump(classifier, 'fName' + '_RF.pkl')   # Save to disk
 
     # Trains a character classifier on 50% of the data, a word classifier on te other half
     def fullWordTrain(self, words):
@@ -693,9 +695,15 @@ class Classification():
         print 'Classification 2.0 greenified your hard disk with two random forests.\n',\
             'Thanks for your consideration of the environment!'
 
+    # Classifies words by loading in trained character classifiers and stacking.
+    # Returns n predictions with highest probability for every segment of all words.
+    def classify(self, featureWords, n):
+        #TODO implement the new validation using all features
+        pass
+
     # Loads in a character and a word classifier which then predict words on given features
     # NOTE: this function incorporates word classification as postprocessing!!
-    def classify(self, feat):
+    def classifyWord(self, feat):
         # Load previously trained character and word classifiers
         self.loadClassifier('RF')       # Characters
         self.loadClassifier('WRF')      # Words

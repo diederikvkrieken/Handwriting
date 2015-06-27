@@ -27,6 +27,10 @@ def unwrap_self_wordParallel(arg, **kwarg):
 def unwrap_self_allFeatParallel(arg, **kwarg):
     return Recognizer.allFeatParallel(*arg, **kwarg)
 
+# Variant used during validation
+def unwrap_self_validateFeatParallel(arg, **kwarg):
+    return Recognizer.validateFeatParallel(*arg, **kwarg)
+
 class Recognizer:
     """
     Recognizer class
@@ -53,7 +57,7 @@ class Recognizer:
 
     def wordParallelMultiFeat(self, combined):
 
-        print "RUNNING AL FEAT PARALLEL"
+        print "RUNNING ALL FEAT PARALLEL"
         word = combined[0]
         f = combined[1]
 
@@ -111,36 +115,77 @@ class Recognizer:
 
         return featureResults
 
-    # Trains a character and a word classifier on all images and words in folders
+    # Parallel feature extraction for validation.
+    # This variant handles words that are just the images (grey, binary).
+    def validateFeatParallel(self, combined):
+
+        featureResults = []
+
+        preppedWords = combined[0]
+        f = combined[1]
+
+        # Consider all words
+        for word in preppedWords:
+            ## Character segmentation
+            cuts, segs = cs.segment(word[0], word[1])
+
+            ## Feature extraction
+            word = list(word)
+            word.append([])     # Add empty list for features and classes
+
+            # Obtain features of all segments
+            for seg in segs:
+                # Extract features from each segment
+                if f[1] == 0:
+                    word[1].append((f[0].run(seg[0])))
+                elif f[1] == 1:
+                    word[1].append((f[0].run(seg[1])))
+
+            featureResults.append(word)     # Word is ready for classification
+
+        return featureResults
+
+    # Trains character classifiers for every feature
+    # and a stacking classifier for obtaining a top 5 of characters for every segment.
+    # These classifiers are all saved to disk.
     def fullTrain(self, ppm_folder, words_folder):
 
+        wordsInter = []
+
         for file in os.listdir(ppm_folder):
+            print file
             if file.endswith('.ppm') or file.endswith('.jpg'):
-                print file
                 ## Read and preprocess
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                wordsIn = prepper.prep(ppm, inwords)
+                wordsInter.append(prepper.prep(ppm, inwords))
 
-                # Iterate through words
-                for word in wordsIn:
-                    ## Character segmentation
-                    cuts, chars = cs.segment(word[0][0], word[0][1])  # Make segments
-                    segs = cs.annotate(cuts, word[2]) # Give annotations to segments
+        #Combine words
+        wordsMerged = []
+        for w in wordsInter:
+            w = np.array(w)
+            wordsMerged += w.tolist()
 
-                    assert len(chars) == len(segs) #Safety check did the segmenting go correctly
+        # USELESS PIECE OF POOP CODE    (To stay close to the original :))
+        combined = []
 
-                    ## Feature extraction
-                    word = list(word)
-                    word.append([])     # Add empty list to word for features
-                    for char, seg in zip(chars, segs):
-                        # Extract features from each segment, include labeling
-                        word[3].append((feat.HOG(char[1]), seg[1]))
-                    words.append(word)     # Word is ready for classification
+        for fName, f in feat.featureMethods.iteritems():
+            combined.append([wordsMerged, f, fName])
+
+        ## Prarallel feature extraction.
+        print "Starting job"
+        jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
+
+        # Turn jobs into dictionary
+        jobsAsDictonary = {}
+
+        for idx, job in enumerate(jobs):
+            # Simply add job under key, which is the name of a feature
+            jobsAsDictonary[combined[idx][2]] = job
 
         ## Classification
-        # Fully train character and word classifier on data
-        cls.fullWordTrain(words)
+        # Fully train character and stacking classifiers on data
+        cls.fullTrain(jobsAsDictonary, 5)
 
     # One run using all files in an images and a words folder
     def folders(self, ppm_folder, words_folder):
@@ -316,24 +361,33 @@ class Recognizer:
     # Standard run for validation by instructors
     def validate(self, ppm, inwords, outwords):
         ## Preprocessing
-        words = prepper.wordPrep(ppm, inwords)
+        words = prepper.wordPrep(ppm, inwords)  # Read words
 
-        features = []       # Empty list of features for classification
+        # Combine words
+        wordsMerged = []
+        for w in words:
+            w = np.array(w)
+            wordsMerged += w.tolist()
 
-        # Go through all words
-        for word in words:
-            ## Character segmentation
-            cuts, chars = cs.segment(word[0], word[1])
+        # USELESS PIECE OF POOP CODE    (To stay close to the original :))
+        combined = []
 
-            f = []  # Empty feature vector which will contain features of this word's characters
-            # Go through all segments (binary, grayscale)
-            for c in chars:
-                ## Feature extraction
-                f.append(feat.HOG(c[1]))   # Extract features from segment
-            features.append(f)                  # Add features of all segments to all features
+        for fName, f in feat.featureMethods.iteritems():
+            combined.append([wordsMerged, f, fName])
+
+        ## Prarallel feature extraction.
+        print "Starting job"
+        jobs = pool.map(unwrap_self_validateFeatParallel, zip([self]*len(combined), combined))
+
+        # Turn jobs into dictionary
+        jobsAsDictonary = {}
+
+        for idx, job in enumerate(jobs):
+            # Simply add job under key, which is the name of a feature
+            jobsAsDictonary[combined[idx][2]] = job
 
         ## Classification
-        predictions = cls.classify(features)
+        predictions = cls.classify(jobsAsDictonary, 5)
 
         prepper.saveXML(predictions, inwords, outwords)
 
