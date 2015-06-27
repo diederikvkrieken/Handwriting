@@ -255,7 +255,9 @@ class Recognizer:
 
         ## Post processing
         # A debug print to ensure correct format of classification output
-        print predictions[0:9]
+        for word in predictions:
+            for segment in word:
+                print 'Top 5 for this segment: ', segment
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):

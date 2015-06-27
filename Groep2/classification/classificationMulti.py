@@ -58,6 +58,8 @@ class Classification():
         self.predTrainChar = {}
         # Dictionary of segment predictions of character classifiers for the test set
         self.predTestChar = {}
+        # List of top 5 characters for every segment in every word in the test set (3D array)
+        self.bestChar = []
 
         self.trainPredictions = []  # List of predictions for word training
         self.testPredictions = []   # List of predictions for word testing
@@ -74,7 +76,7 @@ class Classification():
     def asciiSeg(self, segment):
         # Convert segment (string) into ascii
         ascii = [ord(c) for c in ''.join(segment)]
-        res = 0     # res will become final value of contained string
+        res = float(0)  # res will become final value of contained string
         for idx, char in enumerate(ascii):
             res += char*(256**idx)
 
@@ -93,7 +95,7 @@ class Classification():
     # Randomly assigns half of indices to one and half to another grouping
     def halfSplit(self, length):
         # Random assignment
-        print "WARNING!! RANDOM SPLIT IS NOT RANDOM ANNYMORE!!!!!!!!!!"
+        print "WARNING!! RANDOM SPLIT IS NOT RANDOM ANYMORE!!!!!!!!!!"
         np.random.seed(23353634)
         split = np.random.uniform(0, 1, length) <= 0.50
         # Put indices in corresponding halve
@@ -215,29 +217,28 @@ class Classification():
         # Loop over predictions of all features for every segment
         feat = []   # Input for voting
         goal = []   # Desired output of voting
-        for segment in zip(*predictions):
-            seg_pred = []   # Top predictions of this segment
-            # Concatenate top predictions, repeat for all features
-            for feat_pred in segment:
-                seg_pred += [self.asciiSeg(pred) for pred in feat_pred]
+        for word in zip(*predictions):
+            # Zip consists of n entries of features, every row represents a word
+            for segment in zip(*word):
+                # Every row of this zip represents a segment
+                seg_pred = []   # Top predictions of this segment
+                # Concatenate top predictions, repeat for all features
+                for feat_pred in segment:
+                    # Segment consists of top m predictions of n features
+                    seg_pred += [self.asciiSeg(pred) for pred in feat_pred]
 
-            # Add as input for voting
-            feat.append(seg_pred)
+                # Add as input for voting
+                feat.append(seg_pred)
 
         # Go through all words in the training set to extract goals
         for word in train2_words:
             if len(word[1]) > 0:
                 # If the word actually has characters...
-                goal.append(word[1])    # Characters will be goal
+                [goal.append(seg) for seg in word[2]]   # Characters will be the goal
 
         # Train stacking classifier on predicted characters
         print 'Training stacking approach!'
         self.classifiers['VRF'].train(feat, goal)
-
-    def voterTest(self):
-        # Get words from test set
-        test_words = [self.words[idx] for idx in self.test_idx]
-
 
     # Trains a word classifier for word classification as pre-processing
     # NOTICE: depends on a call to characterTrain()!!
@@ -349,6 +350,31 @@ class Classification():
 
                 # Add to dictionaries
                 self.predTestChar[fName].append(prediction)
+
+    # Test stacking classifier on test set and give n classes with highest probability
+    def voterTest(self, n):
+        # Get words from test set
+        test_words = [self.words[idx] for idx in self.test_idx]
+        # Get predictions of all features on test set
+        predictions = self.predTestChar.values()
+
+        # Loop over predictions of all features for every segment
+        for word in zip(*predictions):
+            # Zip consists of n entries of features, every row represents a word
+            feat = []   # Input for voting
+            for segment in zip(*word):
+                # Every row of this zip represents a segment
+                seg_pred = []   # Top predictions of this segment
+                # Concatenate top predictions, repeat for all features
+                for feat_pred in segment:
+                    # segment consists of top m predictions of n features
+                    seg_pred += [self.asciiSeg(pred) for pred in feat_pred]
+
+                # Add as input for voting
+                feat.append(seg_pred)
+
+            # Let stacking classifier predict character based on predicted characters
+            self.bestChar.append(self.classifiers['VRF'].testTopN(feat, n))
 
     # Test word classification
     def wordTest(self):
@@ -704,10 +730,10 @@ class Classification():
             self.characterTest(name, n)     # Predict on train 2 and test set
 
         self.voterTrain()   # Train stacking approach
-        self.voterTest()    # Test stacking approach
+        self.voterTest(n)   # Test stacking approach
 
         # Send on to post processing
-        return self.predTestChar    # Return predictions of stacking approach
+        return self.bestChar    # Return predictions of stacking approach
 
     # This will run the one words function however we use a simple voting scheme between features.
     def oneWordRunAllFeat(self, featureWords):
