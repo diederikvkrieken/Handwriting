@@ -430,7 +430,10 @@ class Recognizer:
         ## Classification
         predictions = cls.classify(jobsAsDictonary, 5)
 
-        prepper.saveXML(predictions, inwords, outwords)
+        ## Post-processing
+        # Add function calls here that generate the finalWords and uncomment the last line
+
+        # prepper.saveXML(finalWords, inwords, outwords)
 
 
 if __name__ == "__main__":
