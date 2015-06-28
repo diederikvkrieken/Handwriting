@@ -98,6 +98,8 @@ class Recognizer:
 
             segs = cs.annotate(cuts, word[2])
 
+            # DEBUG CODE
+            """
             if len(chars) != len(segs):
                 print "WORD: ", word[1]
                 print "cuts:", cuts
@@ -107,6 +109,7 @@ class Recognizer:
                 for imgseg in chars:
                     cv2.imshow("IMG", imgseg[0] * 255)
                     cv2.waitKey()
+            """
             assert len(chars) == len(segs), "#Safety check did the segmenting go correctly len chars: %d, len segs %d" % (len(chars), len(segs))
 
             ## Feature extraction
