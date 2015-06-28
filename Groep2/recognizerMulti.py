@@ -296,12 +296,14 @@ class Recognizer:
             # cv2.waitKey(0)
         '''
 
-        predictions = cls.featureClassification(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
+        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
 
         ## Post processing
         # A debug print to ensure correct format of classification output
         for word in predictions:
             for segment in word:
+
+                print 'actual word:'
                 print 'Top 5 for this segment: ', segment
 
     # Trains and tests on a single image

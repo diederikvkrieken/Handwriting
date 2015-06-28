@@ -743,6 +743,22 @@ class Classification():
         # Send on to post processing
         return self.bestChar    # Return predictions of stacking approach
 
+    def featureClassificationWithOriginal(self, featureWords, n):
+        # Consider all features
+        for name, feature_res in featureWords.iteritems():
+            self.splitData(feature_res)     # Make custom split
+            self.characterTrain()           # Train character classifier
+            self.characterTest(name, n)     # Predict on train 2 and test set
+
+        self.voterTrain()   # Train stacking approach
+        self.voterTest(n)   # Test stacking approach
+
+        # Send on to post processing
+        originalWords = [self.words[idx] for idx in self.test_idx]
+        originalWords = [row[0] for row in originalWords]
+        return (self.bestChar, originalWords)    # Return predictions of stacking approach + original
+
+
     # This will run the one words function however we use a simple voting scheme between features.
     def oneWordRunAllFeat(self, featureWords):
 
