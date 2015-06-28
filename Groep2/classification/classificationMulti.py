@@ -104,6 +104,16 @@ class Classification():
         # Return indices
         return half1, half2
 
+    def dummyPred(self, word):
+        feat = []
+        predictions = []
+        if len(word[1]) > 0:
+            # If the word actually contains features...
+            feat.append(word[1])
+        else:
+            # Just suggest likely single characters for this word
+            predictions.append([['o', 's', 'a', 'b', 't']])
+
     # Split data for training with word classification
     def splitData(self, words):
         # Words: (image, text, characters, segments)
@@ -150,6 +160,18 @@ class Classification():
 
         if 'KM' in self.perf:
             self.classifiers['KM'] = km.KMeans(len(uniq_class)*2, 'KM')
+
+    # Prepare data for validation
+    def valData(self, words):
+        # Words: (image, segment features)
+        self.words = []     # Word list containing just the features
+
+        # Get features from words and put these in self.words
+        for w in words:
+            self.words.append(w[1])
+
+        # Pretend all these words to be the test set
+        self.test_idx = range(len(self.words))
 
     # Prepares fold n
     def n_fold(self, n):
@@ -300,6 +322,10 @@ class Classification():
         for name, classifier in self.classifiers.iteritems():
             classifier = jl.load(name + '.pkl')
 
+    # Loads a character classifier. NOTE that since we're only using RF, it is put in there.
+    def loadCharClassifier(self, cln):
+        self.classifiers['RF'] = jl.load(cln + '.pkl')
+
     # Loads a particular classifier
     def loadClassifier(self, cln):
         self.classifiers[cln] = jl.load(cln + '.pkl')
@@ -357,6 +383,9 @@ class Classification():
         test_words = [self.words[idx] for idx in self.test_idx]
         # Get predictions of all features on test set
         predictions = self.predTestChar.values()
+
+        if len(test_words) != len(predictions[0]):
+            print 'There was a word without features!! Stacking will not predict for all words!'
 
         # Loop over predictions of all features for every segment
         for word in zip(*predictions):
@@ -672,13 +701,30 @@ class Classification():
         # Return all outcomes
         return self.perf
 
-    # Fully trains character classifiers for all features,
-    # as well as a stacking classifier and dumps them afterwards
+    # Fully trains character classifiers for all features on 50% of the data,
+    # as well as a stacking classifier on the remaining 50% and dumps them afterwards
     def fullTrain(self, featureWords, n):
-        #TODO adapt this function
-        classifier = self.classifiers['RF']  # Get required classifier
-        #classifier.train(feat, goal)        # Train on all provided data
-        jl.dump(classifier, 'fName' + '_RF.pkl')   # Save to disk
+        print 'Classification 3.0 will now enrich your life by building several forests.\n',\
+            'Please be patient as the character classifiers are trained.'
+        # featureWords is a dictionary where every key is the name of a feature
+        # and the values are the extracted feature vectors per word
+        for fName, feature in featureWords.iteritems():
+            # Go over every feature and train a random forest on it (character classifier)
+            # Prepare data and split
+            self.data(feature)      # Going to use self.words from here on!
+            self.train1_idx, self.train2_idx = self.halfSplit(len(self.words))
+            self.test_idx = []      # All data is used for training, there is no testing
+            # Train character classifier and let it predict as to generate input for training stacking
+            print 'Training a character classifier for feature', fName + '.'
+            self.characterTrain()           # Note that training discards the current model
+            jl.dump(self.classifiers['RF'], fName + '_RF.pkl')   # Save to disk
+            self.characterTest(fName, n)    # Generate top predictions for this feature
+
+        # Lastly train stacking classifier
+        print 'Almost there! Sassy stacking is being trained.'
+        self.voterTrain()   # Small notice, self.words is based on last feature...
+        jl.dump(self.classifiers['VRF'], 'VRF.pkl')   # and save to disk
+        print 'Done! You can look in awe at the abundance of files hugging your disk!'
 
     # Trains a character classifier on 50% of the data, a word classifier on te other half
     def fullWordTrain(self, words):
@@ -698,8 +744,23 @@ class Classification():
     # Classifies words by loading in trained character classifiers and stacking.
     # Returns n predictions with highest probability for every segment of all words.
     def classify(self, featureWords, n):
-        #TODO implement the new validation using all features
-        pass
+        # Create list of top n predictions for every segment in every word
+        predictions = []
+        # featureWords is a dictionary where every key is the name of a feature
+        # and the values are the extracted feature vectors per word
+        for fName, feature in featureWords.iteritems():
+            # Prepare feature data for validation
+            self.valData(featureWords)
+            # Load in the trained character classifier for this feature
+            self.loadCharClassifier(fName + '_RF')
+            self.characterTest(fName, n)    # Predict n most probable characters according to feature
+
+        # Load stacking classifier and make it predict n most probable characters
+        self.loadClassifier('VRF')
+        self.voterTest(n)   # Small notice, self.words is based on last feature...
+
+        # Send on to post processing
+        return self.bestChar    # Return predictions of stacking approach
 
     # Loads in a character and a word classifier which then predict words on given features
     # NOTE: this function incorporates word classification as postprocessing!!
