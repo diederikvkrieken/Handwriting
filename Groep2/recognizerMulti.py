@@ -298,13 +298,24 @@ class Recognizer:
 
         predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
 
+        true = 0
+        false = 0
+
         ## Post processing
         # A debug print to ensure correct format of classification output
-        for word in predictions:
-            for segment in word:
+        for i in range(len(predictions[0])):
+            for j in range(len(predictions[0][i])):
+                segmentPredictions = predictions[0][i][j]
+                annotated = predictions[1][i][1][j]
 
-                print 'actual word:'
-                print 'Top 5 for this segment: ', segment
+                if annotated in segmentPredictions:
+                    true += 1
+                else:
+                    false += 1
+
+        print "true: ", true
+        print "false: ", false
+
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):

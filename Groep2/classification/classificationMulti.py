@@ -755,7 +755,7 @@ class Classification():
 
         # Send on to post processing
         originalWords = [self.words[idx] for idx in self.test_idx]
-        originalWords = [row[0] for row in originalWords]
+        originalWords = [(row[0],row[2]) for row in originalWords]
         return (self.bestChar, originalWords)    # Return predictions of stacking approach + original
 
 
