@@ -16,6 +16,7 @@ from segmentation import char_segmentation as cs
 from features import featExtraction
 from classification import classificationMulti
 from latindictionary import buildDictionary
+from postprocessing import postprocessing as postp
 
 # Parallel packages
 from multiprocessing import Pool
@@ -302,6 +303,16 @@ class Recognizer:
         false = 0
 
         ## Post processing
+        ppPredictions = pp.run(predictions)
+
+        predCount = 0
+        for pred in ppPredictions:
+            print "----",predictions[1][predCount],"-----"
+            for alts in pred:
+                print alts
+
+            predCount += 1
+
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
             for j in range(len(predictions[0][i])):
@@ -409,14 +420,15 @@ if __name__ == "__main__":
 
     # Initializes the recognizer by initializing all parts of the pipeline
     # Initialize pipeline
-    prepper = prepImage.PreProcessor()     # Preprocessor
-    cs = cs.segmenter()                    # Character segmentation
-    feat = featExtraction.Features()       # Feature extraction
-    features = []                          # List containing all features
-    classes = []                           # List containing class (word) features belong to
-    words = []                             # Complete word container for experiments
-    pool = Pool(processes=8)               # Initialize pool with 8 processes
+    prepper = prepImage.PreProcessor()          # Preprocessor
+    cs = cs.segmenter()                         # Character segmentation
+    feat = featExtraction.Features()            # Feature extraction
+    features = []                               # List containing all features
+    classes = []                                # List containing class (word) features belong to
+    words = []                                  # Complete word container for experiments
+    pool = Pool(processes=8)                    # Initialize pool with 8 processes
     cls = classificationMulti.Classification()  # Classification
+    pp = postp.Postprocessing()                 #Post Processing
 
     r = Recognizer()
 
