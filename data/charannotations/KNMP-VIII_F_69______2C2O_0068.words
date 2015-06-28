@@ -4,12 +4,12 @@
         <Word no="1" top="88" bottom="143" left="794" right="830" shear="0" text="s">
             <Character no="1" top="88" bottom="143" left="798" right="827" shear="0" text="s"/>
         </Word>
-        <Word no="2" top="48" bottom="147" left="1247" right="1393" shear="0" text="@Sed_S_callig">
+        <Word no="2" top="48" bottom="147" left="1266" right="1393" shear="0" text="@Sed_S_callig">
             <Character no="1" top="48" bottom="147" left="1268" right="1336" shear="0" text="S"/>
             <Character no="2" top="48" bottom="147" left="1336" right="1356" shear="0" text="e"/>
             <Character no="3" top="48" bottom="147" left="1356" right="1389" shear="0" text="d"/>
         </Word>
-        <Word no="3" top="48" bottom="147" left="1247" right="1361" shear="0" text="@S_callig">
+        <Word no="3" top="48" bottom="147" left="1267" right="1361" shear="0" text="@S_callig">
             <Character no="1" top="48" bottom="147" left="1268" right="1336" shear="0" text="S"/>
             <Character no="2" top="48" bottom="147" left="1336" right="1357" shear="0" text="e"/>
         </Word>
