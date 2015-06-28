@@ -80,5 +80,6 @@ class Levenshtein_Distance():
 
 
 
-#words = ['abjurationis', "abactor", "abactoris", "geepstra", "abactir"]
-#Levenshtein_Distance().run(words)
+words = ["geepstra", "fietsen", "saaiheidiseenkeuze", "allezszs"]
+winner = Levenshtein_Distance().run(words)
+print winner
