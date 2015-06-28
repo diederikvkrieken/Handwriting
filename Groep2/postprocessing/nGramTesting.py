@@ -17,7 +17,7 @@ class Ngram():
         self.n = n
 
     def getVocabularySize(self, document):
-        vectorizer = CountVectorizer(ngram_range=(2, 2), token_pattern='(?u)\\b\\w+\\b')
+        vectorizer = CountVectorizer(ngram_range=(1, 1), token_pattern='(?u)\\b\\w+\\b')
         X = vectorizer.fit_transform(document)
         return len(vectorizer.get_feature_names())
 
