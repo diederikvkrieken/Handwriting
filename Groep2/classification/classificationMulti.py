@@ -76,7 +76,7 @@ class Classification():
     def asciiSeg(self, segment):
         # Convert segment (string) into ascii
         ascii = [ord(c) for c in ''.join(segment)]
-        res = float(0)  # res will become final value of contained string
+        res = 0  # res will become final value of contained string
         for idx, char in enumerate(ascii):
             res += char*(256**idx)
 
@@ -103,16 +103,6 @@ class Classification():
         half2 = [idx for idx, el in enumerate(split) if el == False]
         # Return indices
         return half1, half2
-
-    def dummyPred(self, word):
-        feat = []
-        predictions = []
-        if len(word[1]) > 0:
-            # If the word actually contains features...
-            feat.append(word[1])
-        else:
-            # Just suggest likely single characters for this word
-            predictions.append([['o', 's', 'a', 'b', 't']])
 
     # Split data for training with word classification
     def splitData(self, words):
@@ -172,6 +162,7 @@ class Classification():
 
         # Pretend all these words to be the test set
         self.test_idx = range(len(self.words))
+        self.train2_idx = []    # Implying there is no training set at all
 
     # Prepares fold n
     def n_fold(self, n):
@@ -377,15 +368,14 @@ class Classification():
                 # Add to dictionaries
                 self.predTestChar[fName].append(prediction)
 
+            else:
+                # Signify the non-presence of a feature
+                self.predTestChar[fName].append([])
+
     # Test stacking classifier on test set and give n classes with highest probability
     def voterTest(self, n):
-        # Get words from test set
-        test_words = [self.words[idx] for idx in self.test_idx]
         # Get predictions of all features on test set
         predictions = self.predTestChar.values()
-
-        if len(test_words) != len(predictions[0]):
-            print 'There was a word without features!! Stacking will not predict for all words!'
 
         # Loop over predictions of all features for every segment
         for word in zip(*predictions):
@@ -402,8 +392,12 @@ class Classification():
                 # Add as input for voting
                 feat.append(seg_pred)
 
-            # Let stacking classifier predict character based on predicted characters
-            self.bestChar.append(self.classifiers['VRF'].testTopN(feat, n))
+            if 0 in feat:
+                print 'Giving a dummy prediction..'
+                self.bestChar.append([['o', 's', 'a', 'b', 't']])
+            else:
+                # Let stacking classifier predict character based on predicted characters
+                self.bestChar.append(self.classifiers['VRF'].testTopN(feat, n))
 
     # Test word classification
     def wordTest(self):
@@ -744,8 +738,6 @@ class Classification():
     # Classifies words by loading in trained character classifiers and stacking.
     # Returns n predictions with highest probability for every segment of all words.
     def classify(self, featureWords, n):
-        # Create list of top n predictions for every segment in every word
-        predictions = []
         # featureWords is a dictionary where every key is the name of a feature
         # and the values are the extracted feature vectors per word
         for fName, feature in featureWords.iteritems():
