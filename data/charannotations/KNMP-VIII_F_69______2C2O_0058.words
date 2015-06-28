@@ -18,8 +18,8 @@
             <Character no="1" top="427" bottom="480" left="1549" right="1581" shear="0" text="h"/>
         </Word>
     </TextLine>
-    <TextLine no="4" top="529" bottom="574" left="1159" right="1407" shear="0">
-        <Word no="1" top="529" bottom="574" left="1159" right="1407" shear="0" text="memoria">
+    <TextLine no="4" top="529" bottom="574" left="1159" right="1368" shear="0">
+        <Word no="1" top="529" bottom="574" left="1159" right="1368" shear="0" text="memoria">
             <Character no="1" top="529" bottom="574" left="1163" right="1216" shear="0" text="m"/>
             <Character no="2" top="529" bottom="574" left="1216" right="1240" shear="0" text="e"/>
             <Character no="3" top="529" bottom="574" left="1240" right="1261" shear="0" text="m"/>
@@ -57,14 +57,14 @@
         </Word>
     </TextLine>
     <TextLine no="8" top="843" bottom="913" left="571" right="1051" shear="0">
-        <Word no="1" top="849" bottom="904" left="966" right="1051" shear="0" text="hec">
+        <Word no="1" top="849" bottom="904" left="966" right="1049" shear="0" text="hec">
             <Character no="1" top="849" bottom="904" left="971" right="1002" shear="0" text="h"/>
             <Character no="2" top="849" bottom="904" left="1002" right="1023" shear="0" text="e"/>
             <Character no="3" top="849" bottom="904" left="1023" right="1047" shear="0" text="c"/>
         </Word>
-        <Word no="2" top="843" bottom="913" left="571" right="640" shear="0" text="At">
-            <Character no="1" top="843" bottom="913" left="575" right="609" shear="0" text="A"/>
-            <Character no="2" top="843" bottom="913" left="609" right="609" shear="0" text="t"/>
+        <Word no="2" top="843" bottom="913" left="571" right="638" shear="0" text="At">
+            <Character no="1" top="843" bottom="913" left="575" right="607" shear="0" text="A"/>
+            <Character no="2" top="843" bottom="913" left="607" right="635" shear="0" text="t"/>
         </Word>
         <Word no="3" top="844" bottom="910" left="711" right="970" shear="0" text="audientes">
             <Character no="1" top="844" bottom="910" left="713" right="744" shear="0" text="a"/>

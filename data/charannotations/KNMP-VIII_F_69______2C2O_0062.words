@@ -294,7 +294,7 @@
         <Word no="2" top="1914" bottom="1956" left="1157" right="1205" shear="0" text="x">
             <Character no="1" top="1914" bottom="1956" left="1164" right="1202" shear="0" text="x"/>
         </Word>
-        <Word no="3" top="1893" bottom="1959" left="564" right="883" shear="0" text="stupefactis">
+        <Word no="3" top="1893" bottom="1959" left="600" right="883" shear="0" text="stupefactis">
             <Character no="1" top="1893" bottom="1959" left="603" right="618" shear="0" text="s"/>
             <Character no="2" top="1893" bottom="1959" left="618" right="636" shear="0" text="t"/>
             <Character no="3" top="1893" bottom="1959" left="636" right="673" shear="0" text="u"/>

@@ -181,12 +181,12 @@
         </Word>
     </TextLine>
     <TextLine no="10" top="817" bottom="943" left="638" right="1651" shear="0">
-        <Word no="1" top="860" bottom="909" left="780" right="912" shear="0" text="iacet">
+        <Word no="1" top="860" bottom="909" left="780" right="900" shear="0" text="iacet">
             <Character no="1" top="860" bottom="909" left="786" right="803" shear="0" text="i"/>
-            <Character no="2" top="860" bottom="909" left="803" right="803" shear="0" text="a"/>
-            <Character no="3" top="860" bottom="909" left="803" right="829" shear="0" text="c"/>
-            <Character no="4" top="860" bottom="909" left="829" right="850" shear="0" text="e"/>
-            <Character no="5" top="860" bottom="909" left="850" right="874" shear="0" text="t"/>
+            <Character no="2" top="860" bottom="909" left="803" right="827" shear="0" text="a"/>
+            <Character no="3" top="860" bottom="909" left="827" right="850" shear="0" text="c"/>
+            <Character no="4" top="860" bottom="909" left="850" right="872" shear="0" text="e"/>
+            <Character no="5" top="860" bottom="909" left="872" right="899" shear="0" text="t"/>
         </Word>
         <Word no="2" top="863" bottom="908" left="638" right="722" shear="0" text="nec">
             <Character no="1" top="863" bottom="908" left="643" right="674" shear="0" text="n"/>

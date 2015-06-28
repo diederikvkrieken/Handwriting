@@ -287,7 +287,7 @@
             <Character no="8" top="2129" bottom="2206" left="894" right="919" shear="0" text="o"/>
             <Character no="9" top="2129" bottom="2206" left="919" right="946" shear="0" text="s"/>
         </Word>
-        <Word no="2" top="2153" bottom="2219" left="1109" right="1219" shear="0" text="que">
+        <Word no="2" top="2153" bottom="2219" left="1109" right="1204" shear="0" text="que">
             <Character no="1" top="2153" bottom="2219" left="1112" right="1145" shear="0" text="q"/>
             <Character no="2" top="2153" bottom="2219" left="1145" right="1177" shear="0" text="u"/>
             <Character no="3" top="2153" bottom="2219" left="1177" right="1202" shear="0" text="e"/>

@@ -156,10 +156,10 @@
         </Word>
     </TextLine>
     <TextLine no="15" top="1124" bottom="1219" left="987" right="1038" shear="0">
-        <Word no="1" top="1124" bottom="1219" left="987" right="1038" shear="0" text="P">
+        <Word no="1" top="1124" bottom="1219" left="990" right="1021" shear="0" text="P">
             <Character no="1" top="1124" bottom="1219" left="993" right="1020" shear="0" text="P"/>
         </Word>
-        <Word no="2" top="1124" bottom="1219" left="987" right="1027" shear="0" text="P">
+        <Word no="2" top="1124" bottom="1219" left="990" right="1025" shear="0" text="P">
             <Character no="1" top="1124" bottom="1219" left="994" right="1024" shear="0" text="P"/>
         </Word>
     </TextLine>
