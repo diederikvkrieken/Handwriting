@@ -71,12 +71,7 @@ class pathBuilder():
                         # Build Tri gram
                         trigram = "" + topPic[0][-2] + " " + topPic[0][-1] + " " + currentNode[0][:]
 
-                        # Check if this digram is in our dictionary if TRUE: add weight else weight 0
-                        if trigram in ngram.keys():
-                            P = ngram[trigram]
-                        else:
-                            # print "WARNING WE DID NOT FIND A PROBABILTY IN OUR NGRAM!"
-                            P = 0.00000001
+                        P = ngram.getProbability(trigram)
 
                         newProbability = P * topPic[1]
                         optionList[1].append(list(topPic[0]))

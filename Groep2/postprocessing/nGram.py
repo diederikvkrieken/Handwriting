@@ -66,7 +66,3 @@ class Ngram():
         P = numerator / float(denominator)
 
         return P
-
-#document =  ['j o h n i s a g u y\np e r s o n a g u y']
-document = "../KNMPDICT.dat"
-ngram = Ngram(document, 3)
