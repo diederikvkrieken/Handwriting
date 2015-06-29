@@ -2,9 +2,6 @@
 import cv2
 import math
 
-# Import HOG
-from skimage.feature import hog
-
 class HOG():
     def __init__(self):
        pass
