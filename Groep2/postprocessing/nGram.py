@@ -1,7 +1,7 @@
 __author__ = 'jasper'
 
 from sklearn.feature_extraction.text import CountVectorizer
-from Groep2.latindictionary import buildDictionary
+from latindictionary import buildDictionary
 
 import numpy as np
 
