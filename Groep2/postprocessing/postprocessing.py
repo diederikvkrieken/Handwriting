@@ -136,7 +136,7 @@ class Postprocessing():
 
         return predictions, singleCharArray, singleCharWinner
 
-    def run(self, predictions, document = "KNMPDICT.dat"):
+    def run(self, predictions, document = "KNMPSTANDFORDDICT.dat"):
 
         # Create a list with only the single chars
         predictions, singleChars, singleCharWinner = self.getSingleChar(predictions)
