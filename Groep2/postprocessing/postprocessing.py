@@ -36,7 +36,7 @@ class Postprocessing():
             for segments in words:
                 charCount = 0
                 for charOption in segments:
-                    print "CHAR ", charCount, ": ", charOption
+                    # print "CHAR ", charCount, ": ", charOption
                     rfsegmentsOptions[wordCount][charCount].append(charOption)
                     charCount += 1
 
