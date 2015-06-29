@@ -1,8 +1,3 @@
-#!/usr/bin/python
-#By Steve Hanov, 2011. Released to the public domain
-
-
-
 class Levenshtein_Distance():
     def __init__(self):
         pass
