@@ -68,7 +68,7 @@
         </Word>
     </TextLine>
     <TextLine no="5" top="366" bottom="449" left="1039" right="1709" shear="0">
-        <Word no="1" top="366" bottom="449" left="1039" right="1242" shear="0" text="habebat">
+        <Word no="1" top="366" bottom="449" left="1039" right="1226" shear="0" text="habebat">
             <Character no="1" top="366" bottom="449" left="1044" right="1072" shear="0" text="h"/>
             <Character no="2" top="366" bottom="449" left="1072" right="1100" shear="0" text="a"/>
             <Character no="3" top="366" bottom="449" left="1100" right="1124" shear="0" text="b"/>
@@ -376,7 +376,7 @@
             <Character no="7" top="1111" bottom="1184" left="960" right="977" shear="0" text="I"/>
             <Character no="8" top="1111" bottom="1184" left="977" right="994" shear="0" text="I"/>
         </Word>
-        <Word no="6" top="1113" bottom="1184" left="997" right="1128" shear="0" text="pape">
+        <Word no="6" top="1113" bottom="1184" left="997" right="1116" shear="0" text="pape">
             <Character no="1" top="1113" bottom="1184" left="1003" right="1032" shear="0" text="p"/>
             <Character no="2" top="1113" bottom="1184" left="1032" right="1056" shear="0" text="a"/>
             <Character no="3" top="1113" bottom="1184" left="1056" right="1088" shear="0" text="p"/>
@@ -410,7 +410,7 @@
         <Word no="11" top="1139" bottom="1178" left="880" right="912" shear="0" text="o">
             <Character no="1" top="1139" bottom="1178" left="884" right="911" shear="0" text="o"/>
         </Word>
-        <Word no="12" top="1113" bottom="1184" left="997" right="1135" shear="0" text="pape">
+        <Word no="12" top="1113" bottom="1184" left="997" right="1115" shear="0" text="pape">
             <Character no="1" top="1113" bottom="1184" left="1002" right="1032" shear="0" text="p"/>
             <Character no="2" top="1113" bottom="1184" left="1032" right="1056" shear="0" text="a"/>
             <Character no="3" top="1113" bottom="1184" left="1056" right="1087" shear="0" text="p"/>
@@ -657,7 +657,7 @@
             <Character no="10" top="1709" bottom="1760" left="802" right="825" shear="0" text="t"/>
             <Character no="11" top="1709" bottom="1760" left="825" right="851" shear="0" text="e"/>
         </Word>
-        <Word no="2" top="1686" bottom="1760" left="419" right="567" shear="0" text="tanta">
+        <Word no="2" top="1686" bottom="1760" left="428" right="567" shear="0" text="tanta">
             <Character no="1" top="1686" bottom="1760" left="429" right="455" shear="0" text="t"/>
             <Character no="2" top="1686" bottom="1760" left="455" right="485" shear="0" text="a"/>
             <Character no="3" top="1686" bottom="1760" left="485" right="518" shear="0" text="n"/>

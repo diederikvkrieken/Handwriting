@@ -1,84 +1,131 @@
 __author__ = 'diederik'
 
-# wordXML contains the coordinates of every letter for every word so: wordXml = [[top, bottom, left, right, label]] for every LETTER
+# wordXML contains the coordinates of every letter for every word so: wordXml = [[left, right, label]] for every LETTER
 class Comparator:
 
     def __init__(self):
         self.letterChange = True
+        self.lastLetter = ""
+        self.leftOutLeft = False
         pass
 
-    def compare(self, csc_columns, wordXml):
+    def compare(self, csc_columns, wordXml, threshold=6):
+
+        self.letterChange = True
+        self.lastLetter = ""
+        self.leftOutLeft = False
+
+        charCount = 0
+        cscCount = 0
 
         csc_columnsWithLabel = []
-        n = 0
-        k = 0
-        for charSeg in wordXml:
 
-            if k != 0:
-                assert wordXml[k][0] >= wordXml[k-1][1], ("WORD is not correctly annotated!: ", wordXml)
+        # Add the first csc
+        csc_columnsWithLabel.append([csc_columns[0], ""])
 
-            for csc in csc_columns[n:]:
+        while True:
 
-                #Only add a new csc when we do not have undersegmenting
-                if len(csc_columnsWithLabel) == 0 or csc_columnsWithLabel[-1][0] != csc:
-                    csc_columnsWithLabel.append([csc, ""])
+            if (len(wordXml)-1) < charCount:
+                break
 
-                #If a csc has a smaller x value then the segments of the letter.
-                if csc <= charSeg[1]:
+            # Situation 1
+            if wordXml[charCount][1] <= csc_columns[cscCount]:
 
-                    csc_columnsWithLabel[-1][1] = self.sameLetterCheck(n, csc_columnsWithLabel, charSeg, k, wordXml)
-                    n += 1
-
-                #Else calculate how much percentage we overlap
+                if cscCount == 0 or wordXml[charCount][1] - csc_columns[cscCount-1] > threshold:
+                    csc_columnsWithLabel[-1][1] = self.sameLetterCheck(cscCount, csc_columnsWithLabel, wordXml[charCount])
+                    self.leftOutLeft == False
                 else:
+                    # Since we leave out the left char we do not want to also leave out the right char. This would result in an exmpty segment
+                    self.leftOutLeft = True
 
-                    if k != len(wordXml)-1:
-                        diff = csc - charSeg[1]
-                        cscOffset = csc - csc_columns[n-1]
-                        if cscOffset == 0:
-                            # print "something terriblle has happened!!<<<--------- See line 35 compareSegments.py FIX THIS!!"
-                            # print "charSeg: ", charSeg[0], " x: ", charSeg[1], " SC x: ", csc ,"SC-1 x: ", csc_columns[n-1]
-                            # print "SEGMENTS:", csc_columns, "WORD SEGMENTS", wordXml
-                            csc_columnsWithLabel[-1][1] = self.sameLetterCheck(n, csc_columnsWithLabel, charSeg, k ,wordXml)
-                            break
+                # Go to next char.
+                self.letterChange = True
+                charCount += 1
 
-                        percentage = float(diff) / float(cscOffset)
+                continue
 
-                        if percentage < 0.5:
+            # Situation 2
+            if wordXml[charCount][1] > csc_columns[cscCount]:
 
-                            csc_columnsWithLabel[-1][1] = self.sameLetterCheck(n, csc_columnsWithLabel, charSeg, k ,wordXml)
+                if self.leftOutLeft == True or csc_columns[cscCount] - wordXml[charCount][0] > threshold:
+                    csc_columnsWithLabel[-1][1] = self.sameLetterCheck(cscCount, csc_columnsWithLabel, wordXml[charCount])
+                    self.leftOutLeft == False
+                    # print "ADDED WORD IN SIT 2: ", wordXml[charCount]
 
-                            # When we have undersegmenting break.
-                            if len(wordXml) != (k+1) and csc >= wordXml[k+1][1]:
-                                break
-
-                            n += 1
-
+                    # Break when we are out of segments
+                    if (len(csc_columns)-1 == cscCount):
+                        charCount += 1
+                        # print "SEG BREAK IN IF!!!"
                         break
-                    else:
-                        csc_columnsWithLabel[-1][1] = self.sameLetterCheck(n, csc_columnsWithLabel, charSeg, k ,wordXml)
+
+                # Break when we are out of segments
+                if (len(csc_columns)-1 == cscCount):
+                    # print "SEG BREAK!"
+                    break
+
+                cscCount += 1
+                csc_columnsWithLabel.append([csc_columns[cscCount], ""])
+
+                continue
 
 
-            k += 1
-            self.letterChange = True
+        cscString = ""
+        for cscChar in csc_columnsWithLabel:
+            cscString += cscChar[1]
 
+        # print "Cscstring before: ", cscString
+
+        # Add the last letters.
+        while len(wordXml)-1 >= charCount:
+            # print "Added as last: ", wordXml[charCount]
+            csc_columnsWithLabel[-1][1] = self.sameLetterCheck(cscCount, csc_columnsWithLabel, wordXml[charCount])
+            charCount += 1
+            # print "AFTER ADDED: ", wordXml[charCount]
+
+        # If we have a last segment that is empty. I.e. due to thresholding
+        if csc_columnsWithLabel[-1][1] == '':
+            csc_columnsWithLabel[-1][1] = self.sameLetterCheck(cscCount, csc_columnsWithLabel, wordXml[-1])
+
+        for cscChar in csc_columnsWithLabel:
+            assert cscChar[1] != '', "Somehow we got an empty segment this means there is a bug in the comparator"
+
+        xmlString = ""
+        for charXml in wordXml:
+            xmlString += charXml[2]
+
+        # print "XMLSTRING: ", xmlString
+        cscString = ""
+        for cscChar in csc_columnsWithLabel:
+            cscString += cscChar[1]
+
+        for charXml in xmlString:
+            assert charXml in cscString, "We ar missing characters in the CSC this is a bug in the comparator. %s, %s" % (charXml, cscString)
+
+        # print "-----COMP-----"
+        # print xmlString
+        # print cscString
+        # print '"------------'
 
         return csc_columnsWithLabel
 
 
+
     # Will check whether segments are still the same letter
-    def sameLetterCheck(self, n , csc_columnsWithLabel, charSeg, k, wordXml):
+    def sameLetterCheck(self, n , csc_columnsWithLabel, charSeg):
 
         if n!= 0 and charSeg[2] in csc_columnsWithLabel[-2][1]:
 
             if self.letterChange == False:
-                return csc_columnsWithLabel[-2][1] + '_'
+                self.lastLetter = self.lastLetter + '_'
+                return self.lastLetter
             else:
                 self.letterChange = False
+                self.lastLetter = charSeg[2]
                 return csc_columnsWithLabel[-1][1] + charSeg[2]
 
         else:
             self.letterChange = False
+            self.lastLetter = charSeg[2]
             return csc_columnsWithLabel[-1][1] + charSeg[2]
 
 

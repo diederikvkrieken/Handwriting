@@ -16,6 +16,7 @@ from segmentation import char_segmentation as cs
 from features import featExtraction
 from classification import classificationMulti
 from latindictionary import buildDictionary
+from postprocessing import postprocessing as postp
 
 # Parallel packages
 from multiprocessing import Pool
@@ -97,7 +98,19 @@ class Recognizer:
 
             segs = cs.annotate(cuts, word[2])
 
-            assert len(chars) == len(segs) #Safety check did the segmenting go correctly
+            # DEBUG CODE
+            """
+            if len(chars) != len(segs):
+                print "WORD: ", word[1]
+                print "cuts:", cuts
+                print "Words", word[2]
+                print "Segs: ", segs
+                print "Chars: ", np.shape(chars)
+                for imgseg in chars:
+                    cv2.imshow("IMG", imgseg[0] * 255)
+                    cv2.waitKey()
+            """
+            assert len(chars) == len(segs), "#Safety check did the segmenting go correctly len chars: %d, len segs %d" % (len(chars), len(segs))
 
             ## Feature extraction
             word = list(word)
@@ -302,6 +315,16 @@ class Recognizer:
         false = 0
 
         ## Post processing
+        ppPredictions = pp.run(predictions)
+
+        predCount = 0
+        for pred in ppPredictions:
+            print "----",predictions[1][predCount],"-----"
+            for alts in pred:
+                print alts
+
+            predCount += 1
+
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
             for j in range(len(predictions[0][i])):
@@ -339,14 +362,22 @@ class Recognizer:
         combined = []
 
         for fName, f in feat.featureMethods.iteritems():
-            combined.append([wordsInter, f])
+            combined.append([wordsInter, f, fName])
 
         ## Prarallel feature extraction.
         print "Starting job"
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
+        # Turn jobs into dictionary
+        jobsAsDictonary = {}
+
+        for idx, job in enumerate(jobs):
+            # Simply add job under key, which is the name of a feature
+            jobsAsDictonary[combined[idx][2]] = job
+
+
         ## Classification
-        """
+        '''
         counter = 0
         for fr in jobs:
             print "Training for feature: ", combined[counter][1]
@@ -354,9 +385,9 @@ class Recognizer:
             cls.oneWordsRun(fr)  # A full run on the characters
             # cv2.imshow("test", cv2.imread('preprocessing/h.jpg'))
             # cv2.waitKey(0)
-        """
+        '''
 
-        cls.oneWordRunAllFeat(jobs)
+        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
 
     # Go through folder, train and test on each file
     def oneFolder(self, ppm_folder, words_folder):
@@ -369,7 +400,7 @@ class Recognizer:
                 ## Pass on to single file procedure
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                self.singleFile(ppm, inwords)
+                self.singleFileAllFeat(ppm, inwords)
 
     # Standard run for validation by instructors
     def validate(self, ppm, inwords, outwords):
@@ -402,21 +433,25 @@ class Recognizer:
         ## Classification
         predictions = cls.classify(jobsAsDictonary, 5)
 
-        prepper.saveXML(predictions, inwords, outwords)
+        ## Post-processing
+        # Add function calls here that generate the finalWords and uncomment the last line
+
+        # prepper.saveXML(finalWords, inwords, outwords)
 
 
 if __name__ == "__main__":
 
     # Initializes the recognizer by initializing all parts of the pipeline
     # Initialize pipeline
-    prepper = prepImage.PreProcessor()     # Preprocessor
-    cs = cs.segmenter()                    # Character segmentation
-    feat = featExtraction.Features()       # Feature extraction
-    features = []                          # List containing all features
-    classes = []                           # List containing class (word) features belong to
-    words = []                             # Complete word container for experiments
-    pool = Pool(processes=8)               # Initialize pool with 8 processes
+    prepper = prepImage.PreProcessor()          # Preprocessor
+    cs = cs.segmenter()                         # Character segmentation
+    feat = featExtraction.Features()            # Feature extraction
+    features = []                               # List containing all features
+    classes = []                                # List containing class (word) features belong to
+    words = []                                  # Complete word container for experiments
+    pool = Pool(processes=8)                    # Initialize pool with 8 processes
     cls = classificationMulti.Classification()  # Classification
+    pp = postp.Postprocessing()                 #Post Processing
 
     r = Recognizer()
 

@@ -17,23 +17,47 @@ class Postprocessing():
     # This function will reformat the predictions.
     def reformatSegmentsOptions(self, segmentOptions):
 
+        """
+        print "-----Segments----"
+        for segments in segmentOptions:
+            print segments
+        """
+
         rfsegmentsOptions = []
 
-        for char in segmentOptions[0][0]:
+        for words in segmentOptions:
             rfsegmentsOptions.append([])
+            for char in words[0]:
+                rfsegmentsOptions[-1].append([])
 
-        for segment in segmentOptions:
-            charCount = 0
-            for charOption in segment:
-                rfsegmentsOptions[charCount].append(charOption)
-                charCount = +1
+        wordCount = 0
+        for words in segmentOptions:
+
+            for segments in words:
+                charCount = 0
+                for charOption in segments:
+                    print "CHAR ", charCount, ": ", charOption
+                    rfsegmentsOptions[wordCount][charCount].append(charOption)
+                    charCount += 1
+
+            wordCount += 1
+
+        """
+        print "------RF-------"
+        wordCount = 0
+        for words in rfsegmentsOptions:
+            for options in words:
+                print "WORD ", wordCount, ": ", options
+            wordCount += 1
+        print "---done---"
+        """
 
         return rfsegmentsOptions
 
-    def run(self, predictions, document = "../KNMPDICT.dat"):
+    def run(self, predictions, document = "KNMPDICT.dat"):
 
         # Reformated the predictions.
-        segmentsOptions = self.reformatSegementsOptions(predictions[0])
+        segmentsOptions = self.reformatSegmentsOptions(predictions[0])
 
         # Return the results from the ngram matching.
         return self.ngramPostProcessing(segmentsOptions, document)

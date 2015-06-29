@@ -74,11 +74,9 @@
     </TextLine>
     <TextLine no="5" top="511" bottom="574" left="417" right="779" shear="0">
         <Word no="1" top="511" bottom="574" left="707" right="779" shear="0" text="sit">
-            <Character no="1" top="511" bottom="574" left="707" right="710" shear="0" text=";"/>
             <Character no="2" top="511" bottom="574" left="710" right="729" shear="0" text="s"/>
             <Character no="3" top="511" bottom="574" left="729" right="746" shear="0" text="i"/>
             <Character no="4" top="511" bottom="574" left="746" right="772" shear="0" text="t"/>
-            <Character no="5" top="511" bottom="574" left="772" right="780" shear="0" text=";"/>
         </Word>
         <Word no="2" top="516" bottom="573" left="417" right="454" shear="0" text="B">
             <Character no="1" top="516" bottom="573" left="417" right="455" shear="0" text="B"/>
