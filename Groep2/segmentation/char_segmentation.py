@@ -300,9 +300,9 @@ class segmenter:
 
         step3_revisited_treshold = 10
 
-        print "SC BEFORE STEP 3: ", SC_columns
+        # print "SC BEFORE STEP 3: ", SC_columns
         SC_columns = self.step3_revisited(SC_columns, step3_revisited_treshold)
-        print "SC After STEP 3", SC_columns
+        # print "SC After STEP 3", SC_columns
 
         """
         if len(SC_columns) >= 2:
