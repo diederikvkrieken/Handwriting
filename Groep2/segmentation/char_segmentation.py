@@ -295,8 +295,13 @@ class segmenter:
         # for x in SC_columns:
         #     cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
 
-        SC_columns = self.step3_revisited(SC_columns, 8)
+        step3_revisited_treshold = 8
 
+        SC_columns = self.step3_revisited(SC_columns, step3_revisited_treshold)
+
+        if (SC_columns[len(SC_columns) -1] - SC_columns[len(SC_columns) -2]) < step3_revisited_treshold:
+            SC_columns[len(SC_columns) -2] = SC_columns[len(SC_columns) -1]
+            SC_columns.remove(len(SC_columns) -1)
 
         result = []
         for SC_column in SC_columns:
