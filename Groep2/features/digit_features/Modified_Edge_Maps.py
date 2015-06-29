@@ -1,7 +1,7 @@
 import cv2
 import numpy
 import numpy as np
-from Groep2.preprocessing import thinning, prepImage
+from preprocessing import thinning, prepImage
 from bisect import bisect_left
 import math
 
