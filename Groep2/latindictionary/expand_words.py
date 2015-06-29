@@ -1,5 +1,22 @@
 import re
 
+
+def unique(seq, idfun=None):
+   # order preserving
+   if idfun is None:
+       def idfun(x): return x
+   seen = {}
+   result = []
+   for item in seq:
+       marker = idfun(item)
+       # in old Python versions:
+       # if seen.has_key(marker)
+       # but in new ones:
+       if marker in seen: continue
+       seen[marker] = 1
+       result.append(item)
+   return result
+
 with open ("DICTPAGE.txt", "r") as myfile:
     data=myfile.read().replace('\n', '')
 
@@ -11,6 +28,15 @@ matchesLines = [i.split(', ') for i in matchResult]
 
 matches = []
 i = 0
+import string
+lower =  string.ascii_lowercase
+upper = string.ascii_uppercase
+#print len(matches)
+for n in range(len(lower)):
+    matches.append(lower[n])
+    matches.append(upper[n])
+
+
 for matchLine in matchesLines:
     for word in matchLine:
         i += 1
@@ -30,7 +56,6 @@ for matchLine in matchesLines:
             elif "(ii)" in word:
                 word1 = re.sub("\(ii\)", "", word)
                 word2 = re.sub("\(ii\)", "i", word)
-                print word1, word2
                 matches.append(word1)
                 matches.append(word2)
             elif "(n)" in word:
@@ -85,9 +110,15 @@ for matchLine in matchesLines:
             if word.isalpha():
                 matches.append(word)
 
-matches2 = sorted(set(matches),key=matches.index)
 
-print(len(matches2))
+import locale
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8') # vary depending on your lang/locale
+matches = unique(matches)
+matches2 = sorted(matches, cmp=locale.strcoll)
+
+if 'Q' in matches2:
+    print "hoi"
+
 
 with open ("WORDS_DICTPAGE2.txt", "w") as myfile:
     for word in matches2:

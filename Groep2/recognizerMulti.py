@@ -251,7 +251,6 @@ class Recognizer:
         # Build Dictionary
         buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPDICT.dat')
 
-        """
         # USELESS PEACE OF SHIT CODE
         combined = []
 
@@ -262,7 +261,6 @@ class Recognizer:
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         cls.buildClassificationDictionary(jobs, 'KNMPTEST.dat')
-        """
 
     # Running all the features WARNING this will take an extremely long time!
     def allFeatures(self, ppm_folder, words_folder):
@@ -320,7 +318,7 @@ class Recognizer:
         ## Post processing
         ppPredictions = pp.run(predictions)
 
-        ppPredictions, OneCharPredictions = pp.run(predictions)
+        winner = charactercombine.charactercombine().run(ppPredictions)
 
 
         # A debug print to ensure correct format of classification output
@@ -339,39 +337,6 @@ class Recognizer:
         print "true: ", true
         print "false: ", false
 
-    def createStringFromPrediction(self, wordArray):
-
-        word = ''
-        first = False
-
-        #Remove Garbage
-        if wordArray[-1] == "**GARBAGE**":
-            wordArray.pop()
-
-        for char in wordArray:
-
-            currentCharCount = 0
-            for currentChar in char:
-
-                #Check if first char
-                if first == False:
-                    word += currentChar
-                    first = True
-                # Check if current char is not equal to last char and is not a _
-                elif currentChar != word[-1] and currentChar != '_':
-                    word += currentChar
-                # if current char is equal to the last char,
-                elif currentChar == word[-1]:
-                    # Check whether we have do not have a _ then add
-                    if currentCharCount < len(char)-1 and char[currentCharCount+1] != '_':
-                        word += currentChar
-                    # or if its is the last char then also add.
-                    elif currentCharCount == len(char)-1:
-                        word += currentChar
-
-                currentCharCount += 1
-
-        return word
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
@@ -424,8 +389,7 @@ class Recognizer:
 
         true = 0
         false = 0
-
-        ppPredictions, OneCharPredictions = pp.run(predictions)
+        ppPredictions = pp.run(predictions)
 
         winner = charactercombine.charactercombine().run(ppPredictions)
 
