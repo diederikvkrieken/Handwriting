@@ -224,7 +224,7 @@ class segmenter:
                     SC_columns.append(listOrig[k])
 
         if n!=0:
-            SC_columns.append(int(round((sum + listOrig[-1]) / (n + 1))))
+            SC_columns.append(int(round((sum) / (n))))
 
         SC_columns.append(listOrig[len(listOrig) -1])
         return SC_columns
@@ -300,12 +300,16 @@ class segmenter:
 
         step3_revisited_treshold = 10
 
+        print "SC BEFORE STEP 3: ", SC_columns
         SC_columns = self.step3_revisited(SC_columns, step3_revisited_treshold)
+        print "SC After STEP 3", SC_columns
 
+        """
         if len(SC_columns) >= 2:
             if (SC_columns[len(SC_columns) -1] - SC_columns[len(SC_columns) -2]) < step3_revisited_treshold:
                 SC_columns[len(SC_columns) -2] = SC_columns[len(SC_columns) -1]
                 SC_columns.remove(len(SC_columns)-2)
+        """
 
         """
         step4_oversegmenting_Threshold = 20
