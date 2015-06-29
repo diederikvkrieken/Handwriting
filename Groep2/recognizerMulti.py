@@ -320,7 +320,7 @@ class Recognizer:
         ## Post processing
         ppPredictions, OneCharPredictions, oneCharWinners = pp.run(predictions)
 
-        winner = charactercombine.charactercombine().run(ppPredictions)
+        winner = charactercombine.charactercombine().run(ppPredictions,0)
 
 
         # A debug print to ensure correct format of classification output
@@ -394,7 +394,7 @@ class Recognizer:
 
         ppPredictions, OneCharPredictions, oneCharWinners = pp.run(predictions)
 
-        winner = charactercombine.charactercombine().run(ppPredictions)
+        winner = charactercombine.charactercombine().run(ppPredictions, 0)
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
