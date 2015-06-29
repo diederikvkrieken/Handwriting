@@ -391,7 +391,7 @@ class Recognizer:
         false = 0
         ppPredictions = pp.run(predictions)
 
-        winner = charactercombine.charactercombine().run(predictions)
+        winner = charactercombine.charactercombine().run(ppPredictions)
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
