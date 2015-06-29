@@ -203,7 +203,7 @@ class segmenter:
             k += 1
         return SC_columns
 
-    def step3_revisited(self, list, threshold):
+    def step3_revisited(self, listOrig, threshold):
         """
         This function does the same as step 3, but acts on an list without 'zero' elements
         :param list:
@@ -212,18 +212,21 @@ class segmenter:
         """
         sum = n = 0
         SC_columns = []
-        for k in range(len(list) -1):
-            if list[k + 1] - list[k] <= threshold:
-                sum += list[k]
+        for k in range(len(listOrig) -1):
+            if listOrig[k + 1] - listOrig[k] <= threshold:
+                sum += listOrig[k]
                 n += 1
             else:
                 if n > 0:
-                    SC_columns.append(int(round((sum + list[k]) / (n + 1))))
+                    SC_columns.append(int(round((sum + listOrig[k]) / (n + 1))))
                     sum = n = 0
                 else:
-                    SC_columns.append(list[k])
+                    SC_columns.append(listOrig[k])
 
-        SC_columns.append(list[len(list) -1])
+        if n!=0:
+            SC_columns.append(int(round((sum + listOrig[-1]) / (n + 1))))
+
+        SC_columns.append(listOrig[len(listOrig) -1])
         return SC_columns
 
 
@@ -295,14 +298,24 @@ class segmenter:
         # for x in SC_columns:
         #     cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
 
-        step3_revisited_treshold = 8
+        step3_revisited_treshold = 10
 
         SC_columns = self.step3_revisited(SC_columns, step3_revisited_treshold)
 
         if len(SC_columns) >= 2:
             if (SC_columns[len(SC_columns) -1] - SC_columns[len(SC_columns) -2]) < step3_revisited_treshold:
                 SC_columns[len(SC_columns) -2] = SC_columns[len(SC_columns) -1]
-                SC_columns.pop()
+                SC_columns.remove(len(SC_columns)-2)
+
+        """
+        step4_oversegmenting_Threshold = 20
+
+        newList = []
+        for i in range(len(SC_columns)):
+            if i != 0:
+                if not ((SC_columns[i] - SC_columns[i-1]) < step4_oversegmenting_Threshold):
+                    newList.append(SC_columns[i])
+        """
 
         result = []
         for SC_column in SC_columns:
