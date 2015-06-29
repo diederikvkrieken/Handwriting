@@ -402,10 +402,10 @@ class Classification():
 
             if 0 in feat:
                 print 'Giving a dummy prediction..'
-                self.bestChar.append([['o', 's', 'a', 'b', 't']])
+                self.bestChar.append([[('o', 0.2), ('s', 0.2), ('a', 0.2), ('b', 0.2), ('t', 0.2)]])
             else:
                 # Let stacking classifier predict character based on predicted characters
-                self.bestChar.append(self.classifiers['VRF'].testTopN(feat, n))
+                self.bestChar.append(self.classifiers['VRF'].nTopProb(feat, n))
 
     # Test word classification
     def wordTest(self):

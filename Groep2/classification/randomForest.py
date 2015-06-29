@@ -13,7 +13,7 @@ class RandomForest(rfc):
         def test(self, feat):
             return super(RandomForest, self).predict(feat)
 
-        # Predicts on feat and gives class probabilities on each vector
+        # Predicts on feat and gives n most likely classes on each vector
         def testTopN(self, feat, n = 1):
             # Predict and give probabilities for each class
             topList = super(RandomForest, self).predict_proba(feat)
@@ -25,4 +25,17 @@ class RandomForest(rfc):
 
             return res  # Return all lists of n_feat most probable predictions
 
+        # Predicts on feat and gives top n classes together with probabilities on each vector
+        def nTopProb(self, feat, n = 1):
+            # Predict and give probabilities for each class
+            topList = super(RandomForest, self).predict_proba(feat)
+            sorted = np.argsort(topList)    # Indices of lowest to highest probability
+            # Get probabilities of n most likely predictions
+            res = []                        # Will contain tuples of classes and probabilities
+            for idx, cli in enumerate(sorted):
+                # Go through all indices of sorted
+                prob = topList[idx][cli[-n:][::-1]]
+                cls = self.classes_[cli[-n:][::-1]]
+                res.append(zip(cls, prob))
 
+            return res  # Return all lists of n_feat most likely predictions and their probability

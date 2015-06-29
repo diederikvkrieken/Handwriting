@@ -17,6 +17,7 @@ from features import featExtraction
 from classification import classificationMulti
 from latindictionary import buildDictionary
 from postprocessing import postprocessing as postp
+from postprocessing import dictionary_builder, levenshtein_dist
 
 # Parallel packages
 from multiprocessing import Pool
@@ -286,7 +287,7 @@ class Recognizer:
         for fName, f in feat.featureMethods.iteritems():
             combined.append([wordsMerged, f, fName])
 
-        ## Prarallel feature extraction.
+        ## Parallel feature extraction.
         print "Starting job"
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
@@ -317,22 +318,27 @@ class Recognizer:
         ## Post processing
         ppPredictions = pp.run(predictions)
 
-        predCount = 0
+        trie = dictionary_builder.TrieNode().run()
+        winner = [None]*len(ppPredictions)
+        allpredictions = [None]*len(ppPredictions)
+        count = 0
         for pred in ppPredictions:
-            print "----",predictions[1][predCount],"-----"
-            for alts in pred:
-                print alts
-                print self.createStringFromPrediction(alts)
-
-            predCount += 1
+            predicted_winners = [None]*len(pred)
+            for n in range(5):
+                predicted_winners[n] = classificationMulti.Classification().combineChar(pred[n])
+            allpredictions[count] = predicted_winners
+            winner[count] = levenshtein_dist.Levenshtein_Distance().run(predicted_winners, trie)
+            count += 1
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
-            for j in range(len(predictions[0][i])):
-                segmentPredictions = predictions[0][i][j]
-                annotated = predictions[1][i][1][j]
-
-                if annotated in segmentPredictions:
+            #for j in range(len(predictions[0][i])):
+                #segmentPredictions = predictions[0][i][j]
+                annotated = predictions[1][i][0]
+                print annotated, winner[i]
+                print allpredictions[i]
+                print ppPredictions[i]
+                if annotated == winner[i]:
                     true += 1
                 else:
                     false += 1
@@ -340,39 +346,6 @@ class Recognizer:
         print "true: ", true
         print "false: ", false
 
-    def createStringFromPrediction(self, wordArray):
-
-        word = ''
-        first = False
-
-        #Remove Garbage
-        if wordArray[-1] == "**GARBAGE**":
-            wordArray.pop()
-
-        for char in wordArray:
-
-            currentCharCount = 0
-            for currentChar in char:
-
-                #Check if first char
-                if first == False:
-                    word += currentChar
-                    first = True
-                # Check if current char is not equal to last char and is not a _
-                elif currentChar != word[-1] and currentChar != '_':
-                    word += currentChar
-                # if current char is equal to the last char,
-                elif currentChar == word[-1]:
-                    # Check whether we have do not have a _ then add
-                    if currentCharCount < len(char)-1 and char[currentCharCount+1] != '_':
-                        word += currentChar
-                    # or if its is the last char then also add.
-                    elif currentCharCount == len(char)-1:
-                        word += currentChar
-
-                currentCharCount += 1
-
-        return word
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
@@ -425,31 +398,29 @@ class Recognizer:
 
         true = 0
         false = 0
-
-        for pred in predictions:
-            print "PREDICTION: ", pred
-
-        ## Post processing
         ppPredictions = pp.run(predictions)
 
-        print ppPredictions
-
-        predCount = 0
+        trie = dictionary_builder.TrieNode().run()
+        winner = [None]*len(ppPredictions)
+        allpredictions = [None]*len(ppPredictions)
+        count = 0
         for pred in ppPredictions:
-            print "----",predictions[1][predCount],"-----"
-            for alts in pred:
-                print alts
-                print self.createStringFromPrediction(alts)
-
-            predCount += 1
+            predicted_winners = [None]*len(pred)
+            for n in range(5):
+                predicted_winners[n] = classificationMulti.Classification().combineChar(pred[n])
+            allpredictions[count] = predicted_winners
+            winner[count] = levenshtein_dist.Levenshtein_Distance().run(predicted_winners, trie)
+            count += 1
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
-            for j in range(len(predictions[0][i])):
-                segmentPredictions = predictions[0][i][j]
-                annotated = predictions[1][i][1][j]
-
-                if annotated in segmentPredictions:
+            #for j in range(len(predictions[0][i])):
+                #segmentPredictions = predictions[0][i][j]
+                annotated = predictions[1][i][0]
+                print annotated, winner[i]
+                print allpredictions[i]
+                print ppPredictions[i]
+                if annotated == winner[i]:
                     true += 1
                 else:
                     false += 1
