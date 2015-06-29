@@ -196,7 +196,13 @@ class PreProcessor:
         for w in words:
             pros = self.bgSub(w[0])
             pros = self.binarize(w[0])
-            prossed.append(((pros, pros * w[0]), w[1], w[2]))
+
+            # use combination
+            originalWord = ""
+            for char in w[2]:
+                originalWord += char[2]
+
+            prossed.append(((pros, pros * w[0]), originalWord, w[2]))
 
         # Return pre-processed words: (image, text, character(left, right, text))
         return prossed
