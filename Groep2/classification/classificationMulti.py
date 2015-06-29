@@ -12,7 +12,7 @@ import kNear as kn
 from sklearn.cross_validation import KFold as kf
 from sklearn.externals import joblib as jl
 from sklearn.metrics import confusion_matrix as cm
-from Groep2.latindictionary import buildDictionary
+from latindictionary import buildDictionary
 # Parallel packages
 from multiprocessing import Pool
 import time
