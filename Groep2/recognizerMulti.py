@@ -17,7 +17,7 @@ from features import featExtraction
 from classification import classificationMulti
 from latindictionary import buildDictionary
 from postprocessing import postprocessing as postp
-from postprocessing import dictionary_builder, levenshtein_dist
+from postprocessing import charactercombine
 
 # Parallel packages
 from multiprocessing import Pool
@@ -318,17 +318,8 @@ class Recognizer:
         ## Post processing
         ppPredictions = pp.run(predictions)
 
-        trie = dictionary_builder.TrieNode().run()
-        winner = [None]*len(ppPredictions)
-        allpredictions = [None]*len(ppPredictions)
-        count = 0
-        for pred in ppPredictions:
-            predicted_winners = [None]*len(pred)
-            for n in range(5):
-                predicted_winners[n] = classificationMulti.Classification().combineChar(pred[n])
-            allpredictions[count] = predicted_winners
-            winner[count] = levenshtein_dist.Levenshtein_Distance().run(predicted_winners, trie)
-            count += 1
+        winner = charactercombine.charactercombine().run(ppPredictions)
+
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
@@ -336,7 +327,7 @@ class Recognizer:
                 #segmentPredictions = predictions[0][i][j]
                 annotated = predictions[1][i][0]
                 print annotated, winner[i]
-                print allpredictions[i]
+                #print allpredictions[i]
                 print ppPredictions[i]
                 if annotated == winner[i]:
                     true += 1
@@ -400,17 +391,7 @@ class Recognizer:
         false = 0
         ppPredictions = pp.run(predictions)
 
-        trie = dictionary_builder.TrieNode().run()
-        winner = [None]*len(ppPredictions)
-        allpredictions = [None]*len(ppPredictions)
-        count = 0
-        for pred in ppPredictions:
-            predicted_winners = [None]*len(pred)
-            for n in range(5):
-                predicted_winners[n] = classificationMulti.Classification().combineChar(pred[n])
-            allpredictions[count] = predicted_winners
-            winner[count] = levenshtein_dist.Levenshtein_Distance().run(predicted_winners, trie)
-            count += 1
+        winner = charactercombine.charactercombine().run(predictions)
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
@@ -418,8 +399,8 @@ class Recognizer:
                 #segmentPredictions = predictions[0][i][j]
                 annotated = predictions[1][i][0]
                 print annotated, winner[i]
-                print allpredictions[i]
-                print ppPredictions[i]
+                #print allpredictions[i]
+                #print ppPredictions[i]
                 if annotated == winner[i]:
                     true += 1
                 else:
