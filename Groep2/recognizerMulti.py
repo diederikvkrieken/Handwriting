@@ -249,8 +249,9 @@ class Recognizer:
         jobs = pool.map(unwrap_self_wordParallel, zip([self]*len(wordsMerged), wordsMerged))
 
         # Build Dictionary
-        buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPDICT.dat')
-
+        buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPSTANDFORDDICT.dat')
+        
+        """
         # USELESS PEACE OF SHIT CODE
         combined = []
 
@@ -261,6 +262,7 @@ class Recognizer:
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         cls.buildClassificationDictionary(jobs, 'KNMPTEST.dat')
+        """
 
     # Running all the features WARNING this will take an extremely long time!
     def allFeatures(self, ppm_folder, words_folder):
@@ -316,7 +318,7 @@ class Recognizer:
         false = 0
 
         ## Post processing
-        ppPredictions = pp.run(predictions)
+        ppPredictions, OneCharPredictions = pp.run(predictions)
 
         winner = charactercombine.charactercombine().run(ppPredictions)
 
@@ -389,7 +391,8 @@ class Recognizer:
 
         true = 0
         false = 0
-        ppPredictions = pp.run(predictions)
+
+        ppPredictions, OneCharPredictions = pp.run(predictions)
 
         winner = charactercombine.charactercombine().run(ppPredictions)
 
