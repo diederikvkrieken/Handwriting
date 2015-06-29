@@ -1,8 +1,6 @@
 #!/usr/bin/python
 #By Steve Hanov, 2011. Released to the public domain
-from dictionary_builder import TrieNode
 
-trie = TrieNode().run()
 
 
 class Levenshtein_Distance():
@@ -44,7 +42,7 @@ class Levenshtein_Distance():
 
     # The search function returns a list of all words that are less than the given
     # maximum distance from the target word
-    def search(self, word, maxCost ):
+    def search(self, word, maxCost, trie):
         # build first row
         currentRow = range( len(word) + 1 )
 
@@ -64,22 +62,19 @@ class Levenshtein_Distance():
             print("We have multiple winners!")
             return sorted_results[0]
 
-    def run(self, words):
+    def run(self, words, trie):
         print("Running the distance!")
         MAX_COST = 2
         potential_winner = []
         for n in words:
-            results = self.search( n, MAX_COST )
-            #print result, len(result)
-            if results:
-                potential_winner.append(self.decide_winner(results))
+            if len(n)>1:
+                results = self.search( n, MAX_COST ,trie)
+                #print result, len(result)
+                if results:
+                    potential_winner.append(self.decide_winner(results))
+                else:
+                    potential_winner.append((n, MAX_COST))
             else:
-                potential_winner.append((n, MAX_COST))
+                potential_winner.append((n, 0))
         winner = self.decide_winner(potential_winner)
         return winner[0]
-
-
-
-words = ["geepstra", "fietsen", "saaiheidiseenkeuze", "allezszs"]
-winner = Levenshtein_Distance().run(words)
-print winner
