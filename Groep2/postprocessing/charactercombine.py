@@ -27,14 +27,23 @@ class charactercombine():
         return word
 
 
-    def run(self, ppPredictions):
+    def run(self, ppPredictions, type):
+        if type == 1:#then we are validating!
+            charPredictions = []
+            for n in range(0,len(ppPredictions),5):
+                all_letters = ppPredictions[n:n+5]
+                charPredictions.append(all_letters)
+            ppPredictions = charPredictions[:]
+
         trie = TrieNode().run()
         winner = [None]*len(ppPredictions)
         allpredictions = [None]*len(ppPredictions)
         count = 0
+
         for pred in ppPredictions:
+
             predicted_winners = [None]*len(pred)
-            for n in range(5):
+            for n in range(len(pred)):
                 predicted_winners[n] = self.combineChar(pred[n])
             allpredictions[count] = predicted_winners
             winner[count] = Levenshtein_Distance().run(predicted_winners, trie)
