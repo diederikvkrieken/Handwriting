@@ -150,9 +150,9 @@ class Recognizer:
             for seg in segs:
                 # Extract features from each segment
                 if f[1] == 0:
-                    word[1].append((f[0].run(seg[0])))
+                    word[-1].append((f[0].run(seg[0])))
                 elif f[1] == 1:
-                    word[1].append((f[0].run(seg[1])))
+                    word[-1].append((f[0].run(seg[1])))
 
             featureResults.append(word)     # Word is ready for classification
 
@@ -405,19 +405,13 @@ class Recognizer:
     # Standard run for validation by instructors
     def validate(self, ppm, inwords, outwords):
         ## Preprocessing
-        words = prepper.wordPrep(ppm, inwords)  # Read words
-
-        # Combine words
-        wordsMerged = []
-        for w in words:
-            w = np.array(w)
-            wordsMerged += w.tolist()
+        wordsInter = prepper.wordPrep(ppm, inwords)  # Read words
 
         # USELESS PIECE OF POOP CODE    (To stay close to the original :))
         combined = []
 
         for fName, f in feat.featureMethods.iteritems():
-            combined.append([wordsMerged, f, fName])
+            combined.append([wordsInter, f, fName])
 
         ## Prarallel feature extraction.
         print "Starting job"
