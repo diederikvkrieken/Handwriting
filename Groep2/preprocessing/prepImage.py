@@ -193,7 +193,6 @@ class PreProcessor:
 
         # For all words, subtract background, binarize and multiply with original
         prossed = []    # New list for tuples because tuples are immutable...
-        grayscale = [] # List for word images (binary * original)
         for w in words:
             pros = self.bgSub(w[0])
             pros = self.binarize(w[0])
