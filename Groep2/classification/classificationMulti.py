@@ -153,12 +153,12 @@ class Classification():
 
     # Prepare data for validation
     def valData(self, words):
-        # Words: (image, segment features)
+        # Words: (binary image, grey-scale image, segment features)
         self.words = []     # Word list containing an empty string and the features
 
         # Get features from words and put these in self.words
         for w in words:
-            self.words.append(([''], w[1])) # Need an empty text to keep correspondence with other self.words
+            self.words.append(([''], w[2])) # Need an empty text to keep correspondence with other self.words
 
         # Pretend all these words to be the test set
         self.test_idx = range(len(self.words))
