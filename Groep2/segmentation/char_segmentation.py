@@ -286,7 +286,7 @@ class segmenter:
         CSC_columns = CSC_columns[0,:]
 
         # apply step 3 and store
-        SC_columns = self.step3(CSC_columns, 2)
+        SC_columns = self.step3(CSC_columns, 4)
 
 
         # # draw CSC's and CS's

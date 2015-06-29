@@ -92,7 +92,7 @@ class Postprocessing():
 
         singleCharWinner = []
         for word in singleCharArray[0]:
-            singleCharWinner.append(word[0])
+            singleCharWinner.append(word[0][0][0])
 
         return predictions, singleCharArray, singleCharWinner
 
@@ -130,7 +130,9 @@ class Postprocessing():
 
         singleCharWinner = []
         for word in singleCharArray:
-            singleCharWinner.append(word[0])
+            singleCharWinner.append(word[0][0][0])
+
+
 
         return predictions, singleCharArray, singleCharWinner
 

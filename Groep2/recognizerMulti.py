@@ -454,6 +454,7 @@ class Recognizer:
         # Add function calls here that generate the finalWords and uncomment the last line
         ppPredictions, OneCharPredictions, oneCharWinners  = pp.runValidate(predictions)
 
+        finalWords = oneCharWinners
 
         # prepper.saveXML(finalWords, inwords, outwords)
 
