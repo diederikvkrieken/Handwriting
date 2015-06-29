@@ -299,14 +299,14 @@ class segmenter:
 
         SC_columns = self.step3_revisited(SC_columns, step3_revisited_treshold)
 
-        if len(SC_columns >= 2):
+        if len(SC_columns) >= 2:
             if (SC_columns[len(SC_columns) -1] - SC_columns[len(SC_columns) -2]) < step3_revisited_treshold:
                 SC_columns[len(SC_columns) -2] = SC_columns[len(SC_columns) -1]
                 SC_columns.pop()
 
         result = []
         for SC_column in SC_columns:
-            if SC_column > 6:
+            if SC_column > step3_revisited_treshold:
                 result.append(SC_column)
 
         if len(result) == 0:
