@@ -10,8 +10,8 @@ import svm
 import kMeans as km
 import kNear as kn
 from sklearn.cross_validation import KFold as kf
-from sklearn.externals import joblib as jl
 from sklearn.metrics import confusion_matrix as cm
+import pickle
 from latindictionary import buildDictionary
 # Parallel packages
 from multiprocessing import Pool
@@ -305,21 +305,29 @@ class Classification():
     def save(self):
         # Iterate over classifiers
         for name, classifier in self.classifiers.iteritems():
-            jl.dump(classifier, name + '.pkl')
+            f = open(name + '.pkl', mode='a')
+            pickle.dump(classifier, f)
+            f.close()
 
     # Loads classifiers mentioned in init from disk
     def load(self):
         # Iterate over classifiers
         for name, classifier in self.classifiers.iteritems():
-            classifier = jl.load(name + '.pkl')
+            f = open(name + '.pkl')
+            classifier = pickle.load(f)
+            f.close()
 
     # Loads a character classifier. NOTE that since we're only using RF, it is put in there.
     def loadCharClassifier(self, cln):
-        self.classifiers['RF'] = jl.load(cln + '.pkl')
+        f = open(cln + '.pkl')
+        self.classifiers['RF'] = pickle.load(f)
+        f.close()
 
     # Loads a particular classifier
     def loadClassifier(self, cln):
-        self.classifiers[cln] = jl.load(cln + '.pkl')
+        f = open(cln + '.pkl')
+        self.classifiers[cln] = pickle.load(f)
+        f.close()
 
     # Lets all algorithms predict classes of the current test set
     def test(self):
@@ -711,13 +719,17 @@ class Classification():
             # Train character classifier and let it predict as to generate input for training stacking
             print 'Training a character classifier for feature', fName + '.'
             self.characterTrain()           # Note that training discards the current model
-            jl.dump(self.classifiers['RF'], fName + '_RF.pkl')   # Save to disk
+            f = open(fName + '_RF.pkl', mode='a')
+            pickle.dump(self.classifiers['RF'], f)   # Save to disk
+            f.close()
             self.characterTest(fName, n)    # Generate top predictions for this feature
 
         # Lastly train stacking classifier
         print 'Almost there! Sassy stacking is being trained.'
         self.voterTrain()   # Small notice, self.words is based on last feature...
-        jl.dump(self.classifiers['VRF'], 'VRF.pkl')   # and save to disk
+        f = open('VRF.pkl', mode='a')
+        pickle.dump(self.classifiers['VRF'], f)   # and save to disk
+        f.close()
         print 'Done! You can look in awe at the abundance of files hugging your disk!'
 
     # Trains a character classifier on 50% of the data, a word classifier on te other half
@@ -730,8 +742,12 @@ class Classification():
         self.characterTrain()
         self.wordTrain()
         # Save to disk
-        jl.dump(self.classifiers['RF'], 'RF.pkl')
-        jl.dump(self.classifiers['WRF'], 'WRF.pkl')
+        f = open('RF.pkl', mode='a')
+        pickle.dump(self.classifiers['RF'], f)
+        f.close()
+        f = open('WRF.pkl', mode='a')
+        pickle.dump(self.classifiers['WRF'], f)
+        f.close()
         print 'Classification 2.0 greenified your hard disk with two random forests.\n',\
             'Thanks for your consideration of the environment!'
 

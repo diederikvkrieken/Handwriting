@@ -322,7 +322,7 @@ class Recognizer:
             print "----",predictions[1][predCount],"-----"
             for alts in pred:
                 print alts
-                print self.createTestString(top)
+                print self.createStringFromPrediction(alts)
 
             predCount += 1
 
@@ -340,22 +340,33 @@ class Recognizer:
         print "true: ", true
         print "false: ", false
 
-    def createTestString(self, wordArray):
+    def createStringFromPrediction(self, wordArray):
 
         word = ''
-        word += wordArray[0][0]
+        first = False
 
-        for char in word:
+        #Remove Garbage
+        if wordArray[-1] == "**GARBAGE**":
+            wordArray.pop()
+
+        for char in wordArray:
 
             currentCharCount = 0
             for currentChar in char:
 
-                if currentChar != word[-1] and currentChar != '_':
+                #Check if first char
+                if first == False:
                     word += currentChar
-                elif char == word[-1]:
-
+                    first = True
+                # Check if current char is not equal to last char and is not a _
+                elif currentChar != word[-1] and currentChar != '_':
+                    word += currentChar
+                # if current char is equal to the last char,
+                elif currentChar == word[-1]:
+                    # Check whether we have do not have a _ then add
                     if currentCharCount < len(char)-1 and char[currentCharCount+1] != '_':
                         word += currentChar
+                    # or if its is the last char then also add.
                     elif currentCharCount == len(char)-1:
                         word += currentChar
 
@@ -411,6 +422,40 @@ class Recognizer:
         '''
 
         predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
+
+        true = 0
+        false = 0
+
+        for pred in predictions:
+            print "PREDICTION: ", pred
+
+        ## Post processing
+        ppPredictions = pp.run(predictions)
+
+        print ppPredictions
+
+        predCount = 0
+        for pred in ppPredictions:
+            print "----",predictions[1][predCount],"-----"
+            for alts in pred:
+                print alts
+                print self.createStringFromPrediction(alts)
+
+            predCount += 1
+
+        # A debug print to ensure correct format of classification output
+        for i in range(len(predictions[0])):
+            for j in range(len(predictions[0][i])):
+                segmentPredictions = predictions[0][i][j]
+                annotated = predictions[1][i][1][j]
+
+                if annotated in segmentPredictions:
+                    true += 1
+                else:
+                    false += 1
+
+        print "true: ", true
+        print "false: ", false
 
     # Go through folder, train and test on each file
     def oneFolder(self, ppm_folder, words_folder):
