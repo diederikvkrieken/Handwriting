@@ -90,18 +90,76 @@ class Postprocessing():
             predictions[0].pop(index)
             predictions[1].pop(index)
 
-        return predictions, singleCharArray
+        singleCharWinner = []
+        for word in singleCharArray[0]:
+            singleCharWinner.append(word[0])
+
+        return predictions, singleCharArray, singleCharWinner
+
+    # This is the validate version.
+    def getSingleCharValidate(self, predictions):
+
+        singleCharArray = []
+        popList = []
+
+        wordCount = 0
+        for word in predictions:
+
+            single = True
+
+            if len(word) > 1:
+                for char in word[0][1:]:
+                    if char != '_':
+                        single = False
+
+            if single == True:
+
+                singleWord = []
+
+                for char in word[0]:
+                    singleWord.append(char)
+
+                singleCharArray.append(singleWord)
+                popList.append(wordCount)
+
+            wordCount += 1
+
+        for offset, index in enumerate(popList):
+            index -= offset
+            predictions.pop(index)
+
+        singleCharWinner = []
+        for word in singleCharArray:
+            singleCharWinner.append(word[0])
+
+        return predictions, singleCharArray, singleCharWinner
 
     def run(self, predictions, document = "KNMPDICT.dat"):
 
         # Create a list with only the single chars
-        predictions, singleChars = self.getSingleChar(predictions)
+        predictions, singleChars, singleCharWinner = self.getSingleChar(predictions)
 
         # Reformated the predictions.
         segmentsOptions = self.reformatSegmentsOptions(predictions[0])
 
         # Return the results from the ngram matching.
         return self.ngramPostProcessing(segmentsOptions, document), singleChars
+
+    def runValidate(self, predictions, document = "KNMPSTANDFORDDICT.dat"):
+
+        # Create a list with only the single chars
+        predictions, singleChars, singleCharWinner = self.getSingleCharValidate(predictions)
+
+        # Reformated the predictions.
+        segmentsOptions = self.reformatSegmentsOptions(predictions)
+
+        # Return the results from the ngram matching.
+        return self.ngramPostProcessing(segmentsOptions, document), singleChars, singleCharWinner
+
+
+
+
+
 
 
 

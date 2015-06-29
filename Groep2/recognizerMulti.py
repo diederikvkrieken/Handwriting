@@ -250,7 +250,7 @@ class Recognizer:
 
         # Build Dictionary
         buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPSTANDFORDDICT.dat')
-        
+
         """
         # USELESS PEACE OF SHIT CODE
         combined = []
@@ -318,7 +318,7 @@ class Recognizer:
         false = 0
 
         ## Post processing
-        ppPredictions, OneCharPredictions = pp.run(predictions)
+        ppPredictions, OneCharPredictions, oneCharWinners = pp.run(predictions)
 
         winner = charactercombine.charactercombine().run(ppPredictions)
 
@@ -392,7 +392,7 @@ class Recognizer:
         true = 0
         false = 0
 
-        ppPredictions, OneCharPredictions = pp.run(predictions)
+        ppPredictions, OneCharPredictions, oneCharWinners = pp.run(predictions)
 
         winner = charactercombine.charactercombine().run(ppPredictions)
 
