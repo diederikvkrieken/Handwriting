@@ -56,6 +56,14 @@ class pathBuilder():
         levelCount = 2
         for level in levelArray[2:]:
 
+            # calculate normalisation value
+            totalProbability = 0
+            if len(level) == topLimit:
+                for elm in level:
+                    totalProbability += elm[0][1]
+
+                normalisationValue = 1 / totalProbability
+
             for currentNode in level:
 
                 #print "Current node Change to: ", currentNode
@@ -69,9 +77,10 @@ class pathBuilder():
 
                         # print topPic
                         # Build Tri gram
-                        trigram = "" + topPic[0][-2] + " " + topPic[0][-1] + " " + currentNode[0][:]
+                        trigram = "" + topPic[0][0][-2] + " " + topPic[0][0][-1] + " " + currentNode[0][0][:]
 
-                        P = ngram.getProbability(trigram)
+                        probabilityFromStacking = normalisationValue * currentNode[0][1]
+                        P = ngram.getProbability(trigram) * probabilityFromStacking
 
                         newProbability = P * topPic[1]
                         optionList[1].append(list(topPic[0]))
