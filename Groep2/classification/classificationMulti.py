@@ -12,7 +12,7 @@ import kNear as kn
 from sklearn.cross_validation import KFold as kf
 from sklearn.externals import joblib as jl
 from sklearn.metrics import confusion_matrix as cm
-from Groep2.latindictionary import buildDictionary
+from latindictionary import buildDictionary
 # Parallel packages
 from multiprocessing import Pool
 import time
@@ -153,12 +153,12 @@ class Classification():
 
     # Prepare data for validation
     def valData(self, words):
-        # Words: (image, segment features)
-        self.words = []     # Word list containing just the features
+        # Words: (binary image, grey-scale image, segment features)
+        self.words = []     # Word list containing an empty string and the features
 
         # Get features from words and put these in self.words
         for w in words:
-            self.words.append(w[1])
+            self.words.append(([''], w[2])) # Need an empty text to keep correspondence with other self.words
 
         # Pretend all these words to be the test set
         self.test_idx = range(len(self.words))
@@ -742,7 +742,7 @@ class Classification():
         # and the values are the extracted feature vectors per word
         for fName, feature in featureWords.iteritems():
             # Prepare feature data for validation
-            self.valData(featureWords)
+            self.valData(feature)
             # Load in the trained character classifier for this feature
             self.loadCharClassifier(fName + '_RF')
             self.characterTest(fName, n)    # Predict n most probable characters according to feature
