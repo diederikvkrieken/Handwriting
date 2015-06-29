@@ -17,6 +17,7 @@ from features import featExtraction
 from classification import classificationMulti
 from latindictionary import buildDictionary
 from postprocessing import postprocessing as postp
+from postprocessing import charactercombine
 
 # Parallel packages
 from multiprocessing import Pool
@@ -250,6 +251,7 @@ class Recognizer:
         # Build Dictionary
         buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPDICT.dat')
 
+        """
         # USELESS PEACE OF SHIT CODE
         combined = []
 
@@ -260,6 +262,7 @@ class Recognizer:
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
         cls.buildClassificationDictionary(jobs, 'KNMPTEST.dat')
+        """
 
     # Running all the features WARNING this will take an extremely long time!
     def allFeatures(self, ppm_folder, words_folder):
@@ -286,7 +289,7 @@ class Recognizer:
         for fName, f in feat.featureMethods.iteritems():
             combined.append([wordsMerged, f, fName])
 
-        ## Prarallel feature extraction.
+        ## Parallel feature extraction.
         print "Starting job"
         jobs = pool.map(unwrap_self_allFeatParallel, zip([self]*len(combined), combined))
 
@@ -317,22 +320,18 @@ class Recognizer:
         ## Post processing
         ppPredictions = pp.run(predictions)
 
-        predCount = 0
-        for pred in ppPredictions:
-            print "----",predictions[1][predCount],"-----"
-            for alts in pred:
-                print alts
-                print self.createStringFromPrediction(alts)
+        ppPredictions, OneCharPredictions = pp.run(predictions)
 
-            predCount += 1
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
-            for j in range(len(predictions[0][i])):
-                segmentPredictions = predictions[0][i][j]
-                annotated = predictions[1][i][1][j]
-
-                if annotated in segmentPredictions:
+            #for j in range(len(predictions[0][i])):
+                #segmentPredictions = predictions[0][i][j]
+                annotated = predictions[1][i][0]
+                print annotated, winner[i]
+                #print allpredictions[i]
+                print ppPredictions[i]
+                if annotated == winner[i]:
                     true += 1
                 else:
                     false += 1
@@ -426,30 +425,19 @@ class Recognizer:
         true = 0
         false = 0
 
-        for pred in predictions:
-            print "PREDICTION: ", pred
+        ppPredictions, OneCharPredictions = pp.run(predictions)
 
-        ## Post processing
-        ppPredictions = pp.run(predictions)
-
-        print ppPredictions
-
-        predCount = 0
-        for pred in ppPredictions:
-            print "----",predictions[1][predCount],"-----"
-            for alts in pred:
-                print alts
-                print self.createStringFromPrediction(alts)
-
-            predCount += 1
+        winner = charactercombine.charactercombine().run(ppPredictions)
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
-            for j in range(len(predictions[0][i])):
-                segmentPredictions = predictions[0][i][j]
-                annotated = predictions[1][i][1][j]
-
-                if annotated in segmentPredictions:
+            #for j in range(len(predictions[0][i])):
+                #segmentPredictions = predictions[0][i][j]
+                annotated = predictions[1][i][0]
+                print annotated, winner[i]
+                #print allpredictions[i]
+                #print ppPredictions[i]
+                if annotated == winner[i]:
                     true += 1
                 else:
                     false += 1

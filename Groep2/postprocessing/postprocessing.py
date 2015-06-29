@@ -54,13 +54,54 @@ class Postprocessing():
 
         return rfsegmentsOptions
 
+    def getSingleChar(self, predictions):
+
+        singleCharArray = [[],[]]
+        popList = []
+
+        wordCount = 0
+        for word in predictions[0]:
+
+            single = True
+
+            if len(word) > 1:
+                for char in word[0][1:]:
+                    if char != '_':
+                        single = False
+
+            if single == True:
+
+                singleWord = []
+
+                for char in word[0]:
+                    singleWord.append(char)
+
+                singleCharArray[0].append(singleWord)
+                popList.append(wordCount)
+
+            wordCount += 1
+
+        # Pop all single chars
+        for index in popList:
+            singleCharArray[1].append((predictions[1][index]))
+
+        for offset, index in enumerate(popList):
+            index -= offset
+            predictions[0].pop(index)
+            predictions[1].pop(index)
+
+        return predictions, singleCharArray
+
     def run(self, predictions, document = "KNMPDICT.dat"):
+
+        # Create a list with only the single chars
+        predictions, singleChars = self.getSingleChar(predictions)
 
         # Reformated the predictions.
         segmentsOptions = self.reformatSegmentsOptions(predictions[0])
 
         # Return the results from the ngram matching.
-        return self.ngramPostProcessing(segmentsOptions, document)
+        return self.ngramPostProcessing(segmentsOptions, document), singleChars
 
 
 
