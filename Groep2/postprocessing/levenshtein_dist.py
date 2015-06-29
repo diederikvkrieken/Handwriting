@@ -67,14 +67,16 @@ class Levenshtein_Distance():
         MAX_COST = 2
         potential_winner = []
         for n in words:
+            n = n[:]
             if len(n)>1:
-                results = self.search( n, MAX_COST ,trie)
-                #print result, len(result)
-                if results:
+                results = self.search(n, MAX_COST ,trie)
+                if results and len(results)>1:
                     potential_winner.append(self.decide_winner(results))
+                elif results:
+                    potential_winner.append(results[0])
                 else:
                     potential_winner.append((n, MAX_COST))
             else:
-                potential_winner.append((n, 0))
+                 potential_winner.append((n, 1))
         winner = self.decide_winner(potential_winner)
         return winner[0]
