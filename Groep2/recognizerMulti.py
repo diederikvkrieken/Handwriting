@@ -494,8 +494,13 @@ class Recognizer:
         ppPredictions, OneCharPredictions, oneCharWinners  = pp.runValidate(predictions)
         winner = charactercombine.charactercombine().runOther(ppPredictions,0)
 
+        print "WORDS LEN: ", len(wordsInter)
+        print "Predictions LEN: ", len(predictions)
+        print "PP Predictions len: ", len(ppPredictions)
+
         ## Combine the finalwords array.
         finalWords = oneCharWinners + winner
+
 
         prepper.saveXML(finalWords, inwords, outwords)
 
