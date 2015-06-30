@@ -320,6 +320,11 @@ class Recognizer:
         ## Post processing
         ppPredictions, OneCharPredictions, oneCharWinners = pp.run(predictions)
 
+        for pred in ppPredictions:
+            print "----WORD----"
+            for alts in pred:
+                print alts
+
         winner = charactercombine.charactercombine().run(ppPredictions)
 
 
@@ -328,9 +333,9 @@ class Recognizer:
             #for j in range(len(predictions[0][i])):
                 #segmentPredictions = predictions[0][i][j]
                 annotated = predictions[1][i][0]
-                print annotated, winner[i]
+                print "XML: ", annotated, " WINER", winner[i]
                 #print allpredictions[i]
-                print ppPredictions[i]
+                # print ppPredictions[i]
                 if annotated == winner[i]:
                     true += 1
                 else:
@@ -401,9 +406,9 @@ class Recognizer:
             #for j in range(len(predictions[0][i])):
                 #segmentPredictions = predictions[0][i][j]
                 annotated = predictions[1][i][0]
-                print annotated, winner[i]
+                print "XML: ", annotated, " WINER", winner[i]
                 #print allpredictions[i]
-                #print ppPredictions[i]
+                # print ppPredictions[i]
                 if annotated == winner[i]:
                     true += 1
                 else:
