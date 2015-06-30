@@ -9,10 +9,14 @@ class Postprocessing():
         pass
 
     # This will perform the ngram part.
-    def ngramPostProcessing(self, segmentsOptions, document):
+    def ngramPostProcessing(self, segmentsOptions, document, type = 3):
 
-        ngram = nGram.Ngram(document, 3)
-        return ngramPredictions.pathBuilder().run(segmentsOptions, ngram)
+        if type == 3:
+            ngram = nGram.Ngram(document, 3)
+            return ngramPredictions.pathBuilder().run(segmentsOptions, ngram)
+        else:
+            ngram = nGram.Ngram(document, 2)
+            return ngramPredictions.pathBuilder().runDi(segmentsOptions, ngram)
 
     # This function will reformat the predictions.
     def reformatSegmentsOptions(self, segmentOptions):

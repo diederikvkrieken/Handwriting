@@ -492,7 +492,7 @@ class Recognizer:
 
         ## Post-processing
         ppPredictions, OneCharPredictions, oneCharWinners  = pp.runValidate(predictions)
-        winner = charactercombine.charactercombine().run(ppPredictions,0)
+        winner = charactercombine.charactercombine().runOther(ppPredictions,0)
 
         ## Combine the finalwords array.
         finalWords = oneCharWinners + winner
