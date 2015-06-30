@@ -6,15 +6,14 @@ class charactercombine():
     # Combines a sequence of character predictions to a word
     def combineChar(self, segments):
         word = ""   # Empty list to append characters to
-
         # Consider all characters predicted
         for char in segments:
             if len(char)==1:
-                word = word + char
+                word = word + char[0]
             elif char != '**GARBAGE**':
                 match_added = False
                 match = ''
-                for current_char in char:
+                for current_char in char[0]:
                     if current_char==word[-1:] and match_added==False:
                         match = current_char
                     else:
@@ -28,9 +27,12 @@ class charactercombine():
 
 
     def run(self, ppPredictions):
+
+
         trie = TrieNode().run()
         winner = [None]*len(ppPredictions)
         allpredictions = [None]*len(ppPredictions)
+
         count = 0
         for pred in ppPredictions:
             predicted_winners = [None]*len(pred)

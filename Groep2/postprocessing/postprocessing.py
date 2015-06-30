@@ -132,11 +132,9 @@ class Postprocessing():
         for word in singleCharArray:
             singleCharWinner.append(word[0][0][0])
 
-
-
         return predictions, singleCharArray, singleCharWinner
 
-    def run(self, predictions, document = "KNMPSTANDFORDDICT.dat"):
+    def run(self, predictions, document = "KNMPSTANFORDDICT.dat"):
 
         # Create a list with only the single chars
         predictions, singleChars, singleCharWinner = self.getSingleChar(predictions)
@@ -145,9 +143,9 @@ class Postprocessing():
         segmentsOptions = self.reformatSegmentsOptions(predictions[0])
 
         # Return the results from the ngram matching.
-        return self.ngramPostProcessing(segmentsOptions, document), singleChars
+        return self.ngramPostProcessing(segmentsOptions, document), singleChars, singleCharWinner
 
-    def runValidate(self, predictions, document = "KNMPSTANDFORDDICT.dat"):
+    def runValidate(self, predictions, document = "KNMPSTANFORDDICT.dat"):
 
         # Create a list with only the single chars
         predictions, singleChars, singleCharWinner = self.getSingleCharValidate(predictions)
