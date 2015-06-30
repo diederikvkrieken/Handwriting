@@ -134,8 +134,13 @@ class Postprocessing():
             predictions.pop(index)
 
         singleCharWinner = []
-        for word in singleCharArray:
-            singleCharWinner.append(word[0][0][0])
+        for word in singleCharArray[0]:
+            winner = ''
+            for char in word[0][0]:
+                if char == '_':
+                    break
+                winner = winner + char
+            singleCharWinner.append(winner)
 
         return predictions, singleCharArray, singleCharWinner
 

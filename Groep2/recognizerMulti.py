@@ -319,7 +319,16 @@ class Recognizer:
 
         ## Post processing
         ppPredictions, oneCharPredictions, oneCharWinners = pp.run(predictions)
-        winner = charactercombine.charactercombine().run(ppPredictions[0],1)
+
+        """
+        for pred in ppPredictions:
+            print "---WORD---"
+            for word in pred:
+                print word
+        """
+
+        winner = charactercombine.charactercombine().run(ppPredictions,0)
+        winnerOther = charactercombine.charactercombine().runOther(ppPredictions, 0)
 
         for i in range(len(oneCharPredictions[0])):
 
@@ -330,7 +339,9 @@ class Recognizer:
             else:
                 false += 1
 
-        print "WINNER: ", winner
+        trueOther = true
+        falseOther = false
+
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
             annotated = predictions[1][i][0]
@@ -344,6 +355,21 @@ class Recognizer:
 
         print "true: ", true
         print "false: ", false
+
+
+        # A debug print to ensure correct format of classification output
+        for i in range(len(predictions[0])):
+            annotated = predictions[1][i][0]
+
+            print "XML: %-*s  WINNER: %s" % (20,annotated,winnerOther[i])
+
+            if annotated == winnerOther[i]:
+                trueOther += 1
+            else:
+                falseOther += 1
+
+        print "true: ", trueOther
+        print "false: ", falseOther
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
@@ -398,8 +424,7 @@ class Recognizer:
         false = 0
 
         ppPredictions, oneCharPredictions, oneCharWinners = pp.run(predictions)
-
-        winner = charactercombine.charactercombine().run(ppPredictions, 0)
+        winner = charactercombine.charactercombine().run(ppPredictions,0)
 
 
         for i in range(len(oneCharPredictions[0])):
@@ -467,7 +492,7 @@ class Recognizer:
 
         ## Post-processing
         ppPredictions, OneCharPredictions, oneCharWinners  = pp.runValidate(predictions)
-        winner = charactercombine.charactercombine().run(ppPredictions,1)
+        winner = charactercombine.charactercombine().run(ppPredictions,0)
 
         ## Combine the finalwords array.
         finalWords = oneCharWinners + winner

@@ -23,6 +23,49 @@ class charactercombine():
                         elif current_char!= '_':
                             word = word+current_char
                         match = ''
+
+        print "---SEGMENTS---"
+        for char in segments:
+            print char
+
+        print "----WORD---"
+        print word
+
+        return word
+
+    def createStringFromPrediction(self, wordArray):
+
+        word = ''
+        first = False
+
+        #Remove Garbage
+        if wordArray[-1] == "**GARBAGE**":
+            wordArray.pop()
+
+        for char in wordArray:
+
+            currentCharCount = 0
+            for currentChar in char[0]:
+
+                #Check if first char
+                if first == False:
+                    word += currentChar
+                    first = True
+                # Check if current char is not equal to last char and is not a _
+                elif currentChar != word[-1] and currentChar != '_':
+                    word += currentChar
+                # if current char is equal to the last char,
+                elif currentChar == word[-1]:
+                    # Check whether we have do not have a _ then add
+                    if currentCharCount < len(char[0])-1 and char[0][currentCharCount+1] != '_':
+                        word += currentChar
+                    # or if its is the last char then also add.
+                    elif currentCharCount == len(char[0])-1:
+                        word += currentChar
+
+                currentCharCount += 1
+
+        print "OTHER: ", word
         return word
 
 
@@ -44,6 +87,31 @@ class charactercombine():
             predicted_winners = [None]*len(pred)
             for n in range(len(pred)):
                 predicted_winners[n] = self.combineChar(pred[n])
+                self.createStringFromPrediction(pred[n])
+            allpredictions[count] = predicted_winners
+            winner[count] = Levenshtein_Distance().run(predicted_winners, trie)
+            count += 1
+
+        return winner
+
+    def runOther(self, ppPredictions, type):
+        if type == 1:#then we are validating!
+            charPredictions = []
+            for n in range(0,len(ppPredictions),5):
+                all_letters = ppPredictions[n:n+5]
+                charPredictions.append(all_letters)
+            ppPredictions = charPredictions[:]
+
+        trie = TrieNode().run()
+        winner = [None]*len(ppPredictions)
+        allpredictions = [None]*len(ppPredictions)
+        count = 0
+
+        for pred in ppPredictions:
+
+            predicted_winners = [None]*len(pred)
+            for n in range(len(pred)):
+                predicted_winners[n] = self.createStringFromPrediction(pred[n])
             allpredictions[count] = predicted_winners
             winner[count] = Levenshtein_Distance().run(predicted_winners, trie)
             count += 1
