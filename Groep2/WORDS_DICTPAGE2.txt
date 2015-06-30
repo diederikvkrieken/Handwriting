@@ -1,5 +1,3 @@
-a
-A
 ab
 abaci
 abacis
@@ -13140,8 +13138,6 @@ azymita
 azymitae
 azymum
 azymus
-b
-B
 Baal
 babae
 babaecali
@@ -15784,8 +15780,6 @@ byssum
 byssus
 Byzantii
 Byzantium
-c
-C
 caballa
 caballae
 caballarii
@@ -33488,8 +33482,6 @@ cytoplasma
 cytoplasmatis
 cytropodis
 cytropus
-d
-D
 dablae
 dablas
 dacrima
@@ -40425,8 +40417,6 @@ dyspnoea
 dyspnoeae
 dyspnoici
 dyspnoicus
-e
-E
 ea
 eadem
 eare
@@ -44093,8 +44083,6 @@ Ezechiel
 Ezechielis
 Ezra
 Ezrae
-f
-F
 faba
 fabae
 fabella
@@ -46559,8 +46547,6 @@ futurus
 fututus
 fylacterii
 fylacterium
-g
-G
 gabali
 Gabali
 gabalus
@@ -47762,8 +47748,6 @@ gyravi
 gyri
 gyro
 gyrus
-h
-H
 ha
 Habacuc
 habena
@@ -49233,8 +49217,6 @@ hystericum
 hystericus
 hysterologia
 hysterologiae
-i
-I
 iacinthina
 iacinthinae
 iacinthinum
@@ -54956,8 +54938,6 @@ ivi
 ivii
 ixi
 ixon
-j
-J
 jacca
 jaccae
 jaceo
@@ -55406,8 +55386,6 @@ juxta
 juxtapositio
 juxtapositionis
 juxtim
-k
-K
 kadamitas
 kadamitatis
 Kaeso
@@ -55456,8 +55434,6 @@ koppa
 kum
 kumrum
 Kyrie
-l
-L
 labare
 labari
 labarum
@@ -57691,8 +57667,6 @@ lyricum
 lyricus
 lytri
 lytrum
-m
-M
 macaronica
 macaronicum
 macaronicus
@@ -60826,8 +60800,6 @@ myxae
 myxi
 myxum
 myxus
-n
-N
 nable
 nabli
 nablii
@@ -62065,8 +62037,6 @@ nympha
 nymphae
 nymphe
 nymphes
-o
-O
 ob
 obaerata
 obaerati
@@ -64155,8 +64125,6 @@ oxyporum
 oxyporus
 ozonii
 ozonium
-p
-P
 pabilli
 pabillus
 pabulari
@@ -71945,8 +71913,6 @@ pytisso
 pyxidis
 pyxidos
 pyxis
-q
-Q
 qua
 quaad
 quacumque
@@ -72578,8 +72544,6 @@ qur
 quum
 quumesitum
 quur
-r
-R
 rabbi
 rabbini
 rabbinus
@@ -75126,8 +75090,6 @@ rutus
 rythmica
 rythmicum
 rythmicus
-s
-S
 sabacthani
 Sabaoth
 sabath
@@ -81607,8 +81569,6 @@ systema
 systematis
 systyli
 systylos
-t
-T
 tabacaria
 tabacarium
 tabacarius
@@ -84436,8 +84396,6 @@ tyrotarichos
 tyrsi
 tyrsus
 Tyrus
-u
-U
 uber
 uberior
 uberis
@@ -85162,8 +85120,6 @@ uxorii
 uxoris
 uxorium
 uxorius
-v
-V
 va
 vacare
 vacatio
@@ -87064,8 +87020,6 @@ vultus
 vulva
 vulvae
 vumstum
-w
-W
 wadiarii
 wadiarius
 wadiator
@@ -87086,8 +87040,6 @@ werra
 werrae
 Wormacia
 Wormaciae
-x
-X
 xandici
 xandicus
 xenii
@@ -87129,13 +87081,9 @@ xysti
 xystici
 xysticus
 xystus
-y
-Y
 yata
 yatum
 yatus
-z
-Z
 zabuli
 zabulus
 zaeta

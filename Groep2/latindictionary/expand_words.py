@@ -28,20 +28,11 @@ matchesLines = [i.split(', ') for i in matchResult]
 
 matches = []
 i = 0
-import string
-lower =  string.ascii_lowercase
-upper = string.ascii_uppercase
-#print len(matches)
-for n in range(len(lower)):
-    matches.append(lower[n])
-    matches.append(upper[n])
-
 
 for matchLine in matchesLines:
     for word in matchLine:
         i += 1
-
-        if not word.isalpha() and (word != "-" and word != "(gen.)"):
+        if not word.isalpha() and (word != "-" and word != "(gen.)") and len(word)>1:
             if "(gen.)" in word:
                word = re.sub("\(gen.\)", "", word)
                matches.append(word)
@@ -107,8 +98,20 @@ for matchLine in matchesLines:
                 word = word.split()[0]
                 matches.append(word)
         else:
-            if word.isalpha():
+            if word.isalpha() and len(word)>1:
                 matches.append(word)
+
+import string
+lower =  string.ascii_lowercase
+upper = string.ascii_uppercase
+#print len(matches)
+for n in range(len(lower)):
+    if lower[n] in matches:
+        #print lower[n]
+        matches.remove(lower[n])
+    if upper[n] in matches:
+        #print upper[n]
+        matches.remove(upper[n])
 
 
 import locale
@@ -116,8 +119,21 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF-8') # vary depending on your lang/loc
 matches = unique(matches)
 matches2 = sorted(matches, cmp=locale.strcoll)
 
-if 'Q' in matches2:
-    print "hoi"
+
+for n in matches2:
+    if len(n)==1:
+        print 'match!'
+        matches2.remove(n)
+
+for n in matches2:
+    if len(n)==1:
+        matches2.remove(n)
+
+
+for n in matches2:
+    if len(n)==1:
+        print n
+
 
 
 with open ("WORDS_DICTPAGE2.txt", "w") as myfile:
