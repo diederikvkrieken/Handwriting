@@ -24,12 +24,14 @@ class charactercombine():
                             word = word+current_char
                         match = ''
 
+        """
         print "---SEGMENTS---"
         for char in segments:
             print char
 
         print "----WORD---"
         print word
+        """
 
         return word
 
@@ -65,7 +67,7 @@ class charactercombine():
 
                 currentCharCount += 1
 
-        print "OTHER: ", word
+        # print "OTHER: ", word
         return word
 
 

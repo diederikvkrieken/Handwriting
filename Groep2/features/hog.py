@@ -49,5 +49,5 @@ class HOG():
         return result
 
     def run(self, img):
-        print "Hogging"
+        # print "Hogging"
         return self.performHOG(img)

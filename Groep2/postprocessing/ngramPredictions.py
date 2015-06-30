@@ -227,7 +227,7 @@ class pathBuilder():
 
         results = []
         for options in segmentsOptions:
-            results.append(self.build(options, ngram))
+            results.append(self.buildDi(options, ngram))
 
         return results
 

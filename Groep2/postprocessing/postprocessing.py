@@ -95,7 +95,7 @@ class Postprocessing():
             predictions[1].pop(index)
 
         singleCharWinner = []
-        for word in singleCharArray[0]:
+        for word in singleCharArray:
             winner = ''
             for char in word[0][0]:
                 if char == '_':
@@ -138,7 +138,7 @@ class Postprocessing():
             predictions.pop(index)
 
         singleCharWinner = []
-        for word in singleCharArray[0]:
+        for word in singleCharArray:
             winner = ''
             for char in word[0][0]:
                 if char == '_':
@@ -157,7 +157,7 @@ class Postprocessing():
         segmentsOptions = self.reformatSegmentsOptions(predictions[0])
 
         # Return the results from the ngram matching.
-        return self.ngramPostProcessing(segmentsOptions, document), singleChars, singleCharWinner
+        return self.ngramPostProcessing(segmentsOptions, document, type=3), singleChars, singleCharWinner
 
     def runValidate(self, predictions, document = "KNMPSTANFORDDICT.dat"):
 
@@ -168,7 +168,7 @@ class Postprocessing():
         segmentsOptions = self.reformatSegmentsOptions(predictions)
 
         # Return the results from the ngram matching.
-        return self.ngramPostProcessing(segmentsOptions, document), singleChars, singleCharWinner
+        return self.ngramPostProcessing(segmentsOptions, document, type=3), singleChars, singleCharWinner
 
 
 
