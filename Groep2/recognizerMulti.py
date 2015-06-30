@@ -249,7 +249,7 @@ class Recognizer:
         jobs = pool.map(unwrap_self_wordParallel, zip([self]*len(wordsMerged), wordsMerged))
 
         # Build Dictionary
-        buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPSTANDFORDDICT.dat')
+        buildDictionary.DictionaryBuilder().writeWordsDict(jobs, 'KNMPSTANFORDDICT.dat')
 
         """
         # USELESS PEACE OF SHIT CODE
