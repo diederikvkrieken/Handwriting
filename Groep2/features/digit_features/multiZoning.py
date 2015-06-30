@@ -37,6 +37,6 @@ class MultiZoning():
         return featureMerged
 
     def run(self,image):
-        print "Multi Zoning"
+        # print "Multi Zoning"
         feature = self.doMultiZoning(image)
         return feature

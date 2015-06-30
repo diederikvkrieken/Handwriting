@@ -81,7 +81,7 @@ class EdgeMaps():
         return feature_vector
 
     def run(self,img):
-        print "Running Modified Edge Maps"
+        # print "Running Modified Edge Maps"
         feature = self.findEdgeMaps(img)
         return feature
 

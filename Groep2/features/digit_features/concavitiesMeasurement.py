@@ -162,7 +162,7 @@ class ConcavitiesMeasurement():
 
 
     def run(self, img):
-        print "Running Concavities Measurement"
+        # print "Running Concavities Measurement"
         # preprocess
         img, segments = self.scaleAndSegment(img)
 
