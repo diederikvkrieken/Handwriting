@@ -319,7 +319,7 @@ class Recognizer:
 
         ## Post processing
         ppPredictions, oneCharPredictions, oneCharWinners = pp.run(predictions)
-        winner = charactercombine.charactercombine().run(ppPredictions,0)
+        winner = charactercombine.charactercombine().run(ppPredictions[0],1)
 
         for i in range(len(oneCharPredictions[0])):
 
@@ -330,6 +330,7 @@ class Recognizer:
             else:
                 false += 1
 
+        print "WINNER: ", winner
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
             annotated = predictions[1][i][0]
@@ -343,7 +344,6 @@ class Recognizer:
 
         print "true: ", true
         print "false: ", false
-
 
     # Trains and tests on a single image
     def singleFile(self, ppm, inwords):
