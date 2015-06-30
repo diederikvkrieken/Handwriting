@@ -55,11 +55,11 @@ class Levenshtein_Distance():
         if sorted_results[0][1] != sorted_results[1][1]:
             return sorted_results[0]
         else:
-            print("We have multiple winners!")
+            # print("We have multiple winners!")
             return sorted_results[0]
 
     def run(self, words, trie):
-        print("Running the distance!")
+        # print("Running the distance!")
 
         MAX_COST = 2
         potential_winner = []
@@ -68,7 +68,7 @@ class Levenshtein_Distance():
             n = n[:]
             if len(n)>1:
                 results = self.search(n, MAX_COST ,trie)
-                print "RESULTS: ", results
+                # print "RESULTS: ", results
                 if results and len(results)>1:
                     potential_winner.append(self.decide_winner(results))
                 elif results:

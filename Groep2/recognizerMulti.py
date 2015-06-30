@@ -318,23 +318,28 @@ class Recognizer:
         false = 0
 
         ## Post processing
-        ppPredictions, OneCharPredictions, oneCharWinners = pp.run(predictions)
-
+        ppPredictions, oneCharPredictions, oneCharWinners = pp.run(predictions)
         winner = charactercombine.charactercombine().run(ppPredictions,0)
 
+        for i in range(len(oneCharPredictions[0])):
+
+            print "XML: %-*s  WINNER: %s" % (20,oneCharPredictions[1][i][0],oneCharWinners[i])
+
+            if oneCharWinners[i] == oneCharPredictions[1][i][0]:
+                true += 1
+            else:
+                false += 1
 
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
-            #for j in range(len(predictions[0][i])):
-                #segmentPredictions = predictions[0][i][j]
-                annotated = predictions[1][i][0]
-                print annotated, winner[i]
-                #print allpredictions[i]
-                print ppPredictions[i]
-                if annotated == winner[i]:
-                    true += 1
-                else:
-                    false += 1
+            annotated = predictions[1][i][0]
+
+            print "XML: %-*s  WINNER: %s" % (20,annotated,winner[i])
+
+            if annotated == winner[i]:
+                true += 1
+            else:
+                false += 1
 
         print "true: ", true
         print "false: ", false
@@ -392,25 +397,35 @@ class Recognizer:
         true = 0
         false = 0
 
-        ppPredictions, OneCharPredictions, oneCharWinners = pp.run(predictions)
+        ppPredictions, oneCharPredictions, oneCharWinners = pp.run(predictions)
 
         winner = charactercombine.charactercombine().run(ppPredictions, 0)
 
+
+        for i in range(len(oneCharPredictions[0])):
+
+            print "XML: %-*s  WINNER: %s" % (20,oneCharPredictions[1][i][0],oneCharWinners[i])
+
+            if oneCharWinners[i] == oneCharPredictions[1][i][0]:
+                true += 1
+            else:
+                false += 1
+
         # A debug print to ensure correct format of classification output
         for i in range(len(predictions[0])):
-            #for j in range(len(predictions[0][i])):
-                #segmentPredictions = predictions[0][i][j]
-                annotated = predictions[1][i][0]
-                print annotated, winner[i]
-                #print allpredictions[i]
-                #print ppPredictions[i]
-                if annotated == winner[i]:
-                    true += 1
-                else:
-                    false += 1
+            annotated = predictions[1][i][0]
+
+            print "XML: %-*s  WINNER: %s" % (20,annotated,winner[i])
+
+            if annotated == winner[i]:
+                true += 1
+            else:
+                false += 1
 
         print "true: ", true
         print "false: ", false
+
+
 
     # Go through folder, train and test on each file
     def oneFolder(self, ppm_folder, words_folder):
@@ -451,12 +466,13 @@ class Recognizer:
         predictions = cls.classify(jobsAsDictonary, 5)
 
         ## Post-processing
-        # Add function calls here that generate the finalWords and uncomment the last line
         ppPredictions, OneCharPredictions, oneCharWinners  = pp.runValidate(predictions)
+        winner = charactercombine.charactercombine().run(ppPredictions,1)
 
-        finalWords = oneCharWinners
+        ## Combine the finalwords array.
+        finalWords = oneCharWinners + winner
 
-        # prepper.saveXML(finalWords, inwords, outwords)
+        prepper.saveXML(finalWords, inwords, outwords)
 
 
 

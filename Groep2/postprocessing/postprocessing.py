@@ -92,7 +92,12 @@ class Postprocessing():
 
         singleCharWinner = []
         for word in singleCharArray[0]:
-            singleCharWinner.append(word[0][0][0])
+            winner = ''
+            for char in word[0][0]:
+                if char == '_':
+                    break
+                winner = winner + char
+            singleCharWinner.append(winner)
 
         return predictions, singleCharArray, singleCharWinner
 
