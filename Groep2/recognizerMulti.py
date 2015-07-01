@@ -541,10 +541,20 @@ class Recognizer:
             # Simply add job under key, which is the name of a feature
             jobsAsDictonary[combined[idx][2]] = job
 
-
         ## Classification
-        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
+        predictions = cls.oneWordsRunTEST(jobsAsDictonary)     # The all new super duper feature voting thingy
 
+        for featpred in predictions[0].iteritems():
+            predCount = 0
+            for pred in featpred[1]:
+                print '-----WORD----', predictions[1][predCount][0]
+                segmentCount = 0
+                for segment in pred:
+                    print "XML: %-*s  WINNER: %s" % (20,predictions[1][predCount][2][segmentCount], segment)
+                    segmentCount += 1
+                predCount += 1
+
+        return
         #-------------Start comparing segments here----------------
         true = 0
         false = 0
@@ -607,19 +617,21 @@ class Recognizer:
             # Simply add job under key, which is the name of a feature
             jobsAsDictonary[combined[idx][2]] = job
 
-        ## Classification
-        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary)     # The all new super duper feature voting thingy
+       ## Classification
+        predictions = cls.oneWordsRunTEST(jobsAsDictonary)     # The all new super duper feature voting thingy
 
         for featpred in predictions[0].iteritems():
+            print "-----FEAT----"
             predCount = 0
             for pred in featpred[1]:
-                print '-----WORD----', predictions[1][predCount]
-
+                print '-----WORD----', predictions[1][predCount][0]
+                segmentCount = 0
                 for segment in pred:
-                    print segment
-
+                    print "XML: %-*s  WINNER: %s" % (20,predictions[1][predCount][2][segmentCount], segment)
+                    segmentCount += 1
                 predCount += 1
 
+        return
         #-------------Start comparing segments here----------------
         true = 0
         false = 0
