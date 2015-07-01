@@ -20,6 +20,7 @@ class segmenter:
         compSeg = compareSegments.Comparator()
         return compSeg.compare(cs_columns, annotations)
 
+
     # Copied from prepImage, don't ask me what it does
     def ascender_descender(self, binary):
 
@@ -108,6 +109,7 @@ class segmenter:
         for x in SC_columns:
             crop  = imageBinary[0:imageBinary.shape[0], prev_x:x]
             extend_right_width = imageBinary.shape[1] - crop.shape[1] - prev_x
+
             crop = cv2.copyMakeBorder(crop, 0, 0, prev_x, extend_right_width, cv2.BORDER_CONSTANT,value=0)
 
             crop = cv2.bitwise_or(crop, asc_crop)
@@ -271,6 +273,7 @@ class segmenter:
         # calculate the y coordinates of the ascender (e.g. top part f) and descender (e.g. bottom part g) lines
         ascender, descender = self.ascender_descender(wordBinary)
 
+
         # step 1  of paper
         thin = thinning.thinning(wordBinary)
 
@@ -340,6 +343,160 @@ class segmenter:
         #end of drawing CSC's and CS's
 
         return self.crop_sc_areas(SC_columns, ascender, descender, wordBinary, wordGrayscale, x_start)
+
+
+        # # draw ascender and descender lines
+        # asc_desc = word.copy()
+        # cv2.line(asc_desc,(0,ascender),(asc_desc.shape[1] -1,ascender),(1),1)
+        # cv2.line(asc_desc,(0,descender),(asc_desc.shape[1],descender),(1),1)
+
+    # Segments a given word image
+    def segmentXML(self, wordBinary, wordGrayscale, wordXML):
+
+        # let's delete empty space first and remember how much x-axis pixels we removed from the left
+        #   ----------
+        #   |        |    ------
+        #   |  abcd  | => |abcd|
+        #   |        |    ------
+        #   ----------
+
+        cpy = wordBinary.copy()
+
+        if cv2.__version__[0] == '3':
+            # OpenCV 3 has an extra first return value
+            cnts = cv2.findContours(cpy, 0, 2)[1]
+        else:
+            cnts = cv2.findContours(cpy, 0, 2)[0]
+
+        x_start, y_start, width,height = cv2.boundingRect(cnts[0])
+        x_end = x_start + width;
+        for cnt in cnts:
+            xx_start,yy_start,width,hheight = cv2.boundingRect(cnt)
+            if xx_start < x_start:
+                x_start = xx_start
+            if yy_start < y_start:
+                y_start = yy_start
+            if x_end < (xx_start + width):
+                x_end = xx_start + width
+            if height < hheight:
+                height = hheight
+
+        # img[y: y + h, x: x + w]
+        wordBinary = wordBinary[y_start:y_start + height, x_start: x_end]
+        wordGrayscale = wordGrayscale[y_start:y_start + height, x_start: x_end]
+
+        #cv2.imshow("grayscale", wordGrayscale)
+        #cv2.waitKey(1)
+
+        # calculate the y coordinates of the ascender (e.g. top part f) and descender (e.g. bottom part g) lines
+        ascender, descender = self.ascender_descender(wordBinary)
+
+        """
+        # step 1  of paper
+        thin = thinning.thinning(wordBinary)
+
+        #Sum column and find CSC candidates. (step 2 of paper)
+        if cv2.__version__[0] == '3':
+            # OpenCV 3 does not contain the deprecated cv module
+            column_sum = cv2.reduce(thin, 0, cv2.REDUCE_SUM, dtype=cv2.CV_32F)
+        else:
+            column_sum = cv2.reduce(thin, 0, cv2.cv.CV_REDUCE_SUM, dtype=cv2.CV_32F)
+        CSC_columns = cv2.threshold(column_sum, 1.0, 1.0,cv2.THRESH_BINARY_INV)[1]
+        CSC_columns[0,0] = 1
+        CSC_columns[0,-1] = 1
+        CSC_columns = CSC_columns[0,:]
+
+        # apply step 3 and store
+        SC_columns = self.step3(CSC_columns, 2)
+
+
+        # # draw CSC's and CS's
+        # with_lines = thin.copy()
+        # with_lines_step3 = thin.copy()
+        # with_lines_step3_revised = thin.copy()
+        # thin_height, thin_width = thin.shape
+        #
+        # for x in SC_columns:
+        #     cv2.line(with_lines_step3,(x,0),(x,thin_height -1),(1),1)
+
+        step3_revisited_treshold = 10
+
+        # print "SC BEFORE STEP 3: ", SC_columns
+        SC_columns = self.step3_revisited(SC_columns, step3_revisited_treshold)
+        # print "SC After STEP 3", SC_columns
+
+
+
+        if len(SC_columns) >= 2:
+            if (SC_columns[len(SC_columns) -1] - SC_columns[len(SC_columns) -2]) < step3_revisited_treshold:
+                SC_columns[len(SC_columns) -2] = SC_columns[len(SC_columns) -1]
+                SC_columns.remove(len(SC_columns)-2)
+
+
+
+        step4_oversegmenting_Threshold = 20
+
+        newList = []
+        for i in range(len(SC_columns)):
+            if i != 0:
+                if not ((SC_columns[i] - SC_columns[i-1]) < step4_oversegmenting_Threshold):
+                    newList.append(SC_columns[i])
+
+
+        result = []
+        for SC_column in SC_columns:
+            if SC_column > step3_revisited_treshold:
+                result.append(SC_column)
+
+        if len(result) == 0:
+            result.append(wordBinary.shape[1])
+
+        SC_columns = result
+        print "SC OLD: ", SC_columns
+        """
+
+        # CREATE sc columns with From XML coords here and take into account that the last letter sometimes is longer then the binary cut.
+        SC_columns = []
+        wordXMLCount = 0
+        for letter in wordXML:
+                if letter[1] > wordBinary.shape[1]:
+                    SC_columns.append(wordBinary.shape[1])
+                    break
+                else:
+                    SC_columns.append(letter[1])
+
+                wordXMLCount += 1
+
+
+        # for x in SC_columns:
+        #     cv2.line(with_lines_step3_revised,(x,0),(x,thin_height -1),(1),1)
+        #
+        # cv2.imshow("segments", with_lines_step3 * 255)
+        # cv2.imshow("segments revisited", with_lines_step3_revised * 255)
+        # cv2.waitKey(0)
+        #end of drawing CSC's and CS's
+
+
+        cuts, chars = self.crop_sc_areas(SC_columns, ascender, descender, wordBinary, wordGrayscale, x_start)
+
+        # print "Entering for loop: ", len(cuts), " SC: ", len(SC_columns), " WORDXML LEN: ", len(wordXML)
+        # print "SC: ", SC_columns
+        # print "CUTS: ", cuts
+
+        letterCount = 0
+        segs = []
+        for letter in wordXML:
+                if letterCount > len(cuts)-1:
+                    break
+                elif letter[1] > wordBinary.shape[1]:
+                    segs.append([cuts[letterCount], letter[2]])
+                    break
+                else:
+                    segs.append([cuts[letterCount], letter[2]])
+                letterCount += 1
+        # print "WORDXML", wordXML
+        # print "SEGS: ", segs
+        return segs, chars
 
 
         # # draw ascender and descender lines

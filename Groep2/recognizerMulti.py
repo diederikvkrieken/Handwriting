@@ -29,6 +29,9 @@ def unwrap_self_wordParallel(arg, **kwarg):
 def unwrap_self_allFeatParallel(arg, **kwarg):
     return Recognizer.allFeatParallel(*arg, **kwarg)
 
+def unwrap_self_allFeatParallelXML(arg, **kwarg):
+    return Recognizer.allFeatParallelXML(*arg, **kwarg)
+
 # Variant used during validation
 def unwrap_self_validateFeatParallel(arg, **kwarg):
     return Recognizer.validateFeatParallel(*arg, **kwarg)
@@ -54,33 +57,6 @@ class Recognizer:
         # Obtain features of all segments
         for char, s in zip(chars, segs):
             word[3].append((feat.HOG(char[1]), s[1]))
-
-        return word
-
-    def wordParallelMultiFeat(self, combined):
-
-        print "RUNNING ALL FEAT PARALLEL"
-        word = combined[0]
-        f = combined[1]
-
-        ## Character segmentation
-        cuts, chars = cs.segment(word[0][0], word[0][1])
-
-        segs = cs.annotate(cuts, word[2])
-
-        assert len(chars) == len(segs) #Safety check did the segmenting go correctly
-
-        # Feature extraction
-        word = list(word)
-        word.append([])     # Add empty list for features and classes
-
-        # Obtain features of all segments
-        for char, s in zip(chars, segs):
-            # Extract features from each segment, include labeling
-            if f[1] == 0:
-                word[3].append((f[0].run(char[0]), s[1]))
-            elif f[1] == 1:
-                word[3].append((f[0].run(char[1]), s[1]))
 
         return word
 
@@ -110,6 +86,48 @@ class Recognizer:
                 for imgseg in chars:
                     cv2.imshow("IMG", imgseg[0] * 255)
                     cv2.waitKey()
+            """
+            assert len(chars) == len(segs), "#Safety check did the segmenting go correctly len chars: %d, len segs %d" % (len(chars), len(segs))
+
+            ## Feature extraction
+            word = list(word)
+            word.append([])     # Add empty list for features and classes
+
+            # Obtain features of all segments
+            for char, s in zip(chars, segs):
+                # Extract features from each segment, include labeling
+                if f[1] == 0:
+                    word[3].append((f[0].run(char[0]), s[1]))
+                elif f[1] == 1:
+                    word[3].append((f[0].run(char[1]), s[1]))
+
+            featureResults.append(word)     # Word is ready for classification
+
+        return featureResults
+
+    def allFeatParallelXML(self, combined):
+
+        featureResults = []
+
+        preppedWords = combined[0]
+        f = combined[1]
+
+        print f
+        # Consider all words
+
+
+        for word in preppedWords:
+            ## Character segmentation
+            segs, chars = cs.segmentXML(word[0][0], word[0][1], word[2])
+
+            # DEBUG CODE
+            """
+            print "WORD: ", word[1]
+            print "Words", word[2]
+            print "Segs: ", segs
+            for imgseg in chars:
+                cv2.imshow("IMG", imgseg[0] * 255)
+                cv2.waitKey()
             """
             assert len(chars) == len(segs), "#Safety check did the segmenting go correctly len chars: %d, len segs %d" % (len(chars), len(segs))
 
@@ -463,7 +481,7 @@ class Recognizer:
                 ## Pass on to single file procedure
                 ppm = ppm_folder + '/' + file   # ENTIRE path of course..
                 inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
-                self.singleFileAllFeat(ppm, inwords)
+                self.singleFileAllFeatXML(ppm, inwords)
 
     # Standard run for validation by instructors
     def validate(self, ppm, inwords, outwords):
@@ -500,6 +518,133 @@ class Recognizer:
         prepper.saveXML(finalWords, inwords, outwords)
 
 
+    # Trains and tests on a single image and all features
+    def singleFileAllFeatXML(self, ppm, inwords):
+
+        ## Preprocessing
+        wordsInter = prepper.prep(ppm, inwords)
+
+        # USELESS PEACE OF SHIT CODE
+        combined = []
+
+        for fName, f in feat.featureMethods.iteritems():
+            combined.append([wordsInter, f, fName])
+
+        ## Prarallel feature extraction.
+        print "Starting job"
+        jobs = pool.map(unwrap_self_allFeatParallelXML, zip([self]*len(combined), combined))
+
+        # Turn jobs into dictionary
+        jobsAsDictonary = {}
+
+        for idx, job in enumerate(jobs):
+            # Simply add job under key, which is the name of a feature
+            jobsAsDictonary[combined[idx][2]] = job
+
+
+        ## Classification
+        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
+
+        #-------------Start comparing segments here----------------
+        true = 0
+        false = 0
+        ignore = 0
+
+        for i in range(len(predictions[0])):
+            print "------------- ", predictions[1][i][0], " ---------------------------"
+            # print "LEN ORIG: ", len(predictions[1][i][1])
+            # print "LEN PRED: ", len(predictions[0][i])
+
+            if len(predictions[0][i]) != len(predictions[1][i][1]):
+                ignore += 1
+            else:
+                for k in range(len(predictions[0][i])):
+                    print "XML: %-*s  WINNER: %s" % (20,predictions[1][i][1][k], predictions[0][i][k][0][0])
+                    if predictions[0][i][k][0][0] == predictions[1][i][1][k]:
+                        true += 1
+                    else:
+                        false += 1
+
+        print "Ignored Segments: ", ignore
+        print "Correct Segments: ", true
+        print "Incorrect Segments: ", false
+        print "DONE"
+
+
+    # Running all the features WARNING this will take an extremely long time!
+    def allFeaturesXML(self, ppm_folder, words_folder):
+
+        wordsInter = []
+
+        for file in os.listdir(ppm_folder):
+            print file
+            if file.endswith('.ppm') or file.endswith('.jpg'):
+                ## Read and preprocess
+                ppm = ppm_folder + '/' + file   # ENTIRE path of course..
+                inwords = words_folder + '/' + os.path.splitext(file)[0] + '.words'
+                wordsInter.append(prepper.prep(ppm, inwords))
+
+        #Combine words
+        wordsMerged = []
+        for w in wordsInter:
+            w = np.array(w)
+            wordsMerged += w.tolist()
+
+        # USELESS PEACE OF SHIT CODE
+        combined = []
+
+        for fName, f in feat.featureMethods.iteritems():
+            combined.append([wordsMerged, f, fName])
+
+        ## Prarallel feature extraction.
+        print "Starting job"
+        jobs = pool.map(unwrap_self_allFeatParallelXML, zip([self]*len(combined), combined))
+
+        # Turn jobs into dictionary
+        jobsAsDictonary = {}
+
+        for idx, job in enumerate(jobs):
+            # Simply add job under key, which is the name of a feature
+            jobsAsDictonary[combined[idx][2]] = job
+
+        ## Classification
+        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary)     # The all new super duper feature voting thingy
+
+        for featpred in predictions[0].iteritems():
+            predCount = 0
+            for pred in featpred[1]:
+                print '-----WORD----', predictions[1][predCount]
+
+                for segment in pred:
+                    print segment
+
+                predCount += 1
+
+        #-------------Start comparing segments here----------------
+        true = 0
+        false = 0
+        ignore = 0
+
+        for i in range(len(predictions[0])):
+            print "------------- ", predictions[1][i][0], " ---------------------------"
+            # print "LEN ORIG: ", len(predictions[1][i][1])
+            # print "LEN PRED: ", len(predictions[0][i])
+
+            if len(predictions[0][i]) != len(predictions[1][i][1]):
+                ignore += 1
+            else:
+                for k in range(len(predictions[0][i])):
+                    print "XML: %-*s  WINNER: %s" % (20,predictions[1][i][1][k], predictions[0][i][k][0])
+                    if predictions[0][i][k][0][0] == predictions[1][i][1][k]:
+                        true += 1
+                    else:
+                        false += 1
+
+        print "Ignored Segments: ", ignore
+        print "Correct Segments: ", true
+        print "Incorrect Segments: ", false
+        print "DONE"
+
 
 if __name__ == "__main__":
 
@@ -535,12 +680,17 @@ if __name__ == "__main__":
             elif sys.argv[2] == 'singleAllFeat':
                 # Train and test on one file
                 r.singleFileAllFeat(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'singleAllFeatXML':
+                r.singleFileAllFeatXML(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'onefolder':
                 # Train and test on each file in a folder
                 r.oneFolder(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'experimentAllFeat':
                 # Train and test on one file
                 r.allFeatures(sys.argv[3], sys.argv[4])
+            elif sys.argv[2] == 'experimentAllFeatXML':
+                # Train and test on one file
+                r.allFeaturesXML(sys.argv[3], sys.argv[4])
             elif sys.argv[2] == 'experiment':
                 # Run our experiment
                 r.folders(sys.argv[3], sys.argv[4])

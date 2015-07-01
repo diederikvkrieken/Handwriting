@@ -95,7 +95,7 @@ class Postprocessing():
             predictions[1].pop(index)
 
         singleCharWinner = []
-        for word in singleCharArray:
+        for word in singleCharArray[0]:
             winner = ''
             for char in word[0][0]:
                 if char == '_':
