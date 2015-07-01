@@ -542,8 +542,9 @@ class Recognizer:
             jobsAsDictonary[combined[idx][2]] = job
 
         ## Classification
-        predictions = cls.oneWordsRunTEST(jobsAsDictonary)     # The all new super duper feature voting thingy
+        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
 
+        """
         for featpred in predictions[0].iteritems():
             predCount = 0
             for pred in featpred[1]:
@@ -555,6 +556,7 @@ class Recognizer:
                 predCount += 1
 
         return
+        """
         #-------------Start comparing segments here----------------
         true = 0
         false = 0
@@ -618,8 +620,9 @@ class Recognizer:
             jobsAsDictonary[combined[idx][2]] = job
 
        ## Classification
-        predictions = cls.oneWordsRunTEST(jobsAsDictonary)     # The all new super duper feature voting thingy
+        predictions = cls.featureClassificationWithOriginal(jobsAsDictonary, 5)     # The all new super duper feature voting thingy
 
+        """
         for featpred in predictions[0].iteritems():
             print "-----FEAT----"
             predCount = 0
@@ -632,6 +635,7 @@ class Recognizer:
                 predCount += 1
 
         return
+        """
         #-------------Start comparing segments here----------------
         true = 0
         false = 0
