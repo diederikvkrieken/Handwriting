@@ -25,31 +25,31 @@ class Classification():
     # Prepare all classifiers
     def __init__(self):
         # Dictionary of all classifiers
-        self.classifiers = {'RF': RF.RandomForest('RF'),
-                            'VRF': RF.RandomForest('VRF'),  # Random Forest for stacking
-                            'WRF': RF.RandomForest('WRF'),  # Another Random Forest for word classification
+        self.classifiers = {'Stack': kn.KNeighbour(3, 'Stack'),  # Stacking classifier
+                            # 'RF': RF.RandomForest('RF'),
+                            # 'WRF': RF.RandomForest('WRF'),  # Word classifier
                             # 'GB': GB.GBC('GB'),
                             #'SVM': svm.SVM('SVM'),
                             #'KM': km.KMeans(30, 'KM'),
-                            #'KN': kn.KNeighbour(3, 'KN')
+                            'KN': kn.KNeighbour(3, 'KN')
                             }
         # Dictionary of performances
-        self.perf = {'RF': [],
-                     'VRF': [],
-                     'WRF': [],
+        self.perf = {'Stack': [],
+                     # 'RF': [],
+                     # 'WRF': [],
                      # 'GB': [],
                      #'SVM': [],
                      #'KM': [],
-                     #'KN': []
+                     'KN': []
                      }
         # Confusion matrices
-        self.cm = {'RF': [],
-                   'VRF': [],
-                   'WRF': [],
+        self.cm = {'Stack': [],
+                   # 'RF': [],
+                   # 'WRF': [],
                    # 'GB': [],
                    # 'SVM': [],
                    # 'KM': [],
-                   # 'KN': []
+                   'KN': []
                    }
         # Length character vectors should be appended to for word classification
         self.max_seg = 30
@@ -68,7 +68,7 @@ class Classification():
 
         feat = combined[0]
         goal = combined[1]
-        trainingAlgorithm = combined[2] # I found it scarry to name this value classifier since it is actually a classifier, for example SVM
+        trainingAlgorithm = combined[2] # I found it scary to name this value classifier since it is actually a classifier, for example SVM
         print trainingAlgorithm
         return trainingAlgorithm.trainAll(feat, goal)
 
@@ -218,7 +218,7 @@ class Classification():
                 goal.append(word[2][seg])
         # Train a random forest for character classification
         print 'Training character classifier!'
-        self.classifiers['RF'].train(feat, goal)
+        self.classifiers['KN'].train(feat, goal)
 
     # Trains the stacking classifier on predictions of all features
     def voterTrain(self):
@@ -251,7 +251,7 @@ class Classification():
 
         # Train stacking classifier on predicted characters
         print 'Training stacking approach!'
-        self.classifiers['VRF'].train(feat, goal)
+        self.classifiers['Stack'].train(feat, goal)
 
     # Trains a word classifier for word classification as pre-processing
     # NOTICE: depends on a call to characterTrain()!!
@@ -320,7 +320,7 @@ class Classification():
     # Loads a character classifier. NOTE that since we're only using RF, it is put in there.
     def loadCharClassifier(self, cln):
         f = open(cln + '.pkl')
-        self.classifiers['RF'] = pickle.load(f)
+        self.classifiers['KN'] = pickle.load(f)
         f.close()
 
     # Loads a particular classifier
@@ -359,7 +359,7 @@ class Classification():
             # On all words in the test set
             if len(word[1]) > 0:
                 # If the word actually has characters...
-                prediction = self.classifiers['RF'].testTopN(word[1], n)  # Predict the characters
+                prediction = self.classifiers['KN'].testTopN(word[1], n)  # Predict the characters
 
                 # Add to dictionaries
                 self.predTrainChar[fName].append(prediction)
@@ -371,7 +371,7 @@ class Classification():
             # On all words in the test set
             if len(word[1]) > 0:
                 # If the word actually has characters...
-                prediction = self.classifiers['RF'].testTopN(word[1], n)  # Predict the characters
+                prediction = self.classifiers['KN'].testTopN(word[1], n)  # Predict the characters
 
                 # Add to dictionaries
                 self.predTestChar[fName].append(prediction)
@@ -405,7 +405,7 @@ class Classification():
                 self.bestChar.append([[('o', 0.2), ('s', 0.2), ('a', 0.2), ('b', 0.2), ('t', 0.2)]])
             else:
                 # Let stacking classifier predict character based on predicted characters
-                self.bestChar.append(self.classifiers['VRF'].nTopProb(feat, n))
+                self.bestChar.append(self.classifiers['Stack'].nTopProb(feat, n))
 
     # Test word classification
     def wordTest(self):
@@ -464,7 +464,7 @@ class Classification():
             # On all words in the test set
             if len(word[1]) > 0:
                 # If the word actually has characters...
-                prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
+                prediction = self.classifiers['KN'].test(word[1])  # Predict the characters
                 self.n_char += len(word[1])
 
                 self.trainPredictions[-1].append(prediction)
@@ -474,7 +474,7 @@ class Classification():
             # On all words in the test set
             if len(word[1]) > 0:
                 # If the word actually has characters...
-                prediction = self.classifiers['RF'].test(word[1])  # Predict the characters
+                prediction = self.classifiers['KN'].test(word[1])  # Predict the characters
                 self.n_char += len(word[1])
 
                 self.testPredictions[-1].append(prediction)
@@ -719,16 +719,16 @@ class Classification():
             # Train character classifier and let it predict as to generate input for training stacking
             print 'Training a character classifier for feature', fName + '.'
             self.characterTrain()           # Note that training discards the current model
-            f = open(fName + '_RF.pkl', mode='a')
-            pickle.dump(self.classifiers['RF'], f)   # Save to disk
+            f = open(fName + '_KN.pkl', mode='a')
+            pickle.dump(self.classifiers['KN'], f)   # Save to disk
             f.close()
             self.characterTest(fName, n)    # Generate top predictions for this feature
 
         # Lastly train stacking classifier
         print 'Almost there! Sassy stacking is being trained.'
         self.voterTrain()   # Small notice, self.words is based on last feature...
-        f = open('VRF.pkl', mode='a')
-        pickle.dump(self.classifiers['VRF'], f)   # and save to disk
+        f = open('Stack.pkl', mode='a')
+        pickle.dump(self.classifiers['Stack'], f)   # and save to disk
         f.close()
         print 'Done! You can look in awe at the abundance of files hugging your disk!'
 
@@ -760,11 +760,11 @@ class Classification():
             # Prepare feature data for validation
             self.valData(feature)
             # Load in the trained character classifier for this feature
-            self.loadCharClassifier(fName + '_RF')
+            self.loadCharClassifier(fName + '_KN')
             self.characterTest(fName, n)    # Predict n most probable characters according to feature
 
         # Load stacking classifier and make it predict n most probable characters
-        self.loadClassifier('VRF')
+        self.loadClassifier('Stack')
         self.voterTest(n)   # Small notice, self.words is based on last feature...
 
         # Send on to post processing
